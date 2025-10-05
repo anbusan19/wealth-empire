@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { ChevronRight, ChevronLeft, Check, AlertTriangle, Building, FileText, Shield, Award, TrendingUp, Play, Loader2 } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
+import { calculateScores } from '../utils/scoringSystem';
 import ResultsDashboard from './ResultsDashboard';
 import ReportView from './ReportView';
 
@@ -188,6 +190,9 @@ export default function QuestionFlow() {
   const [companyData, setCompanyData] = useState<CompanyData | null>(null);
   const [isLoadingCompany, setIsLoadingCompany] = useState(false);
   const [companyError, setCompanyError] = useState<string | null>(null);
+  const [isSavingResults, setIsSavingResults] = useState(false);
+
+  const { currentUser } = useAuth();
 
   const question = healthCheckupQuestions[currentQuestion];
   const progress = ((currentQuestion + 1) / healthCheckupQuestions.length) * 100;
@@ -230,7 +235,7 @@ export default function QuestionFlow() {
     setCompanyError(null);
 
     try {
-      const response = await fetch(`http://localhost:3000/company/${cin}`);
+      const response = await fetch(`https://node-mca.onrender.com/company/${cin}`);
       const data: CompanyData = await response.json();
 
       if (data.success) {
@@ -247,12 +252,62 @@ export default function QuestionFlow() {
     }
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (currentQuestion < healthCheckupQuestions.length - 1) {
       setCurrentQuestion(currentQuestion + 1);
       setShowFollowUp(false);
     } else {
+      // Complete the questionnaire and save results
+      await completeQuestionnaire();
+    }
+  };
+
+  const completeQuestionnaire = async () => {
+    setIsSavingResults(true);
+
+    try {
+      // Calculate scores using the scoring system
+      const results = calculateScores(answers, followUpAnswers);
+
+      // Save results to backend
+      if (currentUser) {
+        const idToken = await currentUser.getIdToken();
+
+        const response = await fetch('http://localhost:3001/api/health-check/save-results', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${idToken}`,
+            'x-firebase-uid': currentUser.uid,
+            'x-user-email': currentUser.email || ''
+          },
+          body: JSON.stringify({
+            firebaseUid: currentUser.uid,
+            overallScore: results.overallScore,
+            categoryScores: results.categoryScores,
+            answers,
+            followUpAnswers,
+            strengths: results.strengths,
+            redFlags: results.redFlags,
+            risks: results.riskForecast.risks
+          })
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || 'Failed to save results');
+        }
+
+        console.log('Health check results saved successfully');
+      }
+
       setIsCompleted(true);
+    } catch (error: any) {
+      console.error('Error saving health check results:', error);
+      // Still show results even if saving fails
+      setIsCompleted(true);
+    } finally {
+      setIsSavingResults(false);
     }
   };
 
@@ -356,14 +411,14 @@ export default function QuestionFlow() {
         </section>
 
         {/* Results Dashboard */}
-        <ResultsDashboard 
-          companyData={companyData} 
+        <ResultsDashboard
+          companyData={companyData}
           answers={answers}
           followUpAnswers={followUpAnswers}
         />
 
         {/* Report View with Recommendations */}
-        <ReportView 
+        <ReportView
           answers={answers}
           followUpAnswers={followUpAnswers}
         />

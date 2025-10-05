@@ -1,10 +1,13 @@
-import { Menu, X } from 'lucide-react';
+import { Menu, X, User, LogOut } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  const { currentUser, logout } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -34,9 +37,6 @@ export default function Navigation() {
               <Link to="/health-check" className="nav-link text-gray-700 hover:text-gray-900 transition-all duration-300 text-sm font-medium relative">
                 Health Check
               </Link>
-              <a href="#services" className="nav-link text-gray-700 hover:text-gray-900 transition-all duration-300 text-sm font-medium relative">
-                Services
-              </a>
               <a href="#pricing" className="nav-link text-gray-700 hover:text-gray-900 transition-all duration-300 text-sm font-medium relative">
                 Pricing
               </a>
@@ -49,9 +49,42 @@ export default function Navigation() {
             </div>
 
             <div className="hidden md:flex items-center space-x-3 lg:space-x-4">
-              <button className="text-gray-700 hover:text-gray-900 transition-all duration-300 text-sm font-medium px-3 lg:px-4 py-2 rounded-lg hover:bg-white/50">
-                Login
-              </button>
+              {currentUser ? (
+                <div className="relative">
+                  <button
+                    onClick={() => setShowUserMenu(!showUserMenu)}
+                    className="flex items-center gap-2 text-gray-700 hover:text-gray-900 transition-all duration-300 text-sm font-medium px-3 lg:px-4 py-2 rounded-lg hover:bg-white/50"
+                  >
+                    <User size={16} />
+                    {currentUser.displayName || currentUser.email?.split('@')[0]}
+                  </button>
+                  
+                  {showUserMenu && (
+                    <div className="absolute right-0 mt-2 w-48 bg-white/90 backdrop-blur-xl rounded-xl shadow-lg border border-white/20 py-2 z-50">
+                      <div className="px-4 py-2 text-sm text-gray-600 border-b border-gray-200">
+                        {currentUser.email}
+                      </div>
+                      <button
+                        onClick={() => {
+                          logout();
+                          setShowUserMenu(false);
+                        }}
+                        className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-white/50 flex items-center gap-2"
+                      >
+                        <LogOut size={16} />
+                        Sign Out
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <Link 
+                  to="/login" 
+                  className="text-gray-700 hover:text-gray-900 transition-all duration-300 text-sm font-medium px-3 lg:px-4 py-2 rounded-lg hover:bg-white/50"
+                >
+                  Login
+                </Link>
+              )}
               <Link to="/health-check" className="bg-gradient-to-r from-gray-900 to-gray-700 text-white px-4 lg:px-6 py-2 lg:py-2.5 rounded-xl hover:from-gray-800 hover:to-gray-600 transition-all duration-300 text-xs lg:text-sm font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 inline-block">
                 Start Health Check
               </Link>
@@ -85,9 +118,31 @@ export default function Navigation() {
                 Contact
               </a>
               <div className="pt-3 space-y-3 border-t border-white/20">
-                <button className="w-full text-gray-700 hover:text-gray-900 py-3 px-3 text-left rounded-lg hover:bg-white/50 transition-all duration-300">
-                  Login
-                </button>
+                {currentUser ? (
+                  <>
+                    <div className="px-3 py-2 text-sm text-gray-600">
+                      {currentUser.email}
+                    </div>
+                    <button
+                      onClick={() => {
+                        logout();
+                        setIsMenuOpen(false);
+                      }}
+                      className="w-full text-gray-700 hover:text-gray-900 py-3 px-3 text-left rounded-lg hover:bg-white/50 transition-all duration-300 flex items-center gap-2"
+                    >
+                      <LogOut size={16} />
+                      Sign Out
+                    </button>
+                  </>
+                ) : (
+                  <Link 
+                    to="/login" 
+                    className="w-full text-gray-700 hover:text-gray-900 py-3 px-3 text-left rounded-lg hover:bg-white/50 transition-all duration-300"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Login
+                  </Link>
+                )}
                 <Link to="/health-check" className="w-full bg-gradient-to-r from-gray-900 to-gray-700 text-white px-6 py-3 rounded-xl hover:from-gray-800 hover:to-gray-600 transition-all duration-300 shadow-lg inline-block text-center" onClick={() => setIsMenuOpen(false)}>
                   Start Health Check
                 </Link>
