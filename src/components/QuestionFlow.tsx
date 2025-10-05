@@ -356,10 +356,17 @@ export default function QuestionFlow() {
         </section>
 
         {/* Results Dashboard */}
-        <ResultsDashboard companyData={companyData} />
+        <ResultsDashboard 
+          companyData={companyData} 
+          answers={answers}
+          followUpAnswers={followUpAnswers}
+        />
 
         {/* Report View with Recommendations */}
-        <ReportView />
+        <ReportView 
+          answers={answers}
+          followUpAnswers={followUpAnswers}
+        />
 
         {/* Footer */}
         <footer className="bg-white py-16 px-6">

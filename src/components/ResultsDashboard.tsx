@@ -1,110 +1,7 @@
 import React from 'react';
 import { Download, CheckCircle, AlertTriangle, TrendingUp, FileText, Loader2 } from 'lucide-react';
 import generatePDF from '../utils/pdfGenerator';
-
-interface CategoryScore {
-  category: string;
-  score: number;
-  color: string;
-  bgColor: string;
-  insights: string;
-  status: 'excellent' | 'good' | 'needs-attention' | 'critical';
-}
-
-interface ComplianceData {
-  overallScore: number;
-  categoryScores: CategoryScore[];
-  strengths: string[];
-  redFlags: string[];
-  riskForecast: {
-    period: string;
-    risks: Array<{
-      type: string;
-      penalty: string;
-      probability: 'high' | 'medium' | 'low';
-    }>;
-  };
-}
-
-const complianceData: ComplianceData = {
-  overallScore: 77,
-  categoryScores: [
-    {
-      category: 'Legal',
-      score: 95,
-      color: 'text-green-700',
-      bgColor: 'bg-gradient-to-br from-green-100 to-green-200',
-      insights: 'Company registration and MCA compliance are excellent.',
-      status: 'excellent'
-    },
-    {
-      category: 'Tax',
-      score: 82,
-      color: 'text-blue-700',
-      bgColor: 'bg-gradient-to-br from-blue-100 to-blue-200',
-      insights: 'GST filings current, ITR needs attention.',
-      status: 'good'
-    },
-    {
-      category: 'IP',
-      score: 45,
-      color: 'text-orange-700',
-      bgColor: 'bg-gradient-to-br from-orange-100 to-orange-200',
-      insights: 'Trademark registration pending, no patent protection.',
-      status: 'needs-attention'
-    },
-    {
-      category: 'Certification',
-      score: 30,
-      color: 'text-red-700',
-      bgColor: 'bg-gradient-to-br from-red-100 to-red-200',
-      insights: 'Missing ISO certification and industry licenses.',
-      status: 'critical'
-    },
-    {
-      category: 'Finance',
-      score: 88,
-      color: 'text-green-700',
-      bgColor: 'bg-gradient-to-br from-emerald-100 to-emerald-200',
-      insights: 'Good bookkeeping practices, audit compliance maintained.',
-      status: 'excellent'
-    }
-  ],
-  strengths: [
-    'Company legally incorporated with valid CIN',
-    'MCA annual returns filed on time',
-    'GST registration active and compliant',
-    'Proper financial record maintenance',
-    'Regular audit compliance'
-  ],
-  redFlags: [
-    'Trademark application not filed',
-    'Missing ISO 9001 certification',
-    'No patent protection for unique technology',
-    'Industry-specific licenses pending',
-    'DIN KYC pending for 1 director'
-  ],
-  riskForecast: {
-    period: '6-Month Risk Forecast',
-    risks: [
-      {
-        type: 'Trademark Infringement Risk',
-        penalty: '₹2-5 Lakhs + Legal Costs',
-        probability: 'high'
-      },
-      {
-        type: 'ISO Certification Delays',
-        penalty: 'Lost Business Opportunities',
-        probability: 'medium'
-      },
-      {
-        type: 'Director KYC Penalty',
-        penalty: '₹5,000 per director',
-        probability: 'low'
-      }
-    ]
-  }
-};
+import { calculateScores } from '../utils/scoringSystem';
 
 interface ResultsDashboardProps {
   companyData?: {
@@ -115,10 +12,17 @@ interface ResultsDashboardProps {
       }>;
     };
   } | null;
+  answers: Record<number, string>;
+  followUpAnswers: Record<number, string>;
 }
 
-export default function ResultsDashboard({ companyData }: ResultsDashboardProps = {}) {
+export default function ResultsDashboard({ companyData, answers, followUpAnswers }: ResultsDashboardProps) {
   const [isGeneratingPDF, setIsGeneratingPDF] = React.useState(false);
+
+  // Calculate dynamic scores based on user answers
+  const complianceData = React.useMemo(() => {
+    return calculateScores(answers, followUpAnswers);
+  }, [answers, followUpAnswers]);
 
   const generatePDFReport = async () => {
     try {
@@ -151,6 +55,7 @@ export default function ResultsDashboard({ companyData }: ResultsDashboardProps 
       setIsGeneratingPDF(false);
     }
   };
+
   return (
     <section className="py-16 sm:py-24 px-4 sm:px-6 lg:px-8 bg-white">
       <div className="max-w-7xl mx-auto">
@@ -174,6 +79,23 @@ export default function ResultsDashboard({ companyData }: ResultsDashboardProps 
               </div>
               <div className="text-6xl sm:text-7xl font-bold mb-2">{complianceData.overallScore}</div>
               <div className="text-lg text-gray-400">out of 100</div>
+              
+              {/* Score Status Badge */}
+              <div className="mt-4">
+                <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${
+                  complianceData.overallScore >= 80 
+                    ? 'bg-green-100 text-green-800' 
+                    : complianceData.overallScore >= 60 
+                    ? 'bg-yellow-100 text-yellow-800' 
+                    : 'bg-red-100 text-red-800'
+                }`}>
+                  {complianceData.overallScore >= 80 
+                    ? 'EXCELLENT' 
+                    : complianceData.overallScore >= 60 
+                    ? 'GOOD' 
+                    : 'NEEDS IMPROVEMENT'}
+                </span>
+              </div>
             </div>
             <button
               onClick={generatePDFReport}
@@ -224,12 +146,18 @@ export default function ResultsDashboard({ companyData }: ResultsDashboardProps 
               <h3 className="text-xl font-bold text-green-900">Strengths</h3>
             </div>
             <div className="space-y-3">
-              {complianceData.strengths.map((strength, index) => (
-                <div key={index} className="flex items-start gap-3">
-                  <CheckCircle className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
-                  <span className="text-sm text-green-800">{strength}</span>
+              {complianceData.strengths.length > 0 ? (
+                complianceData.strengths.map((strength, index) => (
+                  <div key={index} className="flex items-start gap-3">
+                    <CheckCircle className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                    <span className="text-sm text-green-800">{strength}</span>
+                  </div>
+                ))
+              ) : (
+                <div className="text-sm text-green-700 italic">
+                  Complete more compliance items to build your strengths
                 </div>
-              ))}
+              )}
             </div>
           </div>
 
@@ -240,12 +168,18 @@ export default function ResultsDashboard({ companyData }: ResultsDashboardProps 
               <h3 className="text-xl font-bold text-red-900">Red Flags</h3>
             </div>
             <div className="space-y-3">
-              {complianceData.redFlags.map((flag, index) => (
-                <div key={index} className="flex items-start gap-3">
-                  <AlertTriangle className="w-4 h-4 text-red-600 mt-0.5 flex-shrink-0" />
-                  <span className="text-sm text-red-800">{flag}</span>
+              {complianceData.redFlags.length > 0 ? (
+                complianceData.redFlags.map((flag, index) => (
+                  <div key={index} className="flex items-start gap-3">
+                    <AlertTriangle className="w-4 h-4 text-red-600 mt-0.5 flex-shrink-0" />
+                    <span className="text-sm text-red-800">{flag}</span>
+                  </div>
+                ))
+              ) : (
+                <div className="text-sm text-red-700 italic">
+                  Great! No critical compliance issues identified
                 </div>
-              ))}
+              )}
             </div>
           </div>
         </div>
@@ -256,20 +190,29 @@ export default function ResultsDashboard({ companyData }: ResultsDashboardProps 
             <TrendingUp className="w-6 h-6 text-orange-600" />
             <h3 className="text-xl font-bold text-orange-900">{complianceData.riskForecast.period}</h3>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {complianceData.riskForecast.risks.map((risk, index) => (
-              <div key={index} className="bg-white rounded-lg p-4 border border-orange-200">
-                <div className={`inline-block px-2 py-1 rounded-full text-xs font-semibold mb-3 ${risk.probability === 'high' ? 'bg-red-100 text-red-800' :
-                  risk.probability === 'medium' ? 'bg-yellow-100 text-yellow-800' :
+          {complianceData.riskForecast.risks.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {complianceData.riskForecast.risks.map((risk, index) => (
+                <div key={index} className="bg-white rounded-lg p-4 border border-orange-200">
+                  <div className={`inline-block px-2 py-1 rounded-full text-xs font-semibold mb-3 ${
+                    risk.probability === 'high' ? 'bg-red-100 text-red-800' :
+                    risk.probability === 'medium' ? 'bg-yellow-100 text-yellow-800' :
                     'bg-green-100 text-green-800'
                   }`}>
-                  {risk.probability.toUpperCase()} RISK
+                    {risk.probability.toUpperCase()} RISK
+                  </div>
+                  <h4 className="font-semibold text-gray-900 mb-2 text-sm">{risk.type}</h4>
+                  <p className="text-xs text-gray-600">{risk.penalty}</p>
                 </div>
-                <h4 className="font-semibold text-gray-900 mb-2 text-sm">{risk.type}</h4>
-                <p className="text-xs text-gray-600">{risk.penalty}</p>
+              ))}
+            </div>
+          ) : (
+            <div className="bg-white rounded-lg p-6 border border-orange-200 text-center">
+              <div className="text-sm text-orange-700">
+                Excellent! No significant compliance risks identified for the next 6 months.
               </div>
-            ))}
-          </div>
+            </div>
+          )}
         </div>
       </div>
     </section>

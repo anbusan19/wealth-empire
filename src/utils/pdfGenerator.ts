@@ -39,9 +39,7 @@ export const generatePDF = async (data: ComplianceData): Promise<void> => {
         <!-- Header -->
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 3px solid #1f2937;">
           <div style="display: flex; align-items: center;">
-            <div style="width: 50px; height: 50px; background: #1f2937; border-radius: 6px; display: flex; align-items: center; justify-content: center; margin-right: 12px;">
-              <span style="color: white; font-size: 16px; font-weight: bold; letter-spacing: 1px;">WE</span>
-            </div>
+            <img src="welogo.png" alt="Wealth Empire Logo" style="width: 50px; height: 50px; margin-right: 12px;" />
             <div>
               <div style="font-size: 24px; font-weight: bold; color: #1f2937; margin-bottom: 5px;">
                 WEALTH EMPIRE
