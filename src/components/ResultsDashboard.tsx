@@ -1,6 +1,6 @@
 import React from 'react';
 import { Download, CheckCircle, AlertTriangle, TrendingUp, FileText, Loader2 } from 'lucide-react';
-import generateProfessionalPDF from '../utils/professionalPdfGenerator';
+import generatePDF from '../utils/pdfGenerator';
 
 interface CategoryScore {
   category: string;
@@ -143,7 +143,7 @@ export default function ResultsDashboard({ companyData }: ResultsDashboardProps 
         riskForecast: complianceData.riskForecast
       };
 
-      await generateProfessionalPDF(reportData);
+      await generatePDF(reportData);
     } catch (error) {
       console.error('Error generating PDF:', error);
       alert('Failed to generate PDF report. Please try again.');

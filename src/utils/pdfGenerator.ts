@@ -32,163 +32,177 @@ export const generatePDF = async (data: ComplianceData): Promise<void> => {
     tempContainer.style.top = '0';
     tempContainer.style.width = '210mm';
     tempContainer.style.backgroundColor = 'white';
-    
+
     // Create the HTML content for PDF
     tempContainer.innerHTML = `
-      <div style="width: 210mm; min-height: 297mm; padding: 20mm; font-family: Arial, sans-serif; background: white;">
+      <div style="width: 210mm; height: 297mm; padding: 15mm; font-family: Arial, sans-serif; background: white; font-size: 12px; line-height: 1.4; display: flex; flex-direction: column;">
         <!-- Header -->
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; padding-bottom: 24px; border-bottom: 2px solid #e5e7eb;">
-          <div>
-            <div style="font-size: 24px; font-weight: bold; color: #111827; margin-bottom: 8px;">
-              Wealth Empire
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 3px solid #1f2937;">
+          <div style="display: flex; align-items: center;">
+            <div style="width: 50px; height: 50px; background: #1f2937; border-radius: 6px; display: flex; align-items: center; justify-content: center; margin-right: 12px;">
+              <span style="color: white; font-size: 16px; font-weight: bold; letter-spacing: 1px;">WE</span>
             </div>
-            <h1 style="font-size: 28px; font-weight: bold; color: #111827; margin: 0;">
-              Compliance Health Report
-            </h1>
+            <div>
+              <div style="font-size: 24px; font-weight: bold; color: #1f2937; margin-bottom: 5px;">
+                WEALTH EMPIRE
+              </div>
+              <div style="font-size: 16px; font-weight: 600; color: #374151;">
+                Compliance Health Report
+              </div>
+            </div>
           </div>
           <div style="text-align: right;">
-            <div style="font-size: 14px; color: #6b7280;">Report Date</div>
+            <div style="font-size: 11px; color: #6b7280; margin-bottom: 2px;">Report Date</div>
             <div style="font-weight: 600; margin-bottom: 8px;">${data.reportDate}</div>
-            <div style="font-size: 14px; color: #6b7280;">Company</div>
-            <div style="font-weight: 600;">${data.companyName}</div>
+            <div style="font-size: 11px; color: #6b7280; margin-bottom: 2px;">Company</div>
+            <div style="font-weight: 600; font-size: 14px;">${data.companyName}</div>
           </div>
         </div>
 
-        <!-- Executive Summary -->
-        <div style="margin-bottom: 32px;">
-          <h2 style="font-size: 20px; font-weight: bold; color: #111827; margin-bottom: 16px;">Executive Summary</h2>
-          <div style="background: #f9fafb; border-radius: 8px; padding: 24px;">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-              <div>
-                <div style="font-size: 14px; color: #6b7280; margin-bottom: 4px;">Overall Compliance Score</div>
-                <div style="font-size: 48px; font-weight: bold; color: #111827;">${data.overallScore}/100</div>
-              </div>
-              <div style="padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: 600; ${
-                data.overallScore >= 80 ? 'background: #dcfce7; color: #166534;' :
-                data.overallScore >= 60 ? 'background: #fef3c7; color: #92400e;' :
-                'background: #fee2e2; color: #991b1b;'
-              }">
-                ${data.overallScore >= 80 ? 'EXCELLENT' :
-                  data.overallScore >= 60 ? 'GOOD' : 'NEEDS IMPROVEMENT'}
-              </div>
+        <!-- Executive Summary & Category Scores -->
+        <div style="display: flex; gap: 20px; margin-bottom: 20px;">
+          <!-- Overall Score -->
+          <div style="flex: 1; background: #1f2937; color: white; border-radius: 12px; padding: 20px; text-align: center;">
+            <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; opacity: 0.8;">
+              OVERALL COMPLIANCE SCORE
+            </div>
+            <div style="font-size: 48px; font-weight: bold; margin-bottom: 5px;">
+              ${data.overallScore}
+            </div>
+            <div style="font-size: 14px; opacity: 0.8;">out of 100</div>
+            <div style="margin-top: 15px; padding: 8px 16px; border-radius: 20px; font-size: 11px; font-weight: 600; ${data.overallScore >= 80 ? 'background: #dcfce7; color: #166534;' :
+        data.overallScore >= 60 ? 'background: #fef3c7; color: #92400e;' :
+          'background: #fee2e2; color: #991b1b;'
+      }">
+              ${data.overallScore >= 80 ? 'EXCELLENT' : data.overallScore >= 60 ? 'GOOD' : 'NEEDS IMPROVEMENT'}
+            </div>
+          </div>
+
+          <!-- Category Breakdown -->
+          <div style="flex: 2;">
+            <h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #1f2937;">
+              Category Breakdown
+            </h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;">
+              ${data.categoryScores.map(category => `
+                <div style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px; text-align: center; background: #f9fafb;">
+                  <div style="font-size: 10px; text-transform: uppercase; color: #6b7280; margin-bottom: 4px;">
+                    ${category.category}
+                  </div>
+                  <div style="font-size: 24px; font-weight: bold; color: #1f2937; margin-bottom: 4px;">
+                    ${category.score}
+                  </div>
+                  <div style="font-size: 9px; color: #6b7280; line-height: 1.3;">
+                    ${category.insights}
+                  </div>
+                </div>
+              `).join('')}
             </div>
           </div>
         </div>
 
-        <!-- Category Breakdown -->
-        <div style="margin-bottom: 32px;">
-          <h2 style="font-size: 20px; font-weight: bold; color: #111827; margin-bottom: 16px;">Category Breakdown</h2>
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-            ${data.categoryScores.map(category => `
-              <div style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                  <h3 style="font-weight: 600; color: #111827; margin: 0;">${category.category}</h3>
-                  <span style="font-size: 24px; font-weight: bold; color: #111827;">${category.score}</span>
-                </div>
-                <p style="font-size: 14px; color: #6b7280; margin: 0;">${category.insights}</p>
-              </div>
-            `).join('')}
-          </div>
-        </div>
 
-        <!-- Strengths and Red Flags -->
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 32px;">
+
+        <!-- Strengths, Red Flags, and Risk Forecast -->
+        <div style="display: flex; gap: 15px; margin-bottom: 20px; flex: 1;">
           <!-- Strengths -->
-          <div>
-            <h2 style="font-size: 20px; font-weight: bold; color: #166534; margin-bottom: 16px;">
+          <div style="flex: 1; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 15px;">
+            <h3 style="font-size: 13px; font-weight: bold; color: #166534; margin-bottom: 10px; display: flex; align-items: center; gap: 5px;">
               ✓ Strengths
-            </h2>
-            <div style="space-y: 8px;">
-              ${data.strengths.map(strength => `
-                <div style="display: flex; align-items: flex-start; gap: 8px; margin-bottom: 8px;">
-                  <span style="color: #16a34a; margin-top: 2px;">✓</span>
-                  <span style="font-size: 14px; color: #374151;">${strength}</span>
+            </h3>
+            <div style="font-size: 10px; line-height: 1.4;">
+              ${data.strengths.slice(0, 4).map(strength => `
+                <div style="display: flex; align-items: flex-start; gap: 5px; margin-bottom: 4px;">
+                  <span style="color: #16a34a; margin-top: 1px;">✓</span>
+                  <span style="color: #166534;">${strength}</span>
                 </div>
               `).join('')}
             </div>
           </div>
 
           <!-- Red Flags -->
-          <div>
-            <h2 style="font-size: 20px; font-weight: bold; color: #991b1b; margin-bottom: 16px;">
+          <div style="flex: 1; background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 15px;">
+            <h3 style="font-size: 13px; font-weight: bold; color: #991b1b; margin-bottom: 10px; display: flex; align-items: center; gap: 5px;">
               ⚠ Red Flags
-            </h2>
-            <div style="space-y: 8px;">
-              ${data.redFlags.map(flag => `
-                <div style="display: flex; align-items: flex-start; gap: 8px; margin-bottom: 8px;">
-                  <span style="color: #dc2626; margin-top: 2px;">⚠</span>
-                  <span style="font-size: 14px; color: #374151;">${flag}</span>
+            </h3>
+            <div style="font-size: 10px; line-height: 1.4;">
+              ${data.redFlags.slice(0, 4).map(flag => `
+                <div style="display: flex; align-items: flex-start; gap: 5px; margin-bottom: 4px;">
+                  <span style="color: #dc2626; margin-top: 1px;">⚠</span>
+                  <span style="color: #991b1b;">${flag}</span>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+
+          <!-- Risk Forecast -->
+          <div style="flex: 1; background: #fff7ed; border: 1px solid #fed7aa; border-radius: 8px; padding: 15px;">
+            <h3 style="font-size: 13px; font-weight: bold; color: #ea580c; margin-bottom: 10px;">
+              📈 6-Month Risks
+            </h3>
+            <div style="font-size: 10px; line-height: 1.4;">
+              ${data.riskForecast.risks.map(risk => `
+                <div style="background: white; border: 1px solid #fed7aa; border-radius: 6px; padding: 8px; margin-bottom: 6px;">
+                  <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 3px;">
+                    <div style="font-weight: 600; color: #1f2937; font-size: 10px;">${risk.type}</div>
+                    <span style="padding: 2px 6px; border-radius: 8px; font-size: 8px; font-weight: 600; ${risk.probability === 'high' ? 'background: #fee2e2; color: #991b1b;' :
+          risk.probability === 'medium' ? 'background: #fef3c7; color: #92400e;' :
+            'background: #dcfce7; color: #166534;'
+        }">
+                      ${risk.probability.toUpperCase()}
+                    </span>
+                  </div>
+                  <div style="color: #6b7280; font-size: 9px;">${risk.penalty}</div>
                 </div>
               `).join('')}
             </div>
           </div>
         </div>
 
-        <!-- Risk Forecast -->
-        <div style="margin-bottom: 32px;">
-          <h2 style="font-size: 20px; font-weight: bold; color: #ea580c; margin-bottom: 16px;">
-            📈 ${data.riskForecast.period}
-          </h2>
-          <div style="space-y: 12px;">
-            ${data.riskForecast.risks.map(risk => `
-              <div style="border: 1px solid #fed7aa; border-radius: 8px; padding: 16px; background: #fff7ed;">
-                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                  <div>
-                    <h3 style="font-weight: 600; color: #111827; margin: 0 0 4px 0;">${risk.type}</h3>
-                    <p style="font-size: 14px; color: #6b7280; margin: 0;">${risk.penalty}</p>
-                  </div>
-                  <span style="padding: 4px 8px; border-radius: 12px; font-size: 12px; font-weight: 600; ${
-                    risk.probability === 'high' ? 'background: #fee2e2; color: #991b1b;' :
-                    risk.probability === 'medium' ? 'background: #fef3c7; color: #92400e;' :
-                    'background: #dcfce7; color: #166534;'
-                  }">
-                    ${risk.probability.toUpperCase()} RISK
-                  </span>
-                </div>
-              </div>
-            `).join('')}
-          </div>
-        </div>
-
         <!-- Recommendations -->
-        <div style="margin-bottom: 32px;">
-          <h2 style="font-size: 20px; font-weight: bold; color: #111827; margin-bottom: 16px;">Recommended Actions</h2>
-          <div style="space-y: 16px;">
-            <div style="border: 1px solid #bfdbfe; border-radius: 8px; padding: 16px; background: #eff6ff;">
-              <h3 style="font-weight: 600; color: #1e40af; margin: 0 0 8px 0;">Immediate Actions (High Priority)</h3>
-              <ul style="font-size: 14px; color: #1e40af; margin: 0; padding-left: 20px;">
-                <li>File trademark application to protect brand identity</li>
-                <li>Complete missing industry certifications</li>
-                <li>Update director KYC documentation</li>
+        <div style="margin-bottom: 20px;">
+          <h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px; color: #1f2937;">
+            Recommended Actions
+          </h3>
+          <div style="display: flex; gap: 15px;">
+            <div style="flex: 1; border: 1px solid #bfdbfe; border-radius: 8px; padding: 12px; background: #eff6ff;">
+              <h4 style="font-weight: 600; color: #1e40af; margin-bottom: 6px; font-size: 11px;">
+                High Priority Actions
+              </h4>
+              <ul style="font-size: 10px; color: #1e40af; margin: 0; padding-left: 15px; line-height: 1.4;">
+                <li>File trademark application</li>
+                <li>Complete industry certifications</li>
+                <li>Update director KYC</li>
               </ul>
             </div>
-            <div style="border: 1px solid #fde68a; border-radius: 8px; padding: 16px; background: #fffbeb;">
-              <h3 style="font-weight: 600; color: #92400e; margin: 0 0 8px 0;">Medium Priority Actions</h3>
-              <ul style="font-size: 14px; color: #92400e; margin: 0; padding-left: 20px;">
-                <li>Obtain ISO 9001 certification for quality management</li>
-                <li>Implement comprehensive compliance monitoring</li>
-                <li>Review and update corporate governance policies</li>
+            <div style="flex: 1; border: 1px solid #fde68a; border-radius: 8px; padding: 12px; background: #fffbeb;">
+              <h4 style="font-weight: 600; color: #92400e; margin-bottom: 6px; font-size: 11px;">
+                Medium Priority Actions
+              </h4>
+              <ul style="font-size: 10px; color: #92400e; margin: 0; padding-left: 15px; line-height: 1.4;">
+                <li>Obtain ISO 9001 certification</li>
+                <li>Implement compliance monitoring</li>
+                <li>Review governance policies</li>
               </ul>
             </div>
           </div>
         </div>
 
         <!-- Footer -->
-        <div style="border-top: 2px solid #e5e7eb; padding-top: 24px; margin-top: 32px;">
-          <div style="display: flex; justify-content: space-between; align-items: center;">
-            <div>
-              <div style="font-weight: 600; color: #111827;">Wealth Empire</div>
-              <div style="font-size: 14px; color: #6b7280;">Compliance & Legal Services</div>
-            </div>
-            <div style="text-align: right;">
-              <div style="font-size: 14px; color: #6b7280;">For support contact:</div>
-              <div style="font-weight: 600; color: #111827;">support@wealthempire.com</div>
-            </div>
+        <div style="border-top: 2px solid #e5e7eb; padding-top: 15px; margin-top: auto; display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <div style="font-weight: 600; color: #1f2937; font-size: 12px;">Wealth Empire</div>
+            <div style="font-size: 10px; color: #6b7280;">Compliance & Legal Services</div>
           </div>
-          <div style="text-align: center; margin-top: 16px; font-size: 12px; color: #9ca3af;">
-            This report is confidential and intended solely for the use of ${data.companyName}. 
-            Generated on ${data.reportDate} by Wealth Empire Compliance Platform.
+          <div style="text-align: right;">
+            <div style="font-size: 10px; color: #6b7280;">For support contact:</div>
+            <div style="font-weight: 600; color: #1f2937; font-size: 11px;">support@wealthempire.com</div>
           </div>
+        </div>
+        
+        <div style="text-align: center; margin-top: 10px; font-size: 9px; color: #9ca3af; line-height: 1.3;">
+          This report is confidential and intended solely for ${data.companyName}. 
+          Generated on ${data.reportDate} by Wealth Empire Compliance Platform.
         </div>
       </div>
     `;
