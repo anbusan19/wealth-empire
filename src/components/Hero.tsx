@@ -1,7 +1,20 @@
+import Aurora from "./Aurora";
+import DarkVeil
+ from "./DarkVeil";
 export default function Hero() {
   return (
-    <section className="pt-32 pb-24 px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
+    <section className="relative pt-32 pb-24 px-6 lg:px-8 overflow-hidden">
+      {/* <div className="absolute inset-0 z-0">
+        <Aurora
+          colorStops={["#7b70ee", "#e75c86", "#32ff51"]}
+          blend={0.5}
+          amplitude={0.8}
+          speed={0.8}
+        />
+      </div> */}
+      
+
+      <div className="max-w-7xl mx-auto relative z-10">
         <div className="text-center mb-16">
           <p className="text-xs font-medium tracking-widest uppercase text-gray-500 mb-6">
             COMPLIANCE HEALTH
