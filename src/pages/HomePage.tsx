@@ -1,15 +1,11 @@
 import Navigation from '../components/Navigation';
 import Hero from '../components/Hero';
-import ResultsDashboard from '../components/ResultsDashboard';
-import ReportView from '../components/ReportView';
 
 export default function HomePage() {
   return (
     <div className="min-h-screen bg-white">
       <Navigation />
       <Hero />
-      <ResultsDashboard />
-      <ReportView />
 
       <footer className="bg-white py-16 px-6">
         <div className="max-w-7xl mx-auto">
