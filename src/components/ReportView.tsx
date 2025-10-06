@@ -92,45 +92,84 @@ export default function ReportView({ answers, followUpAnswers }: ReportViewProps
   const complianceData = calculateScores(answers, followUpAnswers);
 
   // Filter and prioritize services based on user's red flags and low scores
-  const getRecommendedServices = () => {
-    const recommended = [];
+  const getRecommendedServices = (): WealthEmpireService[] => {
+    const recommended: WealthEmpireService[] = [];
 
     // Check if company is not incorporated
     if (answers[1] === 'No') {
-      recommended.push(wealthEmpireServices.find(s => s.id === 1));
+      const service = wealthEmpireServices.find(s => s.id === 1);
+      if (service) recommended.push(service);
     }
 
     // Check if trademark is missing
     if (answers[7] === 'No') {
-      recommended.push(wealthEmpireServices.find(s => s.id === 2));
+      const service = wealthEmpireServices.find(s => s.id === 2);
+      if (service) recommended.push(service);
     }
 
     // Check if ISO certification is missing
     if (answers[10] === 'No') {
-      recommended.push(wealthEmpireServices.find(s => s.id === 3));
+      const service = wealthEmpireServices.find(s => s.id === 3);
+      if (service) recommended.push(service);
     }
 
     // Check if GST registration is missing
     if (answers[4] === 'No') {
-      recommended.push(wealthEmpireServices.find(s => s.id === 4));
+      const service = wealthEmpireServices.find(s => s.id === 4);
+      if (service) recommended.push(service);
     }
 
     // Check if bookkeeping needs improvement
     if (answers[12] === 'No') {
-      recommended.push(wealthEmpireServices.find(s => s.id === 5));
+      const service = wealthEmpireServices.find(s => s.id === 5);
+      if (service) recommended.push(service);
     }
 
     // Check if compliance officer is needed
     if (answers[15] === 'No') {
-      recommended.push(wealthEmpireServices.find(s => s.id === 6));
+      const service = wealthEmpireServices.find(s => s.id === 6);
+      if (service) recommended.push(service);
     }
 
-    return recommended.filter(Boolean).slice(0, 6); // Show max 6 services
+    return recommended.slice(0, 6); // Show max 6 services
+  };
+
+  // Get recommended plan based on compliance score
+  const getRecommendedPlan = () => {
+    const overallScore = complianceData.overallScore;
+    const criticalIssues = recommendedServices.filter(s => s.priority === 'high').length;
+
+    if (overallScore < 50 || criticalIssues >= 3) {
+      return {
+        plan: 'elite',
+        title: '#WE Elite',
+        subtitle: 'RECOMMENDED FOR YOU',
+        reason: 'Your compliance score indicates significant gaps that require expert guidance and ongoing monitoring.',
+        urgency: 'high'
+      };
+    } else if (overallScore < 75 || criticalIssues >= 1) {
+      return {
+        plan: 'elite',
+        title: '#WE Elite',
+        subtitle: 'RECOMMENDED',
+        reason: 'Your assessment shows areas for improvement that would benefit from professional compliance management.',
+        urgency: 'medium'
+      };
+    } else {
+      return {
+        plan: 'essentials',
+        title: 'Essentials',
+        subtitle: 'GOOD START',
+        reason: 'Your compliance foundation is solid. Our free plan will help you maintain and monitor your status.',
+        urgency: 'low'
+      };
+    }
   };
 
   const recommendedServices = getRecommendedServices();
+  const recommendedPlan = getRecommendedPlan();
   return (
-    <section className="py-20 sm:py-32 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-slate-50 via-white to-slate-100">
+    <section className="px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-slate-50 via-white to-slate-100">
       <div className="max-w-7xl mx-auto">
         {/* Header Section */}
         <div className="text-center mb-16 sm:mb-20">
@@ -233,242 +272,116 @@ export default function ReportView({ answers, followUpAnswers }: ReportViewProps
           </div>
         )}
 
-        {/* Wealth Empire Subscription Plans */}
-        <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-3xl p-10 sm:p-16 mb-20 relative overflow-hidden shadow-2xl">
-          {/* Background Pattern */}
-          <div className="absolute inset-0 opacity-5">
-            <div className="absolute inset-0" style={{
-              backgroundImage: `radial-gradient(circle at 20% 50%, rgba(255,255,255,0.15) 0%, transparent 60%), 
-                               radial-gradient(circle at 80% 20%, rgba(255,255,255,0.1) 0%, transparent 60%),
-                               radial-gradient(circle at 40% 80%, rgba(255,255,255,0.12) 0%, transparent 60%)`
-            }}></div>
-          </div>
+        {/* Personalized Plan Recommendation */}
+        <div className="mb-20">
 
-          <div className="relative z-10">
-            <div className="text-center mb-16">
-              <div className="inline-flex items-center justify-center w-14 h-14 bg-white/10 backdrop-blur-sm rounded-2xl mb-8 border border-white/20">
-                <Zap className="w-7 h-7 text-white" />
-              </div>
-              <h2 className="text-4xl sm:text-5xl font-bold text-white mb-6 leading-tight">
-                Subscription Plans
-              </h2>
-              <p className="text-slate-300 text-xl max-w-2xl mx-auto leading-relaxed">
-                Comprehensive compliance solutions tailored for every stage of your business journey
-              </p>
+          {/* Recommended Plan Card */}
+          <div className={`bg-gradient-to-br ${recommendedPlan.plan === 'elite'
+            ? 'from-slate-900 via-slate-800 to-slate-900'
+            : 'from-slate-800/50 to-slate-700/50'
+            } rounded-3xl p-10 sm:p-16 relative overflow-hidden shadow-2xl`}>
+
+            {/* Background Pattern */}
+            <div className="absolute inset-0 opacity-5">
+              <div className="absolute inset-0" style={{
+                backgroundImage: `radial-gradient(circle at 20% 50%, rgba(255,255,255,0.15) 0%, transparent 60%), 
+                                 radial-gradient(circle at 80% 20%, rgba(255,255,255,0.1) 0%, transparent 60%),
+                                 radial-gradient(circle at 40% 80%, rgba(255,255,255,0.12) 0%, transparent 60%)`
+              }}></div>
             </div>
 
-            {/* Pricing Cards */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
-              {/* Essentials Plan */}
-              <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-2xl p-10 relative group hover:bg-slate-800/70 transition-all duration-300">
-                <div className="absolute inset-0 bg-gradient-to-br from-slate-700/20 to-transparent rounded-2xl"></div>
-                <div className="relative z-10">
-                  <div className="mb-8">
-                    <div className="text-xs font-semibold tracking-[0.15em] uppercase text-slate-400 mb-3">
-                      WEALTH EMPIRE
-                    </div>
-                    <h3 className="text-3xl font-bold text-white mb-4">Essentials</h3>
-                    <p className="text-slate-300 leading-relaxed">
-                      Includes all features except the premium additions of #WE Elite. Perfect for startups and small businesses.
-                    </p>
-                  </div>
-
-                  <div className="mb-10">
-                    <div className="text-5xl font-bold text-white mb-2">Free</div>
-                    <div className="text-slate-400">Forever</div>
-                  </div>
-
-                  <button className="w-full bg-white text-slate-900 py-4 px-6 rounded-xl font-semibold hover:bg-slate-100 transition-all duration-300 shadow-lg">
-                    Get Started
-                  </button>
-                </div>
+            <div className="relative z-10">
+              {/* Recommendation Badge */}
+              <div className="flex justify-center mb-8">
+                <span className={`px-4 py-2 rounded-full text-xs font-semibold ${recommendedPlan.urgency === 'high'
+                    ? 'bg-gradient-to-r from-red-500 to-red-600 text-white'
+                    : recommendedPlan.urgency === 'medium'
+                      ? 'bg-gradient-to-r from-blue-500 to-indigo-500 text-white'
+                      : 'bg-gradient-to-r from-green-500 to-green-600 text-white'
+                  }`}>
+                  {recommendedPlan.subtitle}
+                </span>
               </div>
 
-              {/* #WE Elite Plan */}
-              <div className="bg-gradient-to-br from-slate-800/60 to-slate-900/80 backdrop-blur-sm border border-slate-600/50 rounded-2xl p-10 relative group hover:border-slate-500/50 transition-all duration-300">
-                <div className="absolute top-6 right-6">
-                  <span className="bg-gradient-to-r from-blue-500 to-indigo-500 text-white text-xs font-semibold px-3 py-1.5 rounded-full">
-                    MOST POPULAR
-                  </span>
+              <div className="text-center mb-12">
+                <div className="text-xs font-semibold tracking-[0.15em] uppercase text-slate-400 mb-3">
+                  WEALTH EMPIRE
+                </div>
+                <h3 className="text-5xl sm:text-6xl font-bold text-white mb-6">
+                  {recommendedPlan.title}
+                </h3>
+                <p className="text-slate-300 text-xl max-w-3xl mx-auto leading-relaxed mb-8">
+                  {recommendedPlan.reason}
+                </p>
+
+                {recommendedPlan.plan === 'elite' ? (
+                  <div className="space-y-6 mb-12">
+                    <div className="flex items-center justify-center gap-3 text-slate-300">
+                      <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0" />
+                      <span>AI Compliance Risk Dashboard (Live Monitoring)</span>
+                    </div>
+                    <div className="flex items-center justify-center gap-3 text-slate-300">
+                      <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0" />
+                      <span>Multi-Company Dashboard for serial entrepreneurs</span>
+                    </div>
+                    <div className="flex items-center justify-center gap-3 text-slate-300">
+                      <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0" />
+                      <span>VIP Support: 1:1 Strategy Consultation with Compliance Experts</span>
+                    </div>
+                    <div className="flex items-center justify-center gap-3 text-slate-300">
+                      <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0" />
+                      <span>Priority access to all individual services</span>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-6 mb-12">
+                    <div className="flex items-center justify-center gap-3 text-slate-300">
+                      <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0" />
+                      <span>Complete health check assessments</span>
+                    </div>
+                    <div className="flex items-center justify-center gap-3 text-slate-300">
+                      <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0" />
+                      <span>Basic compliance monitoring</span>
+                    </div>
+                    <div className="flex items-center justify-center gap-3 text-slate-300">
+                      <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0" />
+                      <span>Email support</span>
+                    </div>
+                  </div>
+                )}
+
+                <div className="mb-12">
+                  <div className="flex items-baseline justify-center gap-2">
+                    <span className="text-5xl font-bold text-white">
+                      {recommendedPlan.plan === 'elite' ? '₹10,000' : 'Free'}
+                    </span>
+                    {recommendedPlan.plan === 'elite' && (
+                      <span className="text-xl text-slate-400">/year</span>
+                    )}
+                  </div>
+                  <div className="text-slate-400 mt-1">
+                    {recommendedPlan.plan === 'elite' ? 'Billed annually' : 'Forever'}
+                  </div>
                 </div>
 
-                <div className="relative z-10">
-                  <div className="mb-8">
-                    <div className="text-xs font-semibold tracking-[0.15em] uppercase text-slate-400 mb-3">
-                      WEALTH EMPIRE
-                    </div>
-                    <h3 className="text-3xl font-bold text-white mb-4">#WE Elite</h3>
-                    <p className="text-slate-300 leading-relaxed mb-6">
-                      The ultimate premium experience — built for the relentless founders chasing unicorn status,
-                      who refuse to settle for anything less than the absolute best.
-                    </p>
-
-                    <div className="space-y-4">
-                      <div className="flex items-center gap-3 text-slate-300">
-                        <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0" />
-                        <span>The essentials plus...</span>
-                      </div>
-                      <div className="flex items-center gap-3 text-slate-300">
-                        <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0" />
-                        <span>AI Compliance Risk Dashboard (Live Monitoring)</span>
-                      </div>
-                      <div className="flex items-center gap-3 text-slate-300">
-                        <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0" />
-                        <span>Multi-Company Dashboard for serial entrepreneurs</span>
-                      </div>
-                      <div className="flex items-center gap-3 text-slate-300">
-                        <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0" />
-                        <span>Integrated Business Portfolio Report</span>
-                      </div>
-                      <div className="flex items-center gap-3 text-slate-300">
-                        <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0" />
-                        <span>VIP Support: 1:1 Strategy Consultation with Compliance Experts</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="mb-10">
-                    <div className="flex items-baseline gap-2">
-                      <span className="text-5xl font-bold text-white">₹10,000</span>
-                      <span className="text-xl text-slate-400">/year</span>
-                    </div>
-                    <div className="text-slate-400 mt-1">Billed annually</div>
-                  </div>
-
+                <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
                   <a
-                    href="mailto:support@wealthempires.in?subject=WE Elite Plan Inquiry"
-                    className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-4 px-6 rounded-xl font-semibold hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 flex items-center justify-center gap-2 group shadow-lg"
+                    href={`mailto:support@wealthempires.in?subject=${recommendedPlan.title} Plan Inquiry`}
+                    className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-4 px-8 rounded-xl font-semibold hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 flex items-center justify-center gap-2 group shadow-lg"
                   >
-                    Contact Sales
+                    Get Started
                     <ArrowUpRight className="w-4 h-4 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+                  </a>
+                  <a
+                    href="mailto:support@wealthempires.in?subject=Free Consultation Request"
+                    className="flex-1 bg-white/10 backdrop-blur-sm border border-white/30 text-white py-4 px-8 rounded-xl font-semibold hover:bg-white/20 transition-all duration-300 flex items-center justify-center gap-2 group"
+                  >
+                    Free Consultation
                   </a>
                 </div>
               </div>
             </div>
-
-            {/* White Label Plan - Full Width */}
-            <div className="bg-gradient-to-r from-purple-900/80 via-indigo-900/80 to-purple-900/80 backdrop-blur-sm rounded-2xl p-10 relative overflow-hidden border border-purple-500/20">
-              <div className="absolute inset-0 bg-gradient-to-r from-purple-600/10 via-indigo-600/10 to-purple-600/10"></div>
-              <div className="relative z-10">
-                <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
-                  <div className="flex-1">
-                    <div className="text-xs font-semibold tracking-[0.15em] uppercase text-purple-300 mb-3">
-                      FOR BUSINESS
-                    </div>
-                    <h3 className="text-4xl font-bold text-white mb-4">#WE White Label</h3>
-                    <p className="text-purple-100 mb-6 leading-relaxed max-w-2xl">
-                      Complete white-label compliance platform for agencies, consultants, and enterprises.
-                      Scale your business with our proven infrastructure.
-                    </p>
-                    <div className="mb-6">
-                      <div className="text-sm text-purple-200 mb-2">Plans Starting</div>
-                      <div className="flex items-baseline gap-2">
-                        <span className="text-5xl font-bold text-white">₹1,000</span>
-                        <span className="text-xl text-purple-300">/month</span>
-                      </div>
-                      <div className="text-purple-200 mt-1">Custom pricing available</div>
-                    </div>
-                  </div>
-
-                  <div className="lg:flex-shrink-0">
-                    <a
-                      href="mailto:support@wealthempires.in?subject=WE White Label Plan Inquiry"
-                      className="inline-flex items-center gap-3 bg-white/15 backdrop-blur-sm border border-white/30 text-white py-4 px-8 rounded-xl font-semibold hover:bg-white/25 transition-all duration-300 group shadow-lg"
-                    >
-                      Contact Sales
-                      <ArrowUpRight className="w-5 h-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
-                    </a>
-                  </div>
-                </div>
-              </div>
-            </div>
           </div>
-        </div>
-
-        {/* Individual Services Section */}
-        <div className="text-center mb-16">
-          <div className="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-br from-slate-100 to-slate-200 rounded-xl mb-8 shadow-sm">
-            <CheckCircle className="w-6 h-6 text-slate-600" />
-          </div>
-          <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-6">
-            Individual Services
-          </h2>
-          <p className="text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed">
-            Need specific compliance solutions? Choose from our comprehensive individual services
-            with transparent pricing and expert delivery.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-20">
-          {wealthEmpireServices.map((service) => (
-            <div
-              key={service.id}
-              className="group bg-white rounded-2xl p-8 border border-slate-200 shadow-sm hover:shadow-xl hover:border-slate-300 transition-all duration-300 relative overflow-hidden"
-            >
-              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-slate-200 via-slate-300 to-slate-200"></div>
-
-              <div className="flex items-start justify-between mb-6">
-                <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold ${service.priority === 'high'
-                    ? 'bg-gradient-to-r from-red-50 to-red-100 text-red-700 border border-red-200'
-                    : 'bg-gradient-to-r from-amber-50 to-amber-100 text-amber-700 border border-amber-200'
-                  }`}>
-                  <div className={`w-2 h-2 rounded-full ${service.priority === 'high' ? 'bg-red-500' : 'bg-amber-500'
-                    }`}></div>
-                  {service.priority.toUpperCase()} PRIORITY
-                </div>
-                <div className="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center group-hover:bg-slate-200 transition-colors">
-                  <Zap className="w-5 h-5 text-slate-600" />
-                </div>
-              </div>
-
-              <h3 className="text-2xl font-bold text-slate-900 mb-4 group-hover:text-slate-700 transition-colors">
-                {service.title}
-              </h3>
-              <p className="text-slate-600 mb-6 leading-relaxed">
-                {service.description}
-              </p>
-
-              {/* Features */}
-              <div className="mb-8">
-                <div className="grid grid-cols-1 gap-3">
-                  {service.features.slice(0, 4).map((feature, index) => (
-                    <div key={index} className="flex items-center gap-3">
-                      <div className="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
-                        <CheckCircle className="w-3 h-3 text-green-600" />
-                      </div>
-                      <span className="text-sm text-slate-700">{feature}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Pricing */}
-              <div className="flex items-center justify-between mb-8 p-4 bg-slate-50 rounded-xl">
-                <div>
-                  <div className="flex items-baseline gap-3">
-                    <span className="text-3xl font-bold text-slate-900">
-                      ₹{service.discountedPrice.toLocaleString()}
-                    </span>
-                    <span className="text-lg text-slate-400 line-through">
-                      ₹{service.originalPrice.toLocaleString()}
-                    </span>
-                  </div>
-                  <div className="text-sm text-green-600 font-medium mt-1">
-                    {service.discount}
-                  </div>
-                </div>
-                <div className="bg-gradient-to-r from-green-500 to-green-600 text-white px-4 py-2 rounded-full text-xs font-semibold shadow-sm">
-                  SAVE ₹{(service.originalPrice - service.discountedPrice).toLocaleString()}
-                </div>
-              </div>
-
-              {/* CTA Button */}
-              <button className="group w-full bg-gradient-to-r from-slate-900 to-slate-800 text-white px-6 py-4 rounded-xl hover:from-slate-800 hover:to-slate-700 transition-all duration-300 font-semibold flex items-center justify-center gap-2 shadow-lg">
-                Get Started Now
-                <ArrowUpRight size={18} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
-              </button>
-            </div>
-          ))}
         </div>
 
         {/* Expert Support Section */}

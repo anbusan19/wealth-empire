@@ -251,7 +251,7 @@ export const PDFTemplate: React.FC<PDFTemplateProps> = ({ data }) => {
             }}>
                 <div>
                     <div style={{ fontWeight: '600', color: '#1f2937', fontSize: '12px' }}>Wealth Empire</div>
-                    <div style={{ fontSize: '10px', color: '#6b7280' }}>Compliance & Legal Services</div>
+                    <div style={{ fontSize: '10px', color: '#6b7280' }}>Startup Compliance Health Check</div>
                 </div>
                 <div style={{ textAlign: 'right' }}>
                     <div style={{ fontSize: '10px', color: '#6b7280' }}>For support contact:</div>

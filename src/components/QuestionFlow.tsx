@@ -273,7 +273,7 @@ export default function QuestionFlow() {
       if (currentUser) {
         const idToken = await currentUser.getIdToken();
 
-        const response = await fetch('http://localhost:3001/api/health-check/save-results', {
+        const response = await fetch('http://localhost:3000/api/health-check/save-results', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -390,25 +390,8 @@ export default function QuestionFlow() {
 
   if (isCompleted) {
     return (
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen mt-10 bg-white">
         {/* Completion Header */}
-        <section className="pt-24 sm:pt-32 pb-12 sm:pb-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-gray-50 to-white">
-          <div className="max-w-4xl mx-auto text-center">
-            <div className="animate-fade-in">
-              <div className="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 bg-green-100 rounded-2xl mb-6 sm:mb-8">
-                <Check className="w-8 h-8 sm:w-10 sm:h-10 text-green-600" />
-              </div>
-
-              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-4 sm:mb-6 px-4 sm:px-0">
-                Health Checkup Complete!
-              </h2>
-
-              <p className="text-lg sm:text-xl text-gray-600 mb-6 sm:mb-8 px-4 sm:px-0">
-                Your comprehensive compliance report is ready. Review your results and recommendations below.
-              </p>
-            </div>
-          </div>
-        </section>
 
         {/* Results Dashboard */}
         <ResultsDashboard

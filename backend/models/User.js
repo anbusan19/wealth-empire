@@ -1,15 +1,13 @@
 const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
 
 const userSchema = new mongoose.Schema({
-  // Firebase Auth ID
+  // Firebase Auth Data
   firebaseUid: {
     type: String,
     required: true,
-    unique: true
+    unique: true,
+    index: true
   },
-  
-  // Basic Auth Info
   email: {
     type: String,
     required: true,
@@ -18,166 +16,128 @@ const userSchema = new mongoose.Schema({
     trim: true
   },
   
-  displayName: {
-    type: String,
-    trim: true
-  },
-  
-  // Profile completion status
-  isOnboarded: {
-    type: Boolean,
-    default: false
-  },
-  
-  // Onboarding Data
+  // User Profile Data
   startupName: {
     type: String,
+    required: true,
     trim: true
   },
-  
   city: {
     type: String,
+    required: true,
     trim: true
   },
-  
   state: {
     type: String,
+    required: true,
     trim: true
   },
-  
   country: {
     type: String,
-    trim: true,
-    default: 'India'
+    required: true,
+    trim: true
   },
-  
   website: {
     type: String,
     trim: true,
-    validate: {
-      validator: function(v) {
-        if (!v) return true; // Allow empty
-        return /^https?:\/\/.+/.test(v);
-      },
-      message: 'Website must be a valid URL'
-    }
+    default: null
   },
-  
   founderName: {
     type: String,
+    required: true,
+    trim: true
+  },
+  contactNumber: {
+    type: String,
+    required: true,
     trim: true
   },
   
-  contactNumber: {
-    type: String,
-    trim: true,
-    validate: {
-      validator: function(v) {
-        if (!v) return true; // Allow empty
-        return /^[\+]?[1-9][\d]{0,15}$/.test(v);
-      },
-      message: 'Please enter a valid contact number'
-    }
+  // System Data
+  isOnboardingComplete: {
+    type: Boolean,
+    default: false
   },
-  
-  // Health Check History
-  healthCheckResults: [{
-    completedAt: {
+  subscription: {
+    type: {
+      type: String,
+      enum: ['free', 'premium', 'enterprise'],
+      default: 'free'
+    },
+    startDate: {
       type: Date,
       default: Date.now
     },
-    overallScore: {
+    endDate: Date,
+    isActive: {
+      type: Boolean,
+      default: true
+    }
+  },
+  
+  // Health Check Results
+  healthCheckResults: [{
+    assessmentDate: {
+      type: Date,
+      default: Date.now
+    },
+    answers: {
+      type: Map,
+      of: mongoose.Schema.Types.Mixed
+    },
+    score: {
       type: Number,
       min: 0,
       max: 100
     },
-    categoryScores: [{
-      category: String,
-      score: Number,
-      status: {
-        type: String,
-        enum: ['excellent', 'good', 'needs-attention', 'critical']
-      }
-    }],
-    answers: {
-      type: Map,
-      of: String
-    },
+    recommendations: [String],
     followUpAnswers: {
       type: Map,
-      of: String
-    },
-    strengths: [String],
-    redFlags: [String],
-    risks: [{
-      type: String,
-      penalty: String,
-      probability: {
-        type: String,
-        enum: ['high', 'medium', 'low']
-      }
-    }]
+      of: mongoose.Schema.Types.Mixed
+    }
   }],
-  
-  // Subscription & Plan Info
-  subscriptionPlan: {
-    type: String,
-    enum: ['free', 'essentials', 'elite', 'white-label'],
-    default: 'free'
-  },
-  
-  subscriptionStatus: {
-    type: String,
-    enum: ['active', 'inactive', 'trial', 'expired'],
-    default: 'active'
-  },
   
   // Metadata
   lastLoginAt: {
     type: Date,
     default: Date.now
   },
+  profileCompletedAt: Date,
   
-  createdAt: {
-    type: Date,
-    default: Date.now
-  },
-  
-  updatedAt: {
-    type: Date,
-    default: Date.now
-  }
 }, {
-  timestamps: true
+  timestamps: true,
+  toJSON: { virtuals: true },
+  toObject: { virtuals: true }
 });
 
-// Additional indexes for better performance (email and firebaseUid already indexed via unique: true)
+// Indexes for performance
+userSchema.index({ email: 1 });
+userSchema.index({ firebaseUid: 1 });
 userSchema.index({ startupName: 1 });
 userSchema.index({ createdAt: -1 });
 
-// Update the updatedAt field before saving
-userSchema.pre('save', function(next) {
-  this.updatedAt = new Date();
-  next();
+// Virtual for latest health check
+userSchema.virtual('latestHealthCheck').get(function() {
+  if (this.healthCheckResults && this.healthCheckResults.length > 0) {
+    return this.healthCheckResults[this.healthCheckResults.length - 1];
+  }
+  return null;
 });
 
-// Instance method to check if user has completed onboarding
-userSchema.methods.hasCompletedOnboarding = function() {
-  return this.isOnboarded && 
-         this.startupName && 
-         this.city && 
-         this.state && 
-         this.founderName && 
-         this.contactNumber;
+// Method to add health check result
+userSchema.methods.addHealthCheckResult = function(resultData) {
+  this.healthCheckResults.push(resultData);
+  return this.save();
 };
 
-// Instance method to get latest health check result
-userSchema.methods.getLatestHealthCheck = function() {
-  if (this.healthCheckResults.length === 0) return null;
-  return this.healthCheckResults[this.healthCheckResults.length - 1];
+// Method to complete onboarding
+userSchema.methods.completeOnboarding = function() {
+  this.isOnboardingComplete = true;
+  this.profileCompletedAt = new Date();
+  return this.save();
 };
 
-// Static method to find user by Firebase UID
+// Static method to find by Firebase UID
 userSchema.statics.findByFirebaseUid = function(firebaseUid) {
   return this.findOne({ firebaseUid });
 };

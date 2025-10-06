@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { 
-  User, 
-  signInWithEmailAndPassword, 
+import {
+  User,
+  signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   signInWithPopup,
   signOut,
@@ -9,6 +9,7 @@ import {
   updateProfile
 } from 'firebase/auth';
 import { auth, googleProvider } from '../config/firebase';
+import { API_ENDPOINTS } from '../config/api';
 
 interface AuthContextType {
   currentUser: User | null;
@@ -17,6 +18,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   loginWithGoogle: () => Promise<void>;
   logout: () => Promise<void>;
+  getIdToken: () => Promise<string>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -42,18 +44,56 @@ export function AuthProvider({ children }: AuthProviderProps) {
     if (displayName) {
       await updateProfile(user, { displayName });
     }
+
+    // Register user in MongoDB
+    await registerUserInDatabase(user, displayName);
   }
 
-  function login(email: string, password: string) {
-    return signInWithEmailAndPassword(auth, email, password).then(() => {});
+  async function login(email: string, password: string) {
+    const { user } = await signInWithEmailAndPassword(auth, email, password);
+    // Ensure user exists in MongoDB
+    await registerUserInDatabase(user);
   }
 
-  function loginWithGoogle() {
-    return signInWithPopup(auth, googleProvider).then(() => {});
+  async function loginWithGoogle() {
+    const { user } = await signInWithPopup(auth, googleProvider);
+    // Ensure user exists in MongoDB
+    await registerUserInDatabase(user, user.displayName || undefined);
   }
 
   function logout() {
     return signOut(auth);
+  }
+
+  async function getIdToken(): Promise<string> {
+    if (!currentUser) {
+      throw new Error('No user is currently signed in');
+    }
+    return await currentUser.getIdToken();
+  }
+
+  async function registerUserInDatabase(user: User, displayName?: string) {
+    try {
+      const token = await user.getIdToken();
+
+      const response = await fetch(API_ENDPOINTS.FIREBASE_AUTH, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          firebaseUid: user.uid,
+          email: user.email,
+          founderName: displayName || user.displayName || 'Unknown Founder'
+        })
+      });
+
+      if (!response.ok) {
+        console.error('Failed to register user in database');
+      }
+    } catch (error) {
+      console.error('Error registering user in database:', error);
+    }
   }
 
   useEffect(() => {
@@ -71,7 +111,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
     signup,
     login,
     loginWithGoogle,
-    logout
+    logout,
+    getIdToken
   };
 
   if (loading) {

@@ -1,201 +1,204 @@
 const express = require('express');
 const { body, validationResult } = require('express-validator');
 const User = require('../models/User');
+const { verifyFirebaseToken, requireOnboarding } = require('../middleware/auth');
+
 const router = express.Router();
 
-// Middleware to validate Firebase token (simplified)
-const authenticateFirebaseToken = async (req, res, next) => {
+// POST /api/health-check/save-results - Save health check assessment results
+router.post('/save-results', verifyFirebaseToken, requireOnboarding, [
+  body('answers').isObject().withMessage('Answers must be an object'),
+  body('score').isNumeric().isFloat({ min: 0, max: 100 }).withMessage('Score must be between 0 and 100'),
+  body('recommendations').optional().isArray().withMessage('Recommendations must be an array'),
+  body('followUpAnswers').optional().isObject().withMessage('Follow-up answers must be an object')
+], async (req, res) => {
   try {
-    const token = req.headers.authorization?.split(' ')[1];
-    
-    if (!token) {
-      return res.status(401).json({ message: 'No token provided' });
-    }
-
-    req.user = {
-      uid: req.body.firebaseUid || req.headers['x-firebase-uid'],
-      email: req.body.email || req.headers['x-user-email']
-    };
-    
-    next();
-  } catch (error) {
-    console.error('Auth error:', error);
-    res.status(401).json({ message: 'Invalid token' });
-  }
-};
-
-// Save health check results
-router.post('/save-results',
-  [
-    body('overallScore').isNumeric().isFloat({ min: 0, max: 100 }).withMessage('Overall score must be between 0 and 100'),
-    body('categoryScores').isArray().withMessage('Category scores must be an array'),
-    body('answers').isObject().withMessage('Answers must be an object'),
-    body('followUpAnswers').optional().isObject().withMessage('Follow-up answers must be an object'),
-    body('strengths').optional().isArray().withMessage('Strengths must be an array'),
-    body('redFlags').optional().isArray().withMessage('Red flags must be an array'),
-    body('risks').optional().isArray().withMessage('Risks must be an array')
-  ],
-  authenticateFirebaseToken,
-  async (req, res) => {
-    try {
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
-      }
-
-      const {
-        overallScore,
-        categoryScores,
-        answers,
-        followUpAnswers = {},
-        strengths = [],
-        redFlags = [],
-        risks = [],
-        firebaseUid
-      } = req.body;
-
-      const user = await User.findByFirebaseUid(firebaseUid || req.user.uid);
-      
-      if (!user) {
-        return res.status(404).json({ message: 'User not found' });
-      }
-
-      // Check if user has completed onboarding
-      if (!user.hasCompletedOnboarding()) {
-        return res.status(400).json({ 
-          message: 'Please complete onboarding before taking the health check',
-          requiresOnboarding: true
-        });
-      }
-
-      // Create new health check result
-      const healthCheckResult = {
-        completedAt: new Date(),
-        overallScore,
-        categoryScores,
-        answers: new Map(Object.entries(answers)),
-        followUpAnswers: new Map(Object.entries(followUpAnswers)),
-        strengths,
-        redFlags,
-        risks
-      };
-
-      // Add to user's health check history
-      user.healthCheckResults.push(healthCheckResult);
-
-      // Keep only last 10 results to prevent document from growing too large
-      if (user.healthCheckResults.length > 10) {
-        user.healthCheckResults = user.healthCheckResults.slice(-10);
-      }
-
-      await user.save();
-
-      res.json({
-        message: 'Health check results saved successfully',
-        resultId: healthCheckResult._id,
-        overallScore,
-        completedAt: healthCheckResult.completedAt
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Validation errors',
+        errors: errors.array()
       });
-
-    } catch (error) {
-      console.error('Health check save error:', error);
-      res.status(500).json({ message: 'Server error saving health check results' });
-    }
-  }
-);
-
-// Get health check history
-router.get('/history', authenticateFirebaseToken, async (req, res) => {
-  try {
-    const user = await User.findByFirebaseUid(req.user.uid);
-    
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
     }
 
-    const history = user.healthCheckResults.map(result => ({
-      id: result._id,
-      completedAt: result.completedAt,
-      overallScore: result.overallScore,
-      categoryScores: result.categoryScores,
-      strengths: result.strengths,
-      redFlags: result.redFlags,
-      risks: result.risks
-    }));
+    const { answers, score, recommendations = [], followUpAnswers = {} } = req.body;
+    const user = req.user;
 
-    res.json({
-      history,
-      totalResults: history.length,
-      latestResult: history.length > 0 ? history[history.length - 1] : null
+    // Create health check result
+    const healthCheckResult = {
+      assessmentDate: new Date(),
+      answers: new Map(Object.entries(answers)),
+      score: parseFloat(score),
+      recommendations,
+      followUpAnswers: new Map(Object.entries(followUpAnswers))
+    };
+
+    // Add to user's health check results
+    await user.addHealthCheckResult(healthCheckResult);
+
+    res.status(201).json({
+      success: true,
+      message: 'Health check results saved successfully',
+      data: {
+        result: {
+          assessmentDate: healthCheckResult.assessmentDate,
+          score: healthCheckResult.score,
+          recommendations: healthCheckResult.recommendations,
+          totalAssessments: user.healthCheckResults.length
+        }
+      }
     });
 
   } catch (error) {
-    console.error('Health check history error:', error);
-    res.status(500).json({ message: 'Server error fetching health check history' });
+    console.error('Save health check error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to save health check results',
+      error: error.message
+    });
   }
 });
 
-// Get latest health check result
-router.get('/latest', authenticateFirebaseToken, async (req, res) => {
+// GET /api/health-check/history - Get user's health check history
+router.get('/history', verifyFirebaseToken, requireOnboarding, async (req, res) => {
   try {
-    const user = await User.findByFirebaseUid(req.user.uid);
-    
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
-    }
+    const user = req.user;
+    const { limit = 10, page = 1 } = req.query;
 
-    const latestResult = user.getLatestHealthCheck();
+    const startIndex = (page - 1) * limit;
+    const endIndex = startIndex + parseInt(limit);
+
+    const history = user.healthCheckResults
+      .slice()
+      .reverse() // Most recent first
+      .slice(startIndex, endIndex)
+      .map(result => ({
+        assessmentDate: result.assessmentDate,
+        score: result.score,
+        recommendations: result.recommendations,
+        answersCount: result.answers ? result.answers.size : 0,
+        followUpAnswersCount: result.followUpAnswers ? result.followUpAnswers.size : 0
+      }));
+
+    res.status(200).json({
+      success: true,
+      data: {
+        history,
+        pagination: {
+          currentPage: parseInt(page),
+          totalResults: user.healthCheckResults.length,
+          totalPages: Math.ceil(user.healthCheckResults.length / limit),
+          hasNext: endIndex < user.healthCheckResults.length,
+          hasPrev: page > 1
+        }
+      }
+    });
+
+  } catch (error) {
+    console.error('Get health check history error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to get health check history',
+      error: error.message
+    });
+  }
+});
+
+// GET /api/health-check/latest - Get latest health check result
+router.get('/latest', verifyFirebaseToken, requireOnboarding, async (req, res) => {
+  try {
+    const user = req.user;
+    const latestResult = user.latestHealthCheck;
 
     if (!latestResult) {
-      return res.json({ 
-        message: 'No health check results found',
-        hasResults: false
+      return res.status(404).json({
+        success: false,
+        message: 'No health check results found'
       });
     }
 
-    res.json({
-      hasResults: true,
-      result: {
-        id: latestResult._id,
-        completedAt: latestResult.completedAt,
-        overallScore: latestResult.overallScore,
-        categoryScores: latestResult.categoryScores,
-        answers: Object.fromEntries(latestResult.answers),
-        followUpAnswers: Object.fromEntries(latestResult.followUpAnswers),
-        strengths: latestResult.strengths,
-        redFlags: latestResult.redFlags,
-        risks: latestResult.risks
+    // Convert Maps to Objects for JSON response
+    const result = {
+      assessmentDate: latestResult.assessmentDate,
+      answers: Object.fromEntries(latestResult.answers || new Map()),
+      score: latestResult.score,
+      recommendations: latestResult.recommendations,
+      followUpAnswers: Object.fromEntries(latestResult.followUpAnswers || new Map())
+    };
+
+    res.status(200).json({
+      success: true,
+      data: {
+        result
       }
     });
 
   } catch (error) {
-    console.error('Latest health check error:', error);
-    res.status(500).json({ message: 'Server error fetching latest health check' });
+    console.error('Get latest health check error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to get latest health check result',
+      error: error.message
+    });
   }
 });
 
-// Delete health check result
-router.delete('/result/:resultId', authenticateFirebaseToken, async (req, res) => {
+// GET /api/health-check/stats - Get health check statistics
+router.get('/stats', verifyFirebaseToken, requireOnboarding, async (req, res) => {
   try {
-    const { resultId } = req.params;
-    const user = await User.findByFirebaseUid(req.user.uid);
-    
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+    const user = req.user;
+    const results = user.healthCheckResults;
+
+    if (results.length === 0) {
+      return res.status(200).json({
+        success: true,
+        data: {
+          totalAssessments: 0,
+          averageScore: 0,
+          highestScore: 0,
+          lowestScore: 0,
+          lastAssessment: null,
+          trend: 'no-data'
+        }
+      });
     }
 
-    // Remove the specific result
-    user.healthCheckResults = user.healthCheckResults.filter(
-      result => result._id.toString() !== resultId
-    );
+    const scores = results.map(r => r.score).filter(s => s !== undefined);
+    const totalAssessments = results.length;
+    const averageScore = scores.reduce((sum, score) => sum + score, 0) / scores.length;
+    const highestScore = Math.max(...scores);
+    const lowestScore = Math.min(...scores);
+    const lastAssessment = results[results.length - 1].assessmentDate;
 
-    await user.save();
+    // Calculate trend (comparing last 2 assessments)
+    let trend = 'stable';
+    if (scores.length >= 2) {
+      const lastScore = scores[scores.length - 1];
+      const previousScore = scores[scores.length - 2];
+      if (lastScore > previousScore) trend = 'improving';
+      else if (lastScore < previousScore) trend = 'declining';
+    }
 
-    res.json({ message: 'Health check result deleted successfully' });
+    res.status(200).json({
+      success: true,
+      data: {
+        totalAssessments,
+        averageScore: Math.round(averageScore * 100) / 100,
+        highestScore,
+        lowestScore,
+        lastAssessment,
+        trend
+      }
+    });
 
   } catch (error) {
-    console.error('Delete health check error:', error);
-    res.status(500).json({ message: 'Server error deleting health check result' });
+    console.error('Get health check stats error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to get health check statistics',
+      error: error.message
+    });
   }
 });
 

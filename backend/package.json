@@ -1,7 +1,7 @@
 {
-  "name": "wealth-empire-backend",
+  "name": "wealth-empires-backend",
   "version": "1.0.0",
-  "description": "Backend for Wealth Empire Health Check Platform",
+  "description": "Backend server for Wealth Empires application",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
@@ -9,25 +9,26 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "express": "^4.18.2",
-    "mongoose": "^8.0.0",
+    "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
-    "bcryptjs": "^2.4.3",
-    "jsonwebtoken": "^9.0.2",
+    "express": "^4.18.2",
     "express-validator": "^7.0.1",
-    "helmet": "^7.1.0",
-    "express-rate-limit": "^7.1.5"
+    "firebase-admin": "^13.5.0",
+    "helmet": "^7.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^7.5.0",
+    "morgan": "^1.10.1"
   },
   "devDependencies": {
     "nodemon": "^3.0.1"
   },
   "keywords": [
-    "compliance",
-    "health-check",
-    "startup",
-    "mongodb"
+    "express",
+    "mongodb",
+    "api",
+    "wealth-empires"
   ],
-  "author": "Wealth Empire",
+  "author": "Wealth Empires",
   "license": "ISC"
 }

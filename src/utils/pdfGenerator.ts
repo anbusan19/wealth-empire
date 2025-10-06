@@ -190,7 +190,7 @@ export const generatePDF = async (data: ComplianceData): Promise<void> => {
         <div style="border-top: 2px solid #e5e7eb; padding-top: 15px; margin-top: auto; display: flex; justify-content: space-between; align-items: center;">
           <div>
             <div style="font-weight: 600; color: #1f2937; font-size: 12px;">Wealth Empire</div>
-            <div style="font-size: 10px; color: #6b7280;">Compliance & Legal Services</div>
+            <div style="font-size: 10px; color: #6b7280;">Startup Compliance Health Check</div>
           </div>
           <div style="text-align: right;">
             <div style="font-size: 10px; color: #6b7280;">For support contact:</div>

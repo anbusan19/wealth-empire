@@ -2,6 +2,7 @@ import { Menu, X, User, LogOut } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import ConditionalLink from './ConditionalLink';
 
 export default function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -34,12 +35,27 @@ export default function Navigation() {
             </div>
 
             <div className="hidden md:flex items-center space-x-8">
-              <Link to="/health-check" className="nav-link text-gray-700 hover:text-gray-900 transition-all duration-300 text-sm font-medium relative">
+              <ConditionalLink
+                to="/health-check"
+                requireOnboarding={true}
+                className="nav-link text-gray-700 hover:text-gray-900 transition-all duration-300 text-sm font-medium relative"
+              >
                 Health Check
-              </Link>
-              <a href="#pricing" className="nav-link text-gray-700 hover:text-gray-900 transition-all duration-300 text-sm font-medium relative">
-                Pricing
-              </a>
+              </ConditionalLink>
+              {currentUser && (
+                <ConditionalLink
+                  to="/dashboard"
+                  requireOnboarding={true}
+                  className="nav-link text-gray-700 hover:text-gray-900 transition-all duration-300 text-sm font-medium relative"
+                >
+                  Dashboard
+                </ConditionalLink>
+              )}
+              {!currentUser && (
+                <a href="#pricing" className="nav-link text-gray-700 hover:text-gray-900 transition-all duration-300 text-sm font-medium relative">
+                  Pricing
+                </a>
+              )}
               <a href="#resources" className="nav-link text-gray-700 hover:text-gray-900 transition-all duration-300 text-sm font-medium relative">
                 Resources
               </a>
@@ -58,7 +74,7 @@ export default function Navigation() {
                     <User size={16} />
                     {currentUser.displayName || currentUser.email?.split('@')[0]}
                   </button>
-                  
+
                   {showUserMenu && (
                     <div className="absolute right-0 mt-2 w-48 bg-white/90 backdrop-blur-xl rounded-xl shadow-lg border border-white/20 py-2 z-50">
                       <div className="px-4 py-2 text-sm text-gray-600 border-b border-gray-200">
@@ -78,16 +94,20 @@ export default function Navigation() {
                   )}
                 </div>
               ) : (
-                <Link 
-                  to="/login" 
+                <Link
+                  to="/login"
                   className="text-gray-700 hover:text-gray-900 transition-all duration-300 text-sm font-medium px-3 lg:px-4 py-2 rounded-lg hover:bg-white/50"
                 >
                   Login
                 </Link>
               )}
-              <Link to="/health-check" className="bg-gradient-to-r from-gray-900 to-gray-700 text-white px-4 lg:px-6 py-2 lg:py-2.5 rounded-xl hover:from-gray-800 hover:to-gray-600 transition-all duration-300 text-xs lg:text-sm font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 inline-block">
+              <ConditionalLink
+                to="/health-check"
+                requireOnboarding={true}
+                className="bg-gradient-to-r from-gray-900 to-gray-700 text-white px-4 lg:px-6 py-2 lg:py-2.5 rounded-xl hover:from-gray-800 hover:to-gray-600 transition-all duration-300 text-xs lg:text-sm font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 inline-block"
+              >
                 Start Health Check
-              </Link>
+              </ConditionalLink>
             </div>
 
             <button
@@ -102,15 +122,29 @@ export default function Navigation() {
         {isMenuOpen && (
           <div className="md:hidden border-t border-white/20 bg-white/80 backdrop-blur-xl rounded-b-2xl animate-slide-down">
             <div className="px-6 py-4 space-y-3">
-              <Link to="/health-check" className="block text-gray-700 hover:text-gray-900 py-3 px-3 rounded-lg hover:bg-white/50 transition-all duration-300" onClick={() => setIsMenuOpen(false)}>
+              <ConditionalLink
+                to="/health-check"
+                requireOnboarding={true}
+                className="block text-gray-700 hover:text-gray-900 py-3 px-3 rounded-lg hover:bg-white/50 transition-all duration-300"
+                onClick={() => setIsMenuOpen(false)}
+              >
                 Health Check
-              </Link>
-              <a href="#services" className="block text-gray-700 hover:text-gray-900 py-3 px-3 rounded-lg hover:bg-white/50 transition-all duration-300">
-                Services
-              </a>
-              <a href="#pricing" className="block text-gray-700 hover:text-gray-900 py-3 px-3 rounded-lg hover:bg-white/50 transition-all duration-300">
-                Pricing
-              </a>
+              </ConditionalLink>
+              {currentUser && (
+                <ConditionalLink
+                  to="/dashboard"
+                  requireOnboarding={true}
+                  className="block text-gray-700 hover:text-gray-900 py-3 px-3 rounded-lg hover:bg-white/50 transition-all duration-300"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Dashboard
+                </ConditionalLink>
+              )}
+              {!currentUser && (
+                <a href="#pricing" className="block text-gray-700 hover:text-gray-900 py-3 px-3 rounded-lg hover:bg-white/50 transition-all duration-300">
+                  Pricing
+                </a>
+              )}
               <a href="#resources" className="block text-gray-700 hover:text-gray-900 py-3 px-3 rounded-lg hover:bg-white/50 transition-all duration-300">
                 Resources
               </a>
@@ -135,17 +169,22 @@ export default function Navigation() {
                     </button>
                   </>
                 ) : (
-                  <Link 
-                    to="/login" 
+                  <Link
+                    to="/login"
                     className="w-full text-gray-700 hover:text-gray-900 py-3 px-3 text-left rounded-lg hover:bg-white/50 transition-all duration-300"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     Login
                   </Link>
                 )}
-                <Link to="/health-check" className="w-full bg-gradient-to-r from-gray-900 to-gray-700 text-white px-6 py-3 rounded-xl hover:from-gray-800 hover:to-gray-600 transition-all duration-300 shadow-lg inline-block text-center" onClick={() => setIsMenuOpen(false)}>
+                <ConditionalLink
+                  to="/health-check"
+                  requireOnboarding={true}
+                  className="w-full bg-gradient-to-r from-gray-900 to-gray-700 text-white px-6 py-3 rounded-xl hover:from-gray-800 hover:to-gray-600 transition-all duration-300 shadow-lg inline-block text-center"
+                  onClick={() => setIsMenuOpen(false)}
+                >
                   Start Health Check
-                </Link>
+                </ConditionalLink>
               </div>
             </div>
           </div>

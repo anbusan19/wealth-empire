@@ -1,7 +1,9 @@
 import React from 'react';
-import { Download, CheckCircle, AlertTriangle, TrendingUp, FileText, Loader2 } from 'lucide-react';
+import { Download, CheckCircle, AlertTriangle, TrendingUp, FileText, Loader2, Share2 } from 'lucide-react';
 import generatePDF from '../utils/pdfGenerator';
 import { calculateScores } from '../utils/scoringSystem';
+import { useAuth } from '../contexts/AuthContext';
+import { useHealthCheck } from '../hooks/useHealthCheck';
 
 interface ResultsDashboardProps {
   companyData?: {
@@ -17,12 +19,49 @@ interface ResultsDashboardProps {
 }
 
 export default function ResultsDashboard({ companyData, answers, followUpAnswers }: ResultsDashboardProps) {
+  const { saveHealthCheck } = useHealthCheck();
   const [isGeneratingPDF, setIsGeneratingPDF] = React.useState(false);
+  const [isSavingResults, setIsSavingResults] = React.useState(false);
+  const [resultsSaved, setResultsSaved] = React.useState(false);
 
   // Calculate dynamic scores based on user answers
   const complianceData = React.useMemo(() => {
     return calculateScores(answers, followUpAnswers);
   }, [answers, followUpAnswers]);
+
+  // Save results to database
+  const saveHealthCheckResults = React.useCallback(async () => {
+    if (resultsSaved || isSavingResults) return; // Prevent duplicate saves
+
+    try {
+      setIsSavingResults(true);
+
+      const recommendations = [
+        ...complianceData.strengths.map(s => `Strength: ${s}`),
+        ...complianceData.redFlags.map(r => `Red Flag: ${r}`),
+        ...complianceData.riskForecast.risks.map(risk => `Risk: ${risk.type} - ${risk.penalty}`)
+      ];
+
+      await saveHealthCheck(
+        answers,
+        complianceData.overallScore,
+        recommendations,
+        followUpAnswers
+      );
+
+      setResultsSaved(true);
+      console.log('Health check results saved successfully');
+    } catch (error) {
+      console.error('Error saving health check results:', error);
+    } finally {
+      setIsSavingResults(false);
+    }
+  }, [answers, followUpAnswers, complianceData, saveHealthCheck, resultsSaved, isSavingResults]);
+
+  // Auto-save results when component mounts
+  React.useEffect(() => {
+    saveHealthCheckResults();
+  }, [saveHealthCheckResults]);
 
   const generatePDFReport = async () => {
     try {
@@ -56,18 +95,66 @@ export default function ResultsDashboard({ companyData, answers, followUpAnswers
     }
   };
 
+  const shareReport = async () => {
+    const shareData = {
+      title: 'My Compliance Health Report',
+      text: `I just completed a compliance health check and scored ${complianceData.overallScore}/100! Check out Wealth Empire's compliance assessment tool.`,
+      url: window.location.href
+    };
+
+    try {
+      if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
+        await navigator.share(shareData);
+      } else {
+        // Fallback to copying to clipboard
+        await navigator.clipboard.writeText(
+          `${shareData.text}\n\n${shareData.url}`
+        );
+        alert('Report details copied to clipboard!');
+      }
+    } catch (error) {
+      console.error('Error sharing:', error);
+      // Fallback: copy to clipboard
+      try {
+        await navigator.clipboard.writeText(
+          `I just completed a compliance health check and scored ${complianceData.overallScore}/100! Check out Wealth Empire's compliance assessment: ${window.location.href}`
+        );
+        alert('Report details copied to clipboard!');
+      } catch (clipboardError) {
+        console.error('Clipboard error:', clipboardError);
+        alert('Unable to share. Please copy the URL manually.');
+      }
+    }
+  };
+
   return (
     <section className="py-16 sm:py-24 px-4 sm:px-6 lg:px-8 bg-white">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-12 sm:mb-16">
-          <p className="text-xs font-medium tracking-widest uppercase text-gray-500 mb-4">
-            YOUR RESULTS
-          </p>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-4 leading-tight">
-            compliance
-            <br />
-            <span className="text-gray-400">health report</span>
-          </h2>
+          <div className="animate-fade-in">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-4 leading-tight">
+              Compliance
+              <br />
+              <span className="text-gray-400">Health Report</span>
+            </h2>
+            <p className="text-xs font-medium tracking-widest uppercase text-gray-500 mb-4">
+              YOUR RESULTS
+            </p>
+            {/* Save Status Indicator */}
+            {isSavingResults && (
+              <div className="flex items-center justify-center gap-2 text-sm text-gray-600 mb-4">
+                <Loader2 size={16} className="animate-spin" />
+                Saving results to your dashboard...
+              </div>
+            )}
+            {resultsSaved && (
+              <div className="flex items-center justify-center gap-2 text-sm text-green-600 mb-4">
+                <CheckCircle size={16} />
+                Results saved to your dashboard
+              </div>
+            )}
+          </div>
+
         </div>
 
         {/* Overall Score and PDF Download */}
@@ -79,41 +166,50 @@ export default function ResultsDashboard({ companyData, answers, followUpAnswers
               </div>
               <div className="text-6xl sm:text-7xl font-bold mb-2">{complianceData.overallScore}</div>
               <div className="text-lg text-gray-400">out of 100</div>
-              
+
               {/* Score Status Badge */}
               <div className="mt-4">
-                <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${
-                  complianceData.overallScore >= 80 
-                    ? 'bg-green-100 text-green-800' 
-                    : complianceData.overallScore >= 60 
-                    ? 'bg-yellow-100 text-yellow-800' 
+                <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${complianceData.overallScore >= 80
+                  ? 'bg-green-100 text-green-800'
+                  : complianceData.overallScore >= 60
+                    ? 'bg-yellow-100 text-yellow-800'
                     : 'bg-red-100 text-red-800'
-                }`}>
-                  {complianceData.overallScore >= 80 
-                    ? 'EXCELLENT' 
-                    : complianceData.overallScore >= 60 
-                    ? 'GOOD' 
-                    : 'NEEDS IMPROVEMENT'}
+                  }`}>
+                  {complianceData.overallScore >= 80
+                    ? 'EXCELLENT'
+                    : complianceData.overallScore >= 60
+                      ? 'GOOD'
+                      : 'NEEDS IMPROVEMENT'}
                 </span>
               </div>
             </div>
-            <button
-              onClick={generatePDFReport}
-              disabled={isGeneratingPDF}
-              className="flex items-center justify-center gap-2 bg-white text-gray-900 px-4 py-3 rounded-full hover:bg-gray-100 transition-all text-sm font-medium mt-6 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isGeneratingPDF ? (
-                <>
-                  <Loader2 size={18} className="animate-spin" />
-                  Generating PDF...
-                </>
-              ) : (
-                <>
-                  <Download size={18} />
-                  Download PDF Report
-                </>
-              )}
-            </button>
+            <div className="flex flex-col sm:flex-row gap-3 mt-6">
+              <button
+                onClick={generatePDFReport}
+                disabled={isGeneratingPDF}
+                className="flex items-center justify-center gap-2 bg-white text-gray-900 px-4 py-3 rounded-full hover:bg-gray-100 transition-all text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed flex-1"
+              >
+                {isGeneratingPDF ? (
+                  <>
+                    <Loader2 size={18} className="animate-spin" />
+                    Generating PDF...
+                  </>
+                ) : (
+                  <>
+                    <Download size={18} />
+                    Download
+                  </>
+                )}
+              </button>
+
+              <button
+                onClick={shareReport}
+                className="flex items-center justify-center gap-2 bg-white/20 backdrop-blur-sm border border-white/30 text-white px-4 py-3 rounded-full hover:bg-white/30 transition-all text-sm font-medium flex-1"
+              >
+                <Share2 size={18} />
+                Share
+              </button>
+            </div>
           </div>
 
           {/* Category Scores */}
@@ -194,11 +290,10 @@ export default function ResultsDashboard({ companyData, answers, followUpAnswers
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {complianceData.riskForecast.risks.map((risk, index) => (
                 <div key={index} className="bg-white rounded-lg p-4 border border-orange-200">
-                  <div className={`inline-block px-2 py-1 rounded-full text-xs font-semibold mb-3 ${
-                    risk.probability === 'high' ? 'bg-red-100 text-red-800' :
+                  <div className={`inline-block px-2 py-1 rounded-full text-xs font-semibold mb-3 ${risk.probability === 'high' ? 'bg-red-100 text-red-800' :
                     risk.probability === 'medium' ? 'bg-yellow-100 text-yellow-800' :
-                    'bg-green-100 text-green-800'
-                  }`}>
+                      'bg-green-100 text-green-800'
+                    }`}>
                     {risk.probability.toUpperCase()} RISK
                   </div>
                   <h4 className="font-semibold text-gray-900 mb-2 text-sm">{risk.type}</h4>

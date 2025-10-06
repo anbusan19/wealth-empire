@@ -1,172 +1,139 @@
 const express = require('express');
 const User = require('../models/User');
+const { verifyFirebaseToken, requireOnboarding } = require('../middleware/auth');
+
 const router = express.Router();
 
-// Middleware to validate Firebase token (simplified)
-const authenticateFirebaseToken = async (req, res, next) => {
+// GET /api/users/dashboard - Get user dashboard data
+router.get('/dashboard', verifyFirebaseToken, requireOnboarding, async (req, res) => {
   try {
-    const token = req.headers.authorization?.split(' ')[1];
-    
-    if (!token) {
-      return res.status(401).json({ message: 'No token provided' });
-    }
+    const user = req.user;
 
-    req.user = {
-      uid: req.body.firebaseUid || req.headers['x-firebase-uid'],
-      email: req.body.email || req.headers['x-user-email']
-    };
-    
-    next();
-  } catch (error) {
-    console.error('Auth error:', error);
-    res.status(401).json({ message: 'Invalid token' });
-  }
-};
-
-// Get user dashboard data
-router.get('/dashboard', authenticateFirebaseToken, async (req, res) => {
-  try {
-    const user = await User.findByFirebaseUid(req.user.uid);
-    
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
-    }
-
-    const latestHealthCheck = user.getLatestHealthCheck();
+    // Get user stats
     const totalHealthChecks = user.healthCheckResults.length;
+    const latestHealthCheck = user.latestHealthCheck;
 
-    // Calculate average score
+    // Calculate average score if health checks exist
     let averageScore = 0;
     if (totalHealthChecks > 0) {
-      const totalScore = user.healthCheckResults.reduce((sum, result) => sum + result.overallScore, 0);
+      const totalScore = user.healthCheckResults.reduce((sum, result) => sum + (result.score || 0), 0);
       averageScore = Math.round(totalScore / totalHealthChecks);
     }
 
-    // Get score trend (last 5 results)
-    const recentResults = user.healthCheckResults.slice(-5);
-    const scoreTrend = recentResults.map(result => ({
-      date: result.completedAt,
-      score: result.overallScore
-    }));
-
-    res.json({
-      user: {
-        id: user._id,
-        email: user.email,
-        displayName: user.displayName,
-        startupName: user.startupName,
-        subscriptionPlan: user.subscriptionPlan,
-        isOnboarded: user.isOnboarded,
-        hasCompletedOnboarding: user.hasCompletedOnboarding()
-      },
-      stats: {
-        totalHealthChecks,
-        averageScore,
-        latestScore: latestHealthCheck?.overallScore || 0,
-        lastCheckDate: latestHealthCheck?.completedAt || null,
-        scoreTrend
-      },
-      latestHealthCheck: latestHealthCheck ? {
-        id: latestHealthCheck._id,
-        completedAt: latestHealthCheck.completedAt,
-        overallScore: latestHealthCheck.overallScore,
-        categoryScores: latestHealthCheck.categoryScores,
-        strengths: latestHealthCheck.strengths?.slice(0, 3) || [], // Top 3 strengths
-        redFlags: latestHealthCheck.redFlags?.slice(0, 3) || [], // Top 3 red flags
-        risks: latestHealthCheck.risks?.slice(0, 3) || [] // Top 3 risks
-      } : null
+    res.status(200).json({
+      success: true,
+      data: {
+        user: {
+          id: user._id,
+          email: user.email,
+          startupName: user.startupName,
+          founderName: user.founderName,
+          city: user.city,
+          state: user.state,
+          country: user.country,
+          website: user.website,
+          contactNumber: user.contactNumber,
+          subscription: user.subscription,
+          memberSince: user.createdAt
+        },
+        stats: {
+          totalHealthChecks,
+          averageScore,
+          lastAssessment: latestHealthCheck?.assessmentDate || null,
+          lastScore: latestHealthCheck?.score || null
+        },
+        latestHealthCheck: latestHealthCheck ? {
+          date: latestHealthCheck.assessmentDate,
+          score: latestHealthCheck.score,
+          recommendations: latestHealthCheck.recommendations
+        } : null
+      }
     });
 
   } catch (error) {
     console.error('Dashboard error:', error);
-    res.status(500).json({ message: 'Server error fetching dashboard data' });
+    res.status(500).json({
+      success: false,
+      message: 'Failed to get dashboard data',
+      error: error.message
+    });
   }
 });
 
-// Update user subscription
-router.patch('/subscription', authenticateFirebaseToken, async (req, res) => {
+// PATCH /api/users/subscription - Update user subscription
+router.patch('/subscription', verifyFirebaseToken, async (req, res) => {
   try {
-    const { subscriptionPlan, subscriptionStatus } = req.body;
-    
-    const validPlans = ['free', 'essentials', 'elite', 'white-label'];
-    const validStatuses = ['active', 'inactive', 'trial', 'expired'];
+    const { type, endDate } = req.body;
+    const user = req.user;
 
-    if (subscriptionPlan && !validPlans.includes(subscriptionPlan)) {
-      return res.status(400).json({ message: 'Invalid subscription plan' });
+    if (!['free', 'premium', 'enterprise'].includes(type)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid subscription type'
+      });
     }
 
-    if (subscriptionStatus && !validStatuses.includes(subscriptionStatus)) {
-      return res.status(400).json({ message: 'Invalid subscription status' });
-    }
+    user.subscription.type = type;
+    user.subscription.isActive = true;
 
-    const user = await User.findByFirebaseUid(req.user.uid);
-    
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+    if (endDate) {
+      user.subscription.endDate = new Date(endDate);
     }
-
-    if (subscriptionPlan) user.subscriptionPlan = subscriptionPlan;
-    if (subscriptionStatus) user.subscriptionStatus = subscriptionStatus;
 
     await user.save();
 
-    res.json({
+    res.status(200).json({
+      success: true,
       message: 'Subscription updated successfully',
-      subscription: {
-        plan: user.subscriptionPlan,
-        status: user.subscriptionStatus
+      data: {
+        subscription: user.subscription
       }
     });
 
   } catch (error) {
     console.error('Subscription update error:', error);
-    res.status(500).json({ message: 'Server error updating subscription' });
+    res.status(500).json({
+      success: false,
+      message: 'Failed to update subscription',
+      error: error.message
+    });
   }
 });
 
-// Get user statistics (admin endpoint - would need proper admin auth in production)
-router.get('/stats', async (req, res) => {
+// GET /api/users/profile - Get detailed user profile
+router.get('/profile', verifyFirebaseToken, async (req, res) => {
   try {
-    const totalUsers = await User.countDocuments();
-    const onboardedUsers = await User.countDocuments({ isOnboarded: true });
-    const usersWithHealthChecks = await User.countDocuments({ 
-      'healthCheckResults.0': { $exists: true } 
-    });
+    const user = req.user;
 
-    // Subscription distribution
-    const subscriptionStats = await User.aggregate([
-      {
-        $group: {
-          _id: '$subscriptionPlan',
-          count: { $sum: 1 }
+    res.status(200).json({
+      success: true,
+      data: {
+        user: {
+          id: user._id,
+          email: user.email,
+          startupName: user.startupName,
+          city: user.city,
+          state: user.state,
+          country: user.country,
+          website: user.website,
+          founderName: user.founderName,
+          contactNumber: user.contactNumber,
+          isOnboardingComplete: user.isOnboardingComplete,
+          subscription: user.subscription,
+          createdAt: user.createdAt,
+          lastLoginAt: user.lastLoginAt,
+          profileCompletedAt: user.profileCompletedAt
         }
       }
-    ]);
-
-    // Recent signups (last 30 days)
-    const thirtyDaysAgo = new Date();
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-    
-    const recentSignups = await User.countDocuments({
-      createdAt: { $gte: thirtyDaysAgo }
-    });
-
-    res.json({
-      totalUsers,
-      onboardedUsers,
-      usersWithHealthChecks,
-      onboardingRate: totalUsers > 0 ? Math.round((onboardedUsers / totalUsers) * 100) : 0,
-      healthCheckRate: onboardedUsers > 0 ? Math.round((usersWithHealthChecks / onboardedUsers) * 100) : 0,
-      recentSignups,
-      subscriptionDistribution: subscriptionStats.reduce((acc, stat) => {
-        acc[stat._id] = stat.count;
-        return acc;
-      }, {})
     });
 
   } catch (error) {
-    console.error('Stats error:', error);
-    res.status(500).json({ message: 'Server error fetching statistics' });
+    console.error('Get user profile error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to get user profile',
+      error: error.message
+    });
   }
 });
 
