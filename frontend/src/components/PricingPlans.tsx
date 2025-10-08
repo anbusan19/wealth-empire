@@ -2,7 +2,7 @@ import { ArrowUpRight, CheckCircle, Zap } from 'lucide-react';
 
 const PricingPlans = () => {
   return (
-    <section id="pricing" className="py-20 sm:py-32 px-4 sm:px-6 lg:px-8 bg-white">
+    <section id="pricing" className="px-4 sm:px-6 lg:px-8 bg-white">
       <div className="max-w-7xl mx-auto">
         {/* Header Section */}
         <div className="text-center mb-16 sm:mb-20">
@@ -20,7 +20,7 @@ const PricingPlans = () => {
         </div>
 
         {/* Wealth Empire Subscription Plans */}
-        <div className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-3xl p-10 sm:p-16 mb-20 relative overflow-hidden shadow-2xl">
+        <div className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-2xl sm:rounded-3xl p-6 sm:p-10 lg:p-16 mb-12 sm:mb-20 relative overflow-hidden shadow-2xl mx-2 sm:mx-0">
           {/* Background Pattern */}
           <div className="absolute inset-0 opacity-5">
             <div className="absolute inset-0" style={{
@@ -31,20 +31,20 @@ const PricingPlans = () => {
           </div>
 
           <div className="relative z-10">
-            <div className="text-center mb-16">
-              <div className="inline-flex items-center justify-center w-14 h-14 bg-white/10 backdrop-blur-sm rounded-2xl mb-8 border border-white/20">
-                <Zap className="w-7 h-7 text-white" />
+            <div className="text-center mb-12 sm:mb-16">
+              <div className="inline-flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 bg-white/10 backdrop-blur-sm rounded-2xl mb-6 sm:mb-8 border border-white/20">
+                <Zap className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
               </div>
-              <h3 className="text-4xl sm:text-5xl font-bold text-white mb-6 leading-tight">
+              <h3 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4 sm:mb-6 leading-tight px-4 sm:px-0">
                 Subscription Plans
               </h3>
-              <p className="text-gray-300 text-xl max-w-2xl mx-auto leading-relaxed">
+              <p className="text-gray-300 text-lg sm:text-xl max-w-2xl mx-auto leading-relaxed px-4 sm:px-0">
                 Comprehensive compliance solutions tailored for every stage of your business journey
               </p>
             </div>
 
             {/* Pricing Cards */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 mb-8 sm:mb-12">
               {/* Essentials Plan */}
               <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 rounded-2xl p-10 relative group hover:bg-gray-800/70 transition-all duration-300">
                 <div className="absolute inset-0 bg-gradient-to-br from-gray-700/20 to-transparent rounded-2xl"></div>

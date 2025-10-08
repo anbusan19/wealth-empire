@@ -9,6 +9,10 @@
     @apply antialiased;
   }
 
+  html {
+    scroll-behavior: smooth;
+  }
+
   body {
     @apply text-gray-900 bg-white;
     font-family: 'Manrope', system-ui, -apple-system, sans-serif;

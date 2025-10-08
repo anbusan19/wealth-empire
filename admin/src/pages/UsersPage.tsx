@@ -1,20 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  Users,
   Search,
-  Filter,
-  MoreVertical,
   Eye,
   Edit,
   Trash2,
   Download,
   Building,
-  Mail,
-  Calendar,
-  Award,
-  AlertTriangle,
-  CheckCircle,
   Loader2
 } from 'lucide-react';
 import AdminNavigation from '../components/AdminNavigation';

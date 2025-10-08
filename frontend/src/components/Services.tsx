@@ -83,7 +83,7 @@ const wealthEmpireServices: WealthEmpireService[] = [
 
 const Services = () => {
   return (
-    <section id="services" className="py-20 sm:py-32 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-gray-50 via-white to-gray-50">
+    <section id="services" className="px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-gray-50 via-white to-gray-50">
       <div className="max-w-7xl mx-auto">
         {/* Header Section */}
         <div className="text-center mb-16 sm:mb-20">
@@ -101,11 +101,11 @@ const Services = () => {
         </div>
 
         {/* Services Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-20">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 mb-12 sm:mb-20 px-2 sm:px-0">
           {wealthEmpireServices.map((service) => (
             <div
               key={service.id}
-              className="group bg-white rounded-3xl p-8 border border-gray-200 shadow-sm hover:shadow-xl hover:border-gray-300 transition-all duration-300 relative overflow-hidden"
+              className="group bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-8 border border-gray-200 shadow-sm hover:shadow-xl hover:border-gray-300 transition-all duration-300 relative overflow-hidden"
             >
               <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200"></div>
 
@@ -172,7 +172,22 @@ const Services = () => {
             </div>
           ))}
         </div>
-
+      <div className="max-w-7xl mx-auto">
+        {/* Header Section */}
+        <div className="text-center mb-16 sm:mb-20">
+          <p className="text-xs font-medium tracking-widest uppercase text-gray-500 mb-4 sm:mb-6">
+            GET IN TOUCH
+          </p>
+          <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold text-gray-900 mb-4 sm:mb-6 leading-tight">
+            Ready to Get
+            <br />
+            <span className="text-gray-400">Started?</span>
+          </h2>
+          <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto mb-8 sm:mb-10">
+            Let's discuss how we can help your business stay compliant and grow with confidence.
+          </p>
+        </div>
+      </div>
         {/* Why Choose Us Section */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <div className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-3xl p-10 text-white relative overflow-hidden shadow-xl">

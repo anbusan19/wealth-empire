@@ -27,9 +27,14 @@ export default function Navigation() {
         <div className="px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-14 sm:h-16">
             <div className="flex items-center">
-              <Link to="/" className="text-lg sm:text-2xl font-bold text-gray-900 hover:text-gray-700 transition-colors">
-                <span className="bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
-                  wealthempire.
+              <Link to="/" className="flex items-center gap-4 text-lg sm:text-2xl font-bold text-gray-900 hover:text-gray-700 transition-colors">
+                <img
+                  src="/welogo.png"
+                  alt="WE"
+                  className="h-8 w-auto"
+                />
+                <span className="text-black">
+                  Wealth Empires
                 </span>
               </Link>
             </div>
@@ -52,14 +57,44 @@ export default function Navigation() {
                 </ConditionalLink>
               )}
               {!currentUser && (
-                <a href="#pricing" className="nav-link text-gray-700 hover:text-gray-900 transition-all duration-300 text-sm font-medium relative">
+                <a 
+                  href="#pricing" 
+                  className="nav-link text-gray-700 hover:text-gray-900 transition-all duration-300 text-sm font-medium relative"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    document.getElementById('pricing')?.scrollIntoView({ 
+                      behavior: 'smooth',
+                      block: 'start'
+                    });
+                  }}
+                >
                   Pricing
                 </a>
               )}
-              <a href="#resources" className="nav-link text-gray-700 hover:text-gray-900 transition-all duration-300 text-sm font-medium relative">
+              <a 
+                href="#resources" 
+                className="nav-link text-gray-700 hover:text-gray-900 transition-all duration-300 text-sm font-medium relative"
+                onClick={(e) => {
+                  e.preventDefault();
+                  document.getElementById('resources')?.scrollIntoView({ 
+                    behavior: 'smooth',
+                    block: 'start'
+                  });
+                }}
+              >
                 Resources
               </a>
-              <a href="#contact" className="nav-link text-gray-700 hover:text-gray-900 transition-all duration-300 text-sm font-medium relative">
+              <a 
+                href="#contact" 
+                className="nav-link text-gray-700 hover:text-gray-900 transition-all duration-300 text-sm font-medium relative"
+                onClick={(e) => {
+                  e.preventDefault();
+                  document.getElementById('contact')?.scrollIntoView({ 
+                    behavior: 'smooth',
+                    block: 'start'
+                  });
+                }}
+              >
                 Contact
               </a>
             </div>
@@ -141,14 +176,47 @@ export default function Navigation() {
                 </ConditionalLink>
               )}
               {!currentUser && (
-                <a href="#pricing" className="block text-gray-700 hover:text-gray-900 py-3 px-3 rounded-lg hover:bg-white/50 transition-all duration-300">
+                <a 
+                  href="#pricing" 
+                  className="block text-gray-700 hover:text-gray-900 py-3 px-3 rounded-lg hover:bg-white/50 transition-all duration-300"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    document.getElementById('pricing')?.scrollIntoView({ 
+                      behavior: 'smooth',
+                      block: 'start'
+                    });
+                    setIsMenuOpen(false);
+                  }}
+                >
                   Pricing
                 </a>
               )}
-              <a href="#resources" className="block text-gray-700 hover:text-gray-900 py-3 px-3 rounded-lg hover:bg-white/50 transition-all duration-300">
+              <a 
+                href="#resources" 
+                className="block text-gray-700 hover:text-gray-900 py-3 px-3 rounded-lg hover:bg-white/50 transition-all duration-300"
+                onClick={(e) => {
+                  e.preventDefault();
+                  document.getElementById('resources')?.scrollIntoView({ 
+                    behavior: 'smooth',
+                    block: 'start'
+                  });
+                  setIsMenuOpen(false);
+                }}
+              >
                 Resources
               </a>
-              <a href="#contact" className="block text-gray-700 hover:text-gray-900 py-3 px-3 rounded-lg hover:bg-white/50 transition-all duration-300">
+              <a 
+                href="#contact" 
+                className="block text-gray-700 hover:text-gray-900 py-3 px-3 rounded-lg hover:bg-white/50 transition-all duration-300"
+                onClick={(e) => {
+                  e.preventDefault();
+                  document.getElementById('contact')?.scrollIntoView({ 
+                    behavior: 'smooth',
+                    block: 'start'
+                  });
+                  setIsMenuOpen(false);
+                }}
+              >
                 Contact
               </a>
               <div className="pt-3 space-y-3 border-t border-white/20">

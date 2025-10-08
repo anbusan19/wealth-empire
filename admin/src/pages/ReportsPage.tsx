@@ -1,22 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-    BarChart3,
     TrendingUp,
-    Users,
     Award,
-    Calendar,
     Download,
-    Filter,
     Search,
     FileText,
     AlertTriangle,
     CheckCircle,
-    Clock,
     Building,
     Loader2,
-    ArrowUpRight,
-    Activity
+    ArrowUpRight
 } from 'lucide-react';
 import AdminNavigation from '../components/AdminNavigation';
 import { ADMIN_API_ENDPOINTS, apiRequest } from '../config/api';
@@ -190,7 +184,7 @@ const ReportsPage: React.FC = () => {
                     </div>
 
                     {/* Stats Grid */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8 sm:mb-12 px-2 sm:px-0">
                         {/* Total Reports */}
                         <div className="bg-gray-900 rounded-3xl p-8 text-white">
                             <div className="flex items-center justify-between mb-4">

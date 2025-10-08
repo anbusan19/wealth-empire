@@ -1,11 +1,23 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: [
-    "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}",
-  ],
+  content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   theme: {
     extend: {
+      fontFamily: {
+        'sans': ['Raleway', 'system-ui', '-apple-system', 'sans-serif'],
+        'heading': ['Space Grotesk', 'system-ui', '-apple-system', 'sans-serif'],
+        'raleway': ['Raleway', 'system-ui', '-apple-system', 'sans-serif'],
+        'space-grotesk': ['Space Grotesk', 'system-ui', '-apple-system', 'sans-serif'],
+      },
+      fontWeight: {
+        'body': '400',
+        'subheading': '500',
+        'subheading-bold': '600',
+        'heading': '600',
+        'heading-bold': '700',
+        'button': '500',
+        'label': '500',
+      },
       animation: {
         'fade-in': 'fadeIn 0.5s ease-in-out',
         'slide-up': 'slideUp 0.3s ease-out',
@@ -30,4 +42,4 @@ export default {
     },
   },
   plugins: [],
-}
+};

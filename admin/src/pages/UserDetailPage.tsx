@@ -7,18 +7,13 @@ import {
   Phone,
   Globe,
   MapPin,
-  Calendar,
   Award,
   BarChart3,
-  TrendingUp,
   AlertTriangle,
-  CheckCircle,
   Edit,
-  Trash2,
   Loader2,
   User,
-  CreditCard,
-  Activity
+  CreditCard
 } from 'lucide-react';
 import AdminNavigation from '../components/AdminNavigation';
 import { ADMIN_API_ENDPOINTS, apiRequest } from '../config/api';
@@ -73,9 +68,9 @@ const UserDetailPage: React.FC = () => {
     try {
       setLoading(true);
       setError(null);
-      
+
       const response = await apiRequest(ADMIN_API_ENDPOINTS.USER_DETAIL(id));
-      
+
       if (response.success) {
         const userData = response.data;
         setUser(userData);
@@ -100,14 +95,6 @@ const UserDetailPage: React.FC = () => {
     return styles[status as keyof typeof styles] || 'bg-gray-100 text-gray-800';
   };
 
-  const getPlanBadge = (plan: string) => {
-    const styles = {
-      Free: 'bg-gray-100 text-gray-800',
-      Elite: 'bg-blue-100 text-blue-800',
-      'White Label': 'bg-purple-100 text-purple-800'
-    };
-    return styles[plan as keyof typeof styles] || 'bg-gray-100 text-gray-800';
-  };
 
   if (loading) {
     return (
@@ -146,11 +133,11 @@ const UserDetailPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-white">
       <AdminNavigation />
-      
+
       <section className="relative pt-20 sm:pt-32 pb-16 sm:pb-24 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           {/* Header */}
-          <div className="flex items-center justify-between mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 sm:mb-8 gap-4 sm:gap-0">
             <div className="flex items-center">
               <Link
                 to="/admin/users"
@@ -174,35 +161,32 @@ const UserDetailPage: React.FC = () => {
           </div>
 
           {/* Tabs */}
-          <div className="border-b border-gray-200 mb-8">
-            <nav className="flex space-x-8">
+          <div className="border-b border-gray-200 mb-6 sm:mb-8 overflow-x-auto">
+            <nav className="flex space-x-4 sm:space-x-8 min-w-max px-2 sm:px-0">
               <button
                 onClick={() => setActiveTab('overview')}
-                className={`py-2 px-1 border-b-2 font-medium text-sm ${
-                  activeTab === 'overview'
-                    ? 'border-gray-900 text-gray-900'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
+                className={`py-2 px-1 border-b-2 font-medium text-sm ${activeTab === 'overview'
+                  ? 'border-gray-900 text-gray-900'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  }`}
               >
                 Overview
               </button>
               <button
                 onClick={() => setActiveTab('health-checks')}
-                className={`py-2 px-1 border-b-2 font-medium text-sm ${
-                  activeTab === 'health-checks'
-                    ? 'border-gray-900 text-gray-900'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
+                className={`py-2 px-1 border-b-2 font-medium text-sm ${activeTab === 'health-checks'
+                  ? 'border-gray-900 text-gray-900'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  }`}
               >
                 Health Checks
               </button>
               <button
                 onClick={() => setActiveTab('subscription')}
-                className={`py-2 px-1 border-b-2 font-medium text-sm ${
-                  activeTab === 'subscription'
-                    ? 'border-gray-900 text-gray-900'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
+                className={`py-2 px-1 border-b-2 font-medium text-sm ${activeTab === 'subscription'
+                  ? 'border-gray-900 text-gray-900'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  }`}
               >
                 Subscription
               </button>
@@ -216,7 +200,7 @@ const UserDetailPage: React.FC = () => {
               <div className="lg:col-span-2">
                 <div className="bg-white rounded-3xl shadow-2xl border border-gray-100 p-8">
                   <h2 className="text-2xl font-bold text-gray-900 mb-6">User Information</h2>
-                  
+
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-4">
                       <div className="flex items-start">
@@ -226,7 +210,7 @@ const UserDetailPage: React.FC = () => {
                           <p className="text-lg font-semibold text-gray-900">{user.founderName}</p>
                         </div>
                       </div>
-                      
+
                       <div className="flex items-start">
                         <Mail className="h-5 w-5 text-gray-400 mt-1 mr-3" />
                         <div>
@@ -234,7 +218,7 @@ const UserDetailPage: React.FC = () => {
                           <p className="text-lg font-semibold text-gray-900">{user.email}</p>
                         </div>
                       </div>
-                      
+
                       <div className="flex items-start">
                         <Phone className="h-5 w-5 text-gray-400 mt-1 mr-3" />
                         <div>
@@ -243,7 +227,7 @@ const UserDetailPage: React.FC = () => {
                         </div>
                       </div>
                     </div>
-                    
+
                     <div className="space-y-4">
                       <div className="flex items-start">
                         <Building className="h-5 w-5 text-gray-400 mt-1 mr-3" />
@@ -252,7 +236,7 @@ const UserDetailPage: React.FC = () => {
                           <p className="text-lg font-semibold text-gray-900">{user.startupName}</p>
                         </div>
                       </div>
-                      
+
                       <div className="flex items-start">
                         <MapPin className="h-5 w-5 text-gray-400 mt-1 mr-3" />
                         <div>
@@ -262,7 +246,7 @@ const UserDetailPage: React.FC = () => {
                           </p>
                         </div>
                       </div>
-                      
+
                       {user.website && (
                         <div className="flex items-start">
                           <Globe className="h-5 w-5 text-gray-400 mt-1 mr-3" />
@@ -343,21 +327,19 @@ const UserDetailPage: React.FC = () => {
             <div className="space-y-6">
               <div className="bg-white rounded-3xl shadow-2xl border border-gray-100 p-8">
                 <h2 className="text-2xl font-bold text-gray-900 mb-6">Health Check History</h2>
-                
+
                 {healthCheckHistory.length > 0 ? (
                   <div className="space-y-6">
                     {healthCheckHistory.map((check) => (
                       <div key={check.id} className="border border-gray-200 rounded-2xl p-6">
                         <div className="flex items-center justify-between mb-4">
                           <div className="flex items-center">
-                            <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                              check.score >= 80 ? 'bg-green-100' :
+                            <div className={`w-12 h-12 rounded-full flex items-center justify-center ${check.score >= 80 ? 'bg-green-100' :
                               check.score >= 60 ? 'bg-yellow-100' : 'bg-red-100'
-                            }`}>
-                              <span className={`text-lg font-bold ${
-                                check.score >= 80 ? 'text-green-800' :
-                                check.score >= 60 ? 'text-yellow-800' : 'text-red-800'
                               }`}>
+                              <span className={`text-lg font-bold ${check.score >= 80 ? 'text-green-800' :
+                                check.score >= 60 ? 'text-yellow-800' : 'text-red-800'
+                                }`}>
                                 {check.score}%
                               </span>
                             </div>
@@ -376,7 +358,7 @@ const UserDetailPage: React.FC = () => {
                             </span>
                           )}
                         </div>
-                        
+
                         <div>
                           <h4 className="text-sm font-medium text-gray-700 mb-2">Recommendations:</h4>
                           <ul className="space-y-1">
@@ -405,7 +387,7 @@ const UserDetailPage: React.FC = () => {
             <div className="space-y-6">
               <div className="bg-white rounded-3xl shadow-2xl border border-gray-100 p-8">
                 <h2 className="text-2xl font-bold text-gray-900 mb-6">Subscription Details</h2>
-                
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   <div className="space-y-6">
                     <div>

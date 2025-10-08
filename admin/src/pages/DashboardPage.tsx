@@ -4,15 +4,12 @@ import {
   Users,
   BarChart3,
   TrendingUp,
-  Calendar,
   Award,
   AlertTriangle,
-  CheckCircle,
   FileText,
   Loader2,
   ArrowUpRight,
   Building,
-  Activity,
   DollarSign
 } from 'lucide-react';
 import AdminNavigation from '../components/AdminNavigation';
@@ -143,9 +140,9 @@ const DashboardPage: React.FC = () => {
           </div>
 
           {/* Stats Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8 sm:mb-12 px-2 sm:px-0">
             {/* Total Users */}
-            <div className="bg-gray-900 rounded-3xl p-8 text-white">
+            <div className="bg-gray-900 rounded-2xl sm:rounded-3xl p-6 sm:p-8 text-white">
               <div className="flex items-center justify-between mb-4">
                 <Users className="h-8 w-8" />
                 <span className="text-xs font-medium tracking-widest uppercase text-gray-400">
@@ -159,7 +156,7 @@ const DashboardPage: React.FC = () => {
             </div>
 
             {/* Health Checks */}
-            <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-3xl p-8">
+            <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl sm:rounded-3xl p-6 sm:p-8">
               <div className="flex items-center justify-between mb-4">
                 <BarChart3 className="h-8 w-8 text-gray-900" />
                 <span className="text-xs font-medium tracking-widest uppercase text-gray-600">
@@ -175,7 +172,7 @@ const DashboardPage: React.FC = () => {
             </div>
 
             {/* Average Score */}
-            <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-3xl p-8">
+            <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-2xl sm:rounded-3xl p-6 sm:p-8">
               <div className="flex items-center justify-between mb-4">
                 <Award className="h-8 w-8 text-gray-900" />
                 <span className="text-xs font-medium tracking-widest uppercase text-gray-600">
@@ -191,7 +188,7 @@ const DashboardPage: React.FC = () => {
             </div>
 
             {/* Revenue */}
-            <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-3xl p-8">
+            <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl sm:rounded-3xl p-6 sm:p-8">
               <div className="flex items-center justify-between mb-4">
                 <DollarSign className="h-8 w-8 text-gray-900" />
                 <span className="text-xs font-medium tracking-widest uppercase text-gray-600">
@@ -208,7 +205,7 @@ const DashboardPage: React.FC = () => {
           </div>
 
           {/* Content Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8 px-2 sm:px-0">
             {/* Recent Users */}
             <div className="lg:col-span-2">
               <div className="bg-white rounded-3xl shadow-2xl border border-gray-100 p-8">

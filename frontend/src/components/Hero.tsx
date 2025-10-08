@@ -18,10 +18,10 @@ export default function Hero() {
           <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto mb-8 sm:mb-10 px-4 sm:px-0">
             AI-powered assessment with actionable insights. Check your startup's compliance health in minutes and get personalized recommendations.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center px-4 sm:px-0">
             <Link 
               to="/health-check" 
-              className="bg-gray-900 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-full hover:bg-gray-800 transition-all text-sm font-medium inline-block shadow-lg hover:shadow-xl transform hover:-translate-y-1 w-full sm:w-auto max-w-xs sm:max-w-none"
+              className="bg-gray-900 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-full hover:bg-gray-800 transition-all text-sm sm:text-base font-medium inline-block shadow-lg hover:shadow-xl transform hover:-translate-y-1 w-full sm:w-auto text-center"
             >
               Start Health Check
             </Link>
