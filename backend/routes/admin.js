@@ -160,8 +160,8 @@ router.get('/health-checks/recent', requireAdmin, async (req, res) => {
       { $limit: 10 }
     ]);
 
-    const formattedHealthChecks = recentHealthChecks.map(item => ({
-      id: `${item._id}_${item.healthCheck.assessmentDate}`,
+    const formattedHealthChecks = recentHealthChecks.map((item, index) => ({
+      id: `${item._id}_${item.healthCheck.assessmentDate}_${index}`,
       userEmail: item.email,
       startupName: item.startupName,
       score: item.healthCheck.score || 0,
@@ -375,8 +375,8 @@ router.get('/reports', requireAdmin, async (req, res) => {
       { $count: 'total' }
     ]);
 
-    const formattedReports = reports.map(item => ({
-      id: item.healthCheck ? `${item._id}_${item.healthCheck.assessmentDate}` : `${item._id}_pending`,
+    const formattedReports = reports.map((item, index) => ({
+      id: item.healthCheck ? `${item._id}_${item.healthCheck.assessmentDate}_${index}` : `${item._id}_pending_${index}`,
       userId: item._id.toString(),
       userEmail: item.email,
       startupName: item.startupName,

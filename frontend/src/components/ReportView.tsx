@@ -180,7 +180,7 @@ export default function ReportView({ answers, followUpAnswers }: ReportViewProps
             SOLUTIONS & PRICING
           </p>
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-slate-900 mb-6 leading-tight">
-            Wealth Empire
+            Wealth Empires
             <br />
             <span className="bg-gradient-to-r from-slate-600 to-slate-400 bg-clip-text text-transparent">Solutions</span>
           </h1>
@@ -305,7 +305,7 @@ export default function ReportView({ answers, followUpAnswers }: ReportViewProps
 
               <div className="text-center mb-12">
                 <div className="text-xs font-semibold tracking-[0.15em] uppercase text-slate-400 mb-3">
-                  WEALTH EMPIRE
+                  WEALTH EMPIRES
                 </div>
                 <h3 className="text-5xl sm:text-6xl font-bold text-white mb-6">
                   {recommendedPlan.title}
@@ -412,7 +412,7 @@ export default function ReportView({ answers, followUpAnswers }: ReportViewProps
             <div className="w-12 h-12 bg-gradient-to-br from-blue-100 to-blue-200 rounded-xl flex items-center justify-center mb-6">
               <CheckCircle className="w-6 h-6 text-blue-600" />
             </div>
-            <h3 className="text-3xl font-bold text-slate-900 mb-6">Why Choose Wealth Empire?</h3>
+            <h3 className="text-3xl font-bold text-slate-900 mb-6">Why Choose Wealth Empires?</h3>
             <div className="space-y-4 mb-8">
               <div className="flex items-center gap-4">
                 <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">

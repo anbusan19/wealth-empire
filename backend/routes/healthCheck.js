@@ -10,6 +10,9 @@ router.post('/save-results', verifyFirebaseToken, requireOnboarding, [
   body('answers').isObject().withMessage('Answers must be an object'),
   body('score').isNumeric().isFloat({ min: 0, max: 100 }).withMessage('Score must be between 0 and 100'),
   body('recommendations').optional().isArray().withMessage('Recommendations must be an array'),
+  body('strengths').optional().isArray().withMessage('Strengths must be an array'),
+  body('redFlags').optional().isArray().withMessage('Red flags must be an array'),
+  body('risks').optional().isArray().withMessage('Risks must be an array'),
   body('followUpAnswers').optional().isObject().withMessage('Follow-up answers must be an object')
 ], async (req, res) => {
   try {
@@ -22,7 +25,15 @@ router.post('/save-results', verifyFirebaseToken, requireOnboarding, [
       });
     }
 
-    const { answers, score, recommendations = [], followUpAnswers = {} } = req.body;
+    const { 
+      answers, 
+      score, 
+      recommendations = [], 
+      strengths = [],
+      redFlags = [],
+      risks = [],
+      followUpAnswers = {} 
+    } = req.body;
     const user = req.user;
 
     // Create health check result
@@ -31,6 +42,9 @@ router.post('/save-results', verifyFirebaseToken, requireOnboarding, [
       answers: new Map(Object.entries(answers)),
       score: parseFloat(score),
       recommendations,
+      strengths,
+      redFlags,
+      risks,
       followUpAnswers: new Map(Object.entries(followUpAnswers))
     };
 
@@ -45,6 +59,9 @@ router.post('/save-results', verifyFirebaseToken, requireOnboarding, [
           assessmentDate: healthCheckResult.assessmentDate,
           score: healthCheckResult.score,
           recommendations: healthCheckResult.recommendations,
+          strengths: healthCheckResult.strengths,
+          redFlags: healthCheckResult.redFlags,
+          risks: healthCheckResult.risks,
           totalAssessments: user.healthCheckResults.length
         }
       }
@@ -77,6 +94,9 @@ router.get('/history', verifyFirebaseToken, requireOnboarding, async (req, res) 
         assessmentDate: result.assessmentDate,
         score: result.score,
         recommendations: result.recommendations,
+        strengths: result.strengths || [],
+        redFlags: result.redFlags || [],
+        risks: result.risks || [],
         answersCount: result.answers ? result.answers.size : 0,
         followUpAnswersCount: result.followUpAnswers ? result.followUpAnswers.size : 0
       }));
@@ -124,6 +144,9 @@ router.get('/latest', verifyFirebaseToken, requireOnboarding, async (req, res) =
       answers: Object.fromEntries(latestResult.answers || new Map()),
       score: latestResult.score,
       recommendations: latestResult.recommendations,
+      strengths: latestResult.strengths || [],
+      redFlags: latestResult.redFlags || [],
+      risks: latestResult.risks || [],
       followUpAnswers: Object.fromEntries(latestResult.followUpAnswers || new Map())
     };
 

@@ -91,6 +91,9 @@ const userSchema = new mongoose.Schema({
       max: 100
     },
     recommendations: [String],
+    strengths: [String],
+    redFlags: [String],
+    risks: [String],
     followUpAnswers: {
       type: Map,
       of: mongoose.Schema.Types.Mixed

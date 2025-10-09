@@ -18,6 +18,18 @@ import {
 import AdminNavigation from '../components/AdminNavigation';
 import { ADMIN_API_ENDPOINTS, apiRequest } from '../config/api';
 
+// Updated HealthCheckHistory interface to reflect the parsed data
+interface HealthCheckHistory {
+  id: string; // The MongoDB data doesn't explicitly show an ID for the check, so we keep the original interface's 'id' but will use the index/date if 'id' is missing.
+  date: string;
+  score: number;
+  criticalIssues: number;
+  recommendations: string[];
+  strengths: string[];
+  redFlags: string[];
+  risks: string[];
+}
+
 interface UserDetail {
   id: string;
   email: string;
@@ -28,26 +40,18 @@ interface UserDetail {
   country: string;
   website?: string;
   contactNumber: string;
-  subscriptionPlan: 'Free' | 'Elite' | 'White Label';
-  subscriptionStatus: 'Active' | 'Expired' | 'Cancelled';
+  subscriptionPlan: 'Free' | 'Elite' | 'White Label'; // Assuming 'free' is mapped to 'Free'
+  subscriptionStatus: 'Active' | 'Expired' | 'Cancelled'; // Assuming 'isActive' and type are mapped to these
   subscriptionStartDate?: string;
   subscriptionEndDate?: string;
   isOnboarded: boolean;
-  joinDate: string;
-  lastLogin: string;
-  lastHealthCheck?: string;
-  complianceScore?: number;
-  totalHealthChecks: number;
+  joinDate: string; // Assuming 'createdAt' is mapped to 'joinDate'
+  lastLogin: string; // Assuming 'lastLoginAt' is mapped to 'lastLogin'
+  lastHealthCheck?: string; // Assuming the latest assessmentDate
+  complianceScore?: number; // Assuming the latest score
+  totalHealthChecks: number; // Assuming healthCheckResults.length
   status: 'Active' | 'Inactive' | 'Suspended';
-  totalRevenue: number;
-}
-
-interface HealthCheckHistory {
-  id: string;
-  date: string;
-  score: number;
-  criticalIssues: number;
-  recommendations: string[];
+  totalRevenue: number; // Placeholder, assuming this is provided by the API
 }
 
 const UserDetailPage: React.FC = () => {
@@ -57,6 +61,25 @@ const UserDetailPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'overview' | 'health-checks' | 'subscription'>('overview');
+
+  // Utility function to parse the combined recommendations array
+  const parseHealthCheckDetails = (recommendations: string[]): Pick<HealthCheckHistory, 'strengths' | 'redFlags' | 'risks'> => {
+    const strengths: string[] = [];
+    const redFlags: string[] = [];
+    const risks: string[] = [];
+
+    recommendations.forEach(rec => {
+      if (rec.startsWith('Strength:')) {
+        strengths.push(rec.replace('Strength:', '').trim());
+      } else if (rec.startsWith('Red Flag:')) {
+        redFlags.push(rec.replace('Red Flag:', '').trim());
+      } else if (rec.startsWith('Risk:')) {
+        risks.push(rec.replace('Risk:', '').trim());
+      }
+    });
+
+    return { strengths, redFlags, risks };
+  };
 
   useEffect(() => {
     if (userId) {
@@ -73,12 +96,34 @@ const UserDetailPage: React.FC = () => {
 
       if (response.success) {
         const userData = response.data;
+
+        // Process health check history to separate strengths, red flags, and risks
+        const processedHistory: HealthCheckHistory[] = (userData.healthCheckHistory || []).map((check: any) => {
+          const { strengths, redFlags, risks } = parseHealthCheckDetails(check.recommendations || []);
+
+          // Assuming the API response for an individual check has 'id', 'date', 'score', 'criticalIssues'
+          // and that 'recommendations' contains the raw, prefixed data.
+          return {
+            ...check,
+            strengths,
+            redFlags,
+            risks,
+            criticalIssues: check.criticalIssues || 0, // Ensure criticalIssues is present
+          };
+        });
+
         setUser(userData);
-        setHealthCheckHistory(userData.healthCheckHistory || []);
+        setHealthCheckHistory(processedHistory);
+      } else {
+        setError('User not found');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error fetching user detail:', error);
-      setError('Failed to load user details');
+      if (error.message?.includes('404') || error.message?.includes('not found')) {
+        setError('User not found');
+      } else {
+        setError('Failed to load user details. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
@@ -119,7 +164,7 @@ const UserDetailPage: React.FC = () => {
             <AlertTriangle className="h-8 w-8 text-red-500 mx-auto mb-4" />
             <p className="text-red-600 mb-4">{error || 'User not found'}</p>
             <Link
-              to="/admin/users"
+              to="/users"
               className="px-6 py-3 bg-gray-900 text-white rounded-2xl hover:bg-gray-800 transition-all duration-300"
             >
               Back to Users
@@ -129,6 +174,32 @@ const UserDetailPage: React.FC = () => {
       </div>
     );
   }
+
+  const DetailList = ({ title, items, colorClass, bgColorClass, dotColorClass }: {
+    title: string;
+    items: string[];
+    colorClass: string;
+    bgColorClass: string;
+    dotColorClass: string;
+  }) => (
+    items.length > 0 ? (
+      <div className={`${bgColorClass} border ${colorClass} rounded-2xl p-4`}>
+        <h4 className={`text-sm font-medium ${colorClass} mb-3 flex items-center`}>
+          <span className={`${dotColorClass} rounded-full mr-2`}></span>
+          {title}
+        </h4>
+        <ul className="space-y-2">
+          {items.map((item, index) => (
+            <li key={index} className={`text-sm ${colorClass} font-lato flex items-start`}>
+              <span className={`w-1 h-1 ${dotColorClass} rounded-full mt-2 mr-3 flex-shrink-0`}></span>
+              {item}
+            </li>
+          ))}
+        </ul>
+      </div>
+    ) : null
+  );
+
 
   return (
     <div className="min-h-screen bg-white">
@@ -140,7 +211,7 @@ const UserDetailPage: React.FC = () => {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 sm:mb-8 gap-4 sm:gap-0">
             <div className="flex items-center">
               <Link
-                to="/admin/users"
+                to="/users"
                 className="mr-4 p-2 text-gray-600 hover:text-gray-900 rounded-lg hover:bg-gray-100"
               >
                 <ArrowLeft className="h-5 w-5" />
@@ -154,9 +225,6 @@ const UserDetailPage: React.FC = () => {
               <span className={`px-3 py-1 text-sm font-semibold rounded-full ${getStatusBadge(user.status)}`}>
                 {user.status}
               </span>
-              <button className="p-2 text-gray-600 hover:text-gray-900 rounded-lg hover:bg-gray-100">
-                <Edit className="h-5 w-5" />
-              </button>
             </div>
           </div>
 
@@ -207,7 +275,7 @@ const UserDetailPage: React.FC = () => {
                         <User className="h-5 w-5 text-gray-400 mt-1 mr-3" />
                         <div>
                           <p className="text-sm font-medium text-gray-500">Founder Name</p>
-                          <p className="text-lg font-semibold text-gray-900">{user.founderName}</p>
+                          <p className="text-lg font-semibold text-gray-900 font-lato">{user.founderName}</p>
                         </div>
                       </div>
 
@@ -215,7 +283,7 @@ const UserDetailPage: React.FC = () => {
                         <Mail className="h-5 w-5 text-gray-400 mt-1 mr-3" />
                         <div>
                           <p className="text-sm font-medium text-gray-500">Email</p>
-                          <p className="text-lg font-semibold text-gray-900">{user.email}</p>
+                          <p className="text-lg font-semibold text-gray-900 font-lato">{user.email}</p>
                         </div>
                       </div>
 
@@ -223,7 +291,7 @@ const UserDetailPage: React.FC = () => {
                         <Phone className="h-5 w-5 text-gray-400 mt-1 mr-3" />
                         <div>
                           <p className="text-sm font-medium text-gray-500">Contact Number</p>
-                          <p className="text-lg font-semibold text-gray-900">{user.contactNumber}</p>
+                          <p className="text-lg font-semibold text-gray-900 font-lato">{user.contactNumber}</p>
                         </div>
                       </div>
                     </div>
@@ -233,7 +301,7 @@ const UserDetailPage: React.FC = () => {
                         <Building className="h-5 w-5 text-gray-400 mt-1 mr-3" />
                         <div>
                           <p className="text-sm font-medium text-gray-500">Startup Name</p>
-                          <p className="text-lg font-semibold text-gray-900">{user.startupName}</p>
+                          <p className="text-lg font-semibold text-gray-900 font-lato">{user.startupName}</p>
                         </div>
                       </div>
 
@@ -241,7 +309,7 @@ const UserDetailPage: React.FC = () => {
                         <MapPin className="h-5 w-5 text-gray-400 mt-1 mr-3" />
                         <div>
                           <p className="text-sm font-medium text-gray-500">Location</p>
-                          <p className="text-lg font-semibold text-gray-900">
+                          <p className="text-lg font-semibold text-gray-900 font-lato">
                             {user.city}, {user.state}, {user.country}
                           </p>
                         </div>
@@ -256,7 +324,7 @@ const UserDetailPage: React.FC = () => {
                               href={user.website}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="text-lg font-semibold text-blue-600 hover:text-blue-700"
+                              className="text-lg font-semibold text-blue-600 hover:text-blue-700 font-lato"
                             >
                               {user.website}
                             </a>
@@ -274,12 +342,12 @@ const UserDetailPage: React.FC = () => {
                 <div className="bg-white rounded-3xl shadow-2xl border border-gray-100 p-6">
                   <div className="text-center">
                     <Award className="h-8 w-8 text-gray-900 mx-auto mb-4" />
-                    <div className="text-4xl font-bold text-gray-900 mb-2">
+                    <div className="text-4xl font-bold text-gray-900 mb-2 font-numbers">
                       {user.complianceScore || 0}%
                     </div>
                     <p className="text-sm text-gray-600 mb-4">Latest Compliance Score</p>
                     {user.lastHealthCheck && (
-                      <p className="text-xs text-gray-500">
+                      <p className="text-xs text-gray-500 font-lato">
                         Last check: {new Date(user.lastHealthCheck).toLocaleDateString()}
                       </p>
                     )}
@@ -292,17 +360,17 @@ const UserDetailPage: React.FC = () => {
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
                       <span className="text-sm text-gray-600">Health Checks</span>
-                      <span className="font-semibold text-gray-900">{user.totalHealthChecks}</span>
+                      <span className="font-semibold text-gray-900 font-lato">{user.totalHealthChecks}</span>
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-sm text-gray-600">Member Since</span>
-                      <span className="font-semibold text-gray-900">
+                      <span className="font-semibold text-gray-900 font-lato">
                         {new Date(user.joinDate).toLocaleDateString()}
                       </span>
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-sm text-gray-600">Last Login</span>
-                      <span className="font-semibold text-gray-900">
+                      <span className="font-semibold text-gray-900 font-lato">
                         {new Date(user.lastLogin).toLocaleDateString()}
                       </span>
                     </div>
@@ -313,7 +381,7 @@ const UserDetailPage: React.FC = () => {
                 <div className="bg-white rounded-3xl shadow-2xl border border-gray-100 p-6">
                   <h3 className="text-lg font-bold text-gray-900 mb-4">Revenue</h3>
                   <div className="text-center">
-                    <div className="text-3xl font-bold text-gray-900 mb-2">
+                    <div className="text-3xl font-bold text-gray-900 mb-2 font-numbers">
                       ₹{user.totalRevenue.toLocaleString()}
                     </div>
                     <p className="text-sm text-gray-600">Total Revenue</p>
@@ -330,14 +398,14 @@ const UserDetailPage: React.FC = () => {
 
                 {healthCheckHistory.length > 0 ? (
                   <div className="space-y-6">
-                    {healthCheckHistory.map((check) => (
-                      <div key={check.id} className="border border-gray-200 rounded-2xl p-6">
+                    {healthCheckHistory.map((check, index) => (
+                      <div key={`${check.id}_${index}`} className="border border-gray-200 rounded-2xl p-6">
                         <div className="flex items-center justify-between mb-4">
                           <div className="flex items-center">
                             <div className={`w-12 h-12 rounded-full flex items-center justify-center ${check.score >= 80 ? 'bg-green-100' :
                               check.score >= 60 ? 'bg-yellow-100' : 'bg-red-100'
                               }`}>
-                              <span className={`text-lg font-bold ${check.score >= 80 ? 'text-green-800' :
+                              <span className={`text-lg font-bold font-numbers ${check.score >= 80 ? 'text-green-800' :
                                 check.score >= 60 ? 'text-yellow-800' : 'text-red-800'
                                 }`}>
                                 {check.score}%
@@ -347,28 +415,47 @@ const UserDetailPage: React.FC = () => {
                               <h3 className="text-lg font-semibold text-gray-900">
                                 Compliance Assessment
                               </h3>
-                              <p className="text-sm text-gray-600">
+                              <p className="text-sm text-gray-600 font-lato">
                                 {new Date(check.date).toLocaleDateString()}
                               </p>
                             </div>
                           </div>
                           {check.criticalIssues > 0 && (
                             <span className="px-3 py-1 bg-red-100 text-red-800 text-sm font-medium rounded-full">
-                              {check.criticalIssues} Critical Issues
+                              <span className="font-numbers">{check.criticalIssues}</span> Critical Issues
                             </span>
                           )}
                         </div>
 
-                        <div>
-                          <h4 className="text-sm font-medium text-gray-700 mb-2">Recommendations:</h4>
-                          <ul className="space-y-1">
-                            {check.recommendations.slice(0, 3).map((rec, index) => (
-                              <li key={index} className="text-sm text-gray-600 flex items-start">
-                                <span className="w-2 h-2 bg-gray-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                                {rec}
-                              </li>
-                            ))}
-                          </ul>
+                        {/* Updated Grid for Strengths, Red Flags, and Risks */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+                          {/* Strengths Container (Green) */}
+                          <DetailList
+                            title="Strengths"
+                            items={check.strengths}
+                            colorClass="text-green-800"
+                            bgColorClass="bg-green-50"
+                            dotColorClass="bg-green-600"
+                          />
+
+                          {/* Red Flags Container (Red) */}
+                          <DetailList
+                            title="Red Flags"
+                            items={check.redFlags}
+                            colorClass="text-red-800"
+                            bgColorClass="bg-red-50"
+                            dotColorClass="bg-red-600"
+                          />
+
+                          {/* Risks Container (Yellow) */}
+                          <DetailList
+                            title="Risks"
+                            items={check.risks}
+                            colorClass="text-yellow-800"
+                            bgColorClass="bg-yellow-50"
+                            dotColorClass="bg-yellow-600"
+                          />
                         </div>
                       </div>
                     ))}
@@ -412,14 +499,14 @@ const UserDetailPage: React.FC = () => {
                         <div className="space-y-3">
                           <div className="flex items-center justify-between">
                             <span className="text-sm text-gray-600">Start Date</span>
-                            <span className="font-semibold text-gray-900">
+                            <span className="font-semibold text-gray-900 font-lato">
                               {new Date(user.subscriptionStartDate).toLocaleDateString()}
                             </span>
                           </div>
                           {user.subscriptionEndDate && (
                             <div className="flex items-center justify-between">
                               <span className="text-sm text-gray-600">End Date</span>
-                              <span className="font-semibold text-gray-900">
+                              <span className="font-semibold text-gray-900 font-lato">
                                 {new Date(user.subscriptionEndDate).toLocaleDateString()}
                               </span>
                             </div>
@@ -433,7 +520,7 @@ const UserDetailPage: React.FC = () => {
                     <h3 className="text-lg font-semibold text-gray-900 mb-4">Billing Information</h3>
                     <div className="p-4 bg-gray-50 rounded-2xl">
                       <div className="text-center">
-                        <div className="text-3xl font-bold text-gray-900 mb-2">
+                        <div className="text-3xl font-bold text-gray-900 mb-2 font-numbers">
                           ₹{user.totalRevenue.toLocaleString()}
                         </div>
                         <p className="text-sm text-gray-600">Total Revenue Generated</p>

@@ -119,9 +119,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 bg-gradient-to-br from-slate-900 to-slate-700 rounded-2xl flex items-center justify-center mb-4 mx-auto shadow-lg">
-            <span className="text-white font-bold text-xl">WE</span>
-          </div>
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-900 mx-auto"></div>
         </div>
       </div>

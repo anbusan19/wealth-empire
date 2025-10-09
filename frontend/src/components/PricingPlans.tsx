@@ -51,7 +51,7 @@ const PricingPlans = () => {
                 <div className="relative z-10">
                   <div className="mb-8">
                     <div className="text-xs font-semibold tracking-[0.15em] uppercase text-gray-400 mb-3">
-                      WEALTH EMPIRE
+                      WEALTH EMPIRES
                     </div>
                     <h4 className="text-3xl font-bold text-white mb-4">Essentials</h4>
                     <p className="text-gray-300 leading-relaxed">
@@ -81,7 +81,7 @@ const PricingPlans = () => {
                 <div className="relative z-10">
                   <div className="mb-8">
                     <div className="text-xs font-semibold tracking-[0.15em] uppercase text-gray-400 mb-3">
-                      WEALTH EMPIRE
+                      WEALTH EMPIRES
                     </div>
                     <h4 className="text-3xl font-bold text-white mb-4">#WE Elite</h4>
                     <p className="text-gray-300 leading-relaxed mb-6">

@@ -193,9 +193,9 @@ const ReportsPage: React.FC = () => {
                                     TOTAL REPORTS
                                 </span>
                             </div>
-                            <div className="text-4xl font-bold mb-2">{stats?.totalReports.toLocaleString()}</div>
+                            <div className="text-4xl font-bold mb-2 font-numbers">{stats?.totalReports.toLocaleString()}</div>
                             <div className="text-sm text-gray-300">
-                                +{stats?.completedThisMonth} this month
+                                +<span className="font-numbers">{stats?.completedThisMonth}</span> this month
                             </div>
                         </div>
 
@@ -207,7 +207,7 @@ const ReportsPage: React.FC = () => {
                                     AVG SCORE
                                 </span>
                             </div>
-                            <div className="text-4xl font-bold text-gray-900 mb-2">
+                            <div className="text-4xl font-bold text-gray-900 mb-2 font-numbers">
                                 {stats?.averageScore}%
                             </div>
                             <div className="text-sm text-gray-700">
@@ -223,7 +223,7 @@ const ReportsPage: React.FC = () => {
                                     CRITICAL ISSUES
                                 </span>
                             </div>
-                            <div className="text-4xl font-bold text-gray-900 mb-2">
+                            <div className="text-4xl font-bold text-gray-900 mb-2 font-numbers">
                                 {stats?.criticalIssues}
                             </div>
                             <div className="text-sm text-gray-700">
@@ -239,7 +239,7 @@ const ReportsPage: React.FC = () => {
                                     IMPROVEMENT
                                 </span>
                             </div>
-                            <div className="text-4xl font-bold text-gray-900 mb-2">
+                            <div className="text-4xl font-bold text-gray-900 mb-2 font-numbers">
                                 +{stats?.improvementRate}%
                             </div>
                             <div className="text-sm text-gray-700">
@@ -253,15 +253,15 @@ const ReportsPage: React.FC = () => {
                         <div className="bg-white rounded-3xl shadow-2xl border border-gray-100 p-8">
                             <h2 className="text-2xl font-bold text-gray-900 mb-6">Category Performance</h2>
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                                {categoryStats.map((category) => (
-                                    <div key={category.category} className="p-6 bg-gray-50 rounded-2xl">
+                                {categoryStats.map((category, index) => (
+                                    <div key={`${category.category}_${index}`} className="p-6 bg-gray-50 rounded-2xl">
                                         <h3 className="font-semibold text-gray-900 mb-2">{category.category}</h3>
-                                        <div className="text-3xl font-bold text-gray-900 mb-2">
+                                        <div className="text-3xl font-bold text-gray-900 mb-2 font-numbers">
                                             {category.averageScore}%
                                         </div>
                                         <div className="flex items-center text-sm">
                                             <TrendingUp className="h-4 w-4 text-green-600 mr-1" />
-                                            <span className="text-green-600 font-medium">+{category.improvement}%</span>
+                                            <span className="text-green-600 font-medium font-numbers">+{category.improvement}%</span>
                                             <span className="text-gray-500 ml-1">vs last month</span>
                                         </div>
                                     </div>
@@ -333,9 +333,9 @@ const ReportsPage: React.FC = () => {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {filteredReports.map((report) => (
+                                    {filteredReports.map((report, index) => (
                                         <tr
-                                            key={report.id}
+                                            key={`${report.id}_${index}`}
                                             className="border-b border-gray-100 hover:bg-gray-50 cursor-pointer transition-colors duration-200"
                                             onClick={() => handleUserClick(report)}
                                             title={`Click to view ${report.startupName}'s detailed report`}

@@ -421,7 +421,7 @@ export default function QuestionFlow() {
             </div>
             <div className="mt-8 pt-8 border-t border-gray-100 text-center">
               <p className="text-sm text-gray-500">
-                © 2025 Wealth Empire. All rights reserved.
+                © 2025 Wealth Empires. All rights reserved.
               </p>
             </div>
           </div>

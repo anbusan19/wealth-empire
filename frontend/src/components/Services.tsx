@@ -215,7 +215,7 @@ const Services = () => {
             <div className="w-12 h-12 bg-gradient-to-br from-blue-100 to-blue-200 rounded-xl flex items-center justify-center mb-6">
               <CheckCircle className="w-6 h-6 text-blue-600" />
             </div>
-            <h3 className="text-3xl font-bold text-gray-900 mb-6">Why Choose Wealth Empire?</h3>
+            <h3 className="text-3xl font-bold text-gray-900 mb-6">Why Choose Wealth Empires?</h3>
             <div className="space-y-4 mb-8">
               <div className="flex items-center gap-4">
                 <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">

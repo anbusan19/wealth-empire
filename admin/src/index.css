@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&family=Lato:wght@300;400;700;900&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -65,6 +65,10 @@
   font-family: 'Space Grotesk', system-ui, sans-serif;
 }
 
+.font-lato {
+  font-family: 'Lato', system-ui, sans-serif;
+}
+
 /* Apply fonts to common elements */
 body {
   font-family: 'Raleway', system-ui, sans-serif;
@@ -86,4 +90,41 @@ input, textarea, select {
 .admin-subheading {
   font-family: 'Space Grotesk', system-ui, sans-serif;
   font-weight: 500;
+}
+
+/* Lato font for numbers and data */
+.font-numbers {
+  font-family: 'Lato', system-ui, sans-serif;
+  font-weight: 700;
+}
+
+.font-data {
+  font-family: 'Lato', system-ui, sans-serif;
+  font-weight: 400;
+}
+
+/* Apply Lato to specific number elements */
+.stat-number {
+  font-family: 'Lato', system-ui, sans-serif;
+  font-weight: 900;
+}
+
+.metric-value {
+  font-family: 'Lato', system-ui, sans-serif;
+  font-weight: 700;
+}
+
+.percentage {
+  font-family: 'Lato', system-ui, sans-serif;
+  font-weight: 700;
+}
+
+.currency {
+  font-family: 'Lato', system-ui, sans-serif;
+  font-weight: 700;
+}
+
+.count {
+  font-family: 'Lato', system-ui, sans-serif;
+  font-weight: 700;
 }

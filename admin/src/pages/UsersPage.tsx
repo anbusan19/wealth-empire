@@ -222,22 +222,22 @@ const UsersPage: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
-                  {currentUsers.map((user) => (
-                    <tr key={user.id} className="hover:bg-gray-50">
+                  {currentUsers.map((user, index) => (
+                    <tr key={`${user.id}_${index}`} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
                             <Building className="h-5 w-5 text-gray-600" />
                           </div>
                           <div className="ml-4">
-                            <div className="text-sm font-medium text-gray-900">{user.founderName}</div>
-                            <div className="text-sm text-gray-500">{user.email}</div>
+                            <div className="text-sm font-medium text-gray-900 font-lato">{user.founderName}</div>
+                            <div className="text-sm text-gray-500 font-lato">{user.email}</div>
                           </div>
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">{user.startupName}</div>
-                        <div className="text-sm text-gray-500">{user.city}, {user.state}</div>
+                        <div className="text-sm text-gray-900 font-lato">{user.startupName}</div>
+                        <div className="text-sm text-gray-500 font-lato">{user.city}, {user.state}</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getPlanBadge(user.subscriptionPlan)}`}>
@@ -247,19 +247,19 @@ const UsersPage: React.FC = () => {
                       <td className="px-6 py-4 whitespace-nowrap">
                         {user.complianceScore ? (
                           <div className="flex items-center">
-                            <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                            <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full font-lato ${
                               user.complianceScore >= 80 ? 'bg-green-100 text-green-800' :
                               user.complianceScore >= 60 ? 'bg-yellow-100 text-yellow-800' :
                               'bg-red-100 text-red-800'
                             }`}>
                               {user.complianceScore}%
                             </span>
-                            <span className="ml-2 text-xs text-gray-500">
+                            <span className="ml-2 text-xs text-gray-500 font-lato">
                               ({user.totalHealthChecks} checks)
                             </span>
                           </div>
                         ) : (
-                          <span className="text-sm text-gray-400">No assessments</span>
+                          <span className="text-sm text-gray-400 font-lato">No assessments</span>
                         )}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
@@ -267,23 +267,17 @@ const UsersPage: React.FC = () => {
                           {user.status}
                         </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-lato">
                         {new Date(user.lastLogin).toLocaleDateString()}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <div className="flex items-center justify-end space-x-2">
                           <Link
-                            to={`/admin/users/${user.id}`}
+                            to={`/users/${user.id}`}
                             className="text-gray-600 hover:text-gray-900 p-1 rounded"
                           >
                             <Eye className="h-4 w-4" />
                           </Link>
-                          <button className="text-gray-600 hover:text-gray-900 p-1 rounded">
-                            <Edit className="h-4 w-4" />
-                          </button>
-                          <button className="text-red-600 hover:text-red-900 p-1 rounded">
-                            <Trash2 className="h-4 w-4" />
-                          </button>
                         </div>
                       </td>
                     </tr>
@@ -295,7 +289,7 @@ const UsersPage: React.FC = () => {
             {/* Pagination */}
             {totalPages > 1 && (
               <div className="bg-gray-50 px-6 py-4 flex items-center justify-between">
-                <div className="text-sm text-gray-700">
+                <div className="text-sm text-gray-700 font-lato">
                   Showing {indexOfFirstUser + 1} to {Math.min(indexOfLastUser, filteredUsers.length)} of {filteredUsers.length} users
                 </div>
                 <div className="flex space-x-2">
@@ -306,7 +300,7 @@ const UsersPage: React.FC = () => {
                   >
                     Previous
                   </button>
-                  <span className="px-3 py-1 text-sm bg-gray-900 text-white rounded-lg">
+                  <span className="px-3 py-1 text-sm bg-gray-900 text-white rounded-lg font-lato">
                     {currentPage}
                   </span>
                   <button

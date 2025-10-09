@@ -103,9 +103,6 @@ export function AdminAuthProvider({ children }: AdminAuthProviderProps) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 bg-gradient-to-br from-gray-900 to-gray-700 rounded-2xl flex items-center justify-center mb-4 mx-auto shadow-lg">
-            <span className="text-white font-bold text-xl">WE</span>
-          </div>
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
         </div>
       </div>

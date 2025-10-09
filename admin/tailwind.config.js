@@ -8,6 +8,8 @@ export default {
         'heading': ['Space Grotesk', 'system-ui', '-apple-system', 'sans-serif'],
         'raleway': ['Raleway', 'system-ui', '-apple-system', 'sans-serif'],
         'space-grotesk': ['Space Grotesk', 'system-ui', '-apple-system', 'sans-serif'],
+        'lato': ['Lato', 'system-ui', '-apple-system', 'sans-serif'],
+        'numbers': ['Lato', 'system-ui', '-apple-system', 'sans-serif'],
       },
       fontWeight: {
         'body': '400',

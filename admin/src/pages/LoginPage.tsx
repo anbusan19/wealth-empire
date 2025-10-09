@@ -77,7 +77,7 @@ const LoginPage: React.FC = () => {
             <div className="inline-block">
               <img
                 src="/welogo.png"
-                alt="Wealth Empire Admin"
+                alt="Wealth Empires Admin"
                 className="h-60 w-auto mx-auto mb-8 hover:scale-105 transition-transform duration-300"
               />
             </div>
@@ -92,7 +92,7 @@ const LoginPage: React.FC = () => {
               <div className="inline-block mb-3">
                 <img
                   src="/welogo.png"
-                  alt="Wealth Empire Admin"
+                  alt="Wealth Empires Admin"
                   className="h-16 w-auto mx-auto"
                 />
               </div>
@@ -212,12 +212,12 @@ const LoginPage: React.FC = () => {
 
             {/* Back to Main Site */}
             <div className="text-center">
-              <Link
-                to="/"
+              <a
+                href="/"
                 className="text-slate-600 hover:text-slate-900 transition-colors text-sm"
               >
                 ← Back to Main Site
-              </Link>
+              </a>
             </div>
           </div>
         </div>

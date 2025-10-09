@@ -1,5 +1,4 @@
 import React from 'react';
-import { CheckCircle, AlertTriangle, TrendingUp } from 'lucide-react';
 
 interface ComplianceData {
     companyName: string;
@@ -55,7 +54,7 @@ export const PDFTemplate: React.FC<PDFTemplateProps> = ({ data }) => {
                         color: '#1f2937',
                         marginBottom: '5px'
                     }}>
-                        WEALTH EMPIRE
+                        Wealth Empires
                     </div>
                     <div style={{
                         fontSize: '16px',
@@ -250,7 +249,7 @@ export const PDFTemplate: React.FC<PDFTemplateProps> = ({ data }) => {
                 alignItems: 'center'
             }}>
                 <div>
-                    <div style={{ fontWeight: '600', color: '#1f2937', fontSize: '12px' }}>Wealth Empire</div>
+                    <div style={{ fontWeight: '600', color: '#1f2937', fontSize: '12px' }}>Wealth Empires</div>
                     <div style={{ fontSize: '10px', color: '#6b7280' }}>Startup Compliance Health Check</div>
                 </div>
                 <div style={{ textAlign: 'right' }}>
@@ -267,7 +266,7 @@ export const PDFTemplate: React.FC<PDFTemplateProps> = ({ data }) => {
                 lineHeight: '1.3'
             }}>
                 This report is confidential and intended solely for {data.companyName}.
-                Generated on {data.reportDate} by Wealth Empire Compliance Platform.
+                Generated on {data.reportDate} by Wealth Empires Compliance Platform.
             </div>
         </div>
     );

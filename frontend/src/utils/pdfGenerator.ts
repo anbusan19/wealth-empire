@@ -39,10 +39,10 @@ export const generatePDF = async (data: ComplianceData): Promise<void> => {
         <!-- Header -->
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 3px solid #1f2937;">
           <div style="display: flex; align-items: center;">
-            <img src="welogo.png" alt="Wealth Empire Logo" style="width: 50px; height: 50px; margin-right: 12px;" />
+            <img src="welogo.png" alt="Wealth Empires Logo" style="width: 50px; height: 50px; margin-right: 12px;" />
             <div>
               <div style="font-size: 24px; font-weight: bold; color: #1f2937; margin-bottom: 5px;">
-                WEALTH EMPIRE
+                WEALTH EMPIRES
               </div>
               <div style="font-size: 16px; font-weight: 600; color: #374151;">
                 Compliance Health Report
@@ -189,7 +189,7 @@ export const generatePDF = async (data: ComplianceData): Promise<void> => {
         <!-- Footer -->
         <div style="border-top: 2px solid #e5e7eb; padding-top: 15px; margin-top: auto; display: flex; justify-content: space-between; align-items: center;">
           <div>
-            <div style="font-weight: 600; color: #1f2937; font-size: 12px;">Wealth Empire</div>
+            <div style="font-weight: 600; color: #1f2937; font-size: 12px;">Wealth Empires</div>
             <div style="font-size: 10px; color: #6b7280;">Startup Compliance Health Check</div>
           </div>
           <div style="text-align: right;">
@@ -200,7 +200,7 @@ export const generatePDF = async (data: ComplianceData): Promise<void> => {
         
         <div style="text-align: center; margin-top: 10px; font-size: 9px; color: #9ca3af; line-height: 1.3;">
           This report is confidential and intended solely for ${data.companyName}. 
-          Generated on ${data.reportDate} by Wealth Empire Compliance Platform.
+          Generated on ${data.reportDate} by Wealth Empires Compliance Platform.
         </div>
       </div>
     `;

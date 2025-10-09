@@ -1,16 +1,19 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AdminAuthProvider } from './contexts/AdminAuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
+import ErrorBoundary from './components/ErrorBoundary';
 import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
 import UsersPage from './pages/UsersPage';
 import UserDetailPage from './pages/UserDetailPage';
 import ReportsPage from './pages/ReportsPage';
+import NotFoundPage from './pages/NotFoundPage';
 
 function App() {
   return (
-    <AdminAuthProvider>
-      <Router>
+    <ErrorBoundary>
+      <AdminAuthProvider>
+        <Router>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
           <Route 
@@ -45,9 +48,19 @@ function App() {
               </ProtectedRoute>
             } 
           />
+          {/* Catch-all route for 404 pages */}
+          <Route 
+            path="*" 
+            element={
+              <ProtectedRoute>
+                <NotFoundPage />
+              </ProtectedRoute>
+            } 
+          />
         </Routes>
-      </Router>
-    </AdminAuthProvider>
+        </Router>
+      </AdminAuthProvider>
+    </ErrorBoundary>
   );
 }
 
