@@ -3,8 +3,6 @@ import { Link } from 'react-router-dom';
 import {
   Search,
   Eye,
-  Edit,
-  Trash2,
   Download,
   Building,
   Loader2

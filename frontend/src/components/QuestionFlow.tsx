@@ -1,9 +1,9 @@
+import { AlertTriangle, Award, Building, Check, ChevronLeft, ChevronRight, FileText, Loader2, Play, Shield, TrendingUp } from 'lucide-react';
 import { useState } from 'react';
-import { ChevronRight, ChevronLeft, Check, AlertTriangle, Building, FileText, Shield, Award, TrendingUp, Play, Loader2 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { calculateScores } from '../utils/scoringSystem';
-import ResultsDashboard from './ResultsDashboard';
 import ReportView from './ReportView';
+import ResultsDashboard from './ResultsDashboard';
 
 interface Question {
   id: number;
@@ -273,7 +273,7 @@ export default function QuestionFlow() {
       if (currentUser) {
         const idToken = await currentUser.getIdToken();
 
-        const response = await fetch('http://localhost:3000/api/health-check/save-results', {
+        const response = await fetch('https://wealth-empire-backend.vercel.app/api/health-check/save-results', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

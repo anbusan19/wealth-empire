@@ -8,56 +8,63 @@ import UsersPage from './pages/UsersPage';
 import UserDetailPage from './pages/UserDetailPage';
 import ReportsPage from './pages/ReportsPage';
 import NotFoundPage from './pages/NotFoundPage';
+import ReportDetailPage from './pages/ReportDetailPage';
 
 function App() {
   return (
     <ErrorBoundary>
       <AdminAuthProvider>
         <Router>
-        <Routes>
-          <Route path="/login" element={<LoginPage />} />
-          <Route 
-            path="/" 
-            element={
-              <ProtectedRoute>
-                <DashboardPage />
-              </ProtectedRoute>
-            } 
-          />
-          <Route 
-            path="/users" 
-            element={
-              <ProtectedRoute>
-                <UsersPage />
-              </ProtectedRoute>
-            } 
-          />
-          <Route 
-            path="/users/:userId" 
-            element={
-              <ProtectedRoute>
-                <UserDetailPage />
-              </ProtectedRoute>
-            } 
-          />
-          <Route 
-            path="/reports" 
-            element={
-              <ProtectedRoute>
-                <ReportsPage />
-              </ProtectedRoute>
-            } 
-          />
-          {/* Catch-all route for 404 pages */}
-          <Route 
-            path="*" 
-            element={
-              <ProtectedRoute>
-                <NotFoundPage />
-              </ProtectedRoute>
-            } 
-          />
-        </Routes>
+          <Routes>
+            <Route path="/login" element={<LoginPage />} />
+            <Route
+              path="/"
+              element={
+                <ProtectedRoute>
+                  <DashboardPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/users"
+              element={
+                <ProtectedRoute>
+                  <UsersPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/users/:userId"
+              element={
+                <ProtectedRoute>
+                  <UserDetailPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/reports"
+              element={
+                <ProtectedRoute>
+                  <ReportsPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/reports/:userId/:reportId"
+              element={<ReportDetailPage />
+
+              }
+            />
+            {/* Catch-all route for 404 pages */}
+            <Route
+              path="*"
+              element={
+                <ProtectedRoute>
+                  <NotFoundPage />
+                </ProtectedRoute>
+              }
+            />
+          </Routes>
         </Router>
       </AdminAuthProvider>
     </ErrorBoundary>

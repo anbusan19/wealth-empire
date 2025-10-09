@@ -1,19 +1,21 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import {
-    TrendingUp,
-    Award,
-    Download,
-    Search,
-    FileText,
     AlertTriangle,
-    CheckCircle,
+    ArrowUpRight,
+    Award,
     Building,
+    CheckCircle,
+    Download,
+    FileText,
     Loader2,
-    ArrowUpRight
+    Search,
+    TrendingUp
 } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import AdminNavigation from '../components/AdminNavigation';
 import { ADMIN_API_ENDPOINTS, apiRequest } from '../config/api';
+
+// ... (Interface definitions remain the same)
 
 interface ReportStats {
     totalReports: number;
@@ -25,8 +27,8 @@ interface ReportStats {
 }
 
 interface ComplianceReport {
-    id: string;
-    userId?: string;
+    id: string; // This is the healthCheckResults._id
+    userId?: string; // This is the user's main _id (68e49f5f4652adc7d3d94beb)
     userEmail: string;
     startupName: string;
     score: number;
@@ -47,6 +49,7 @@ interface CategoryStats {
     totalReports: number;
     improvement: number;
 }
+
 
 const ReportsPage: React.FC = () => {
     const navigate = useNavigate();
@@ -79,6 +82,7 @@ const ReportsPage: React.FC = () => {
                 ...(dateRange !== 'all' && { dateRange })
             });
 
+            // Assuming ADMIN_API_ENDPOINTS.REPORTS fetches the list of compliance reports
             const response = await apiRequest(`${ADMIN_API_ENDPOINTS.REPORTS}?${params}`);
 
             if (response.success) {
@@ -120,12 +124,26 @@ const ReportsPage: React.FC = () => {
 
         return matchesSearch && matchesStatus;
     });
+    
+    // ----------------------------------------------------------------------
+    // MODIFIED FUNCTION: Navigates to the report detail page
+    // ----------------------------------------------------------------------
+    const handleViewReport = (report: ComplianceReport) => {
+        const userId = report.userId;
+        const reportId = report.id;
 
-    const handleUserClick = (report: ComplianceReport) => {
-        // Extract user ID from the report ID or use a separate userId field
-        const userId = report.userId || report.id.split('_')[0];
-        navigate(`/users/${userId}`);
+        if (userId && reportId) {
+            // Navigate to the detail page: /admin/reports/:userId/:reportId
+            navigate(`/reports/${userId}/${reportId}`);
+        } else {
+            console.error('Cannot view report detail: Missing User ID or Report ID.', report);
+            // Fallback: Navigate to the general user profile if ID is missing for the report detail page
+            const fallbackUserId = report.userId || report.id.split('_')[0];
+            navigate(`/users/${fallbackUserId}`); 
+        }
     };
+    // ----------------------------------------------------------------------
+
 
     if (loading) {
         return (
@@ -183,7 +201,7 @@ const ReportsPage: React.FC = () => {
                         </button>
                     </div>
 
-                    {/* Stats Grid */}
+                    {/* Stats Grid - (Content remains the same) */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8 sm:mb-12 px-2 sm:px-0">
                         {/* Total Reports */}
                         <div className="bg-gray-900 rounded-3xl p-8 text-white">
@@ -248,7 +266,7 @@ const ReportsPage: React.FC = () => {
                         </div>
                     </div>
 
-                    {/* Category Performance */}
+                    {/* Category Performance - (Content remains the same) */}
                     <div className="mb-12">
                         <div className="bg-white rounded-3xl shadow-2xl border border-gray-100 p-8">
                             <h2 className="text-2xl font-bold text-gray-900 mb-6">Category Performance</h2>
@@ -270,7 +288,7 @@ const ReportsPage: React.FC = () => {
                         </div>
                     </div>
 
-                    {/* Filters and Search */}
+                    {/* Filters and Search - (Content remains the same) */}
                     <div className="bg-white rounded-3xl shadow-2xl border border-gray-100 p-8 mb-8">
                         <div className="flex flex-col sm:flex-row gap-4 items-center justify-between mb-6">
                             <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
@@ -311,16 +329,13 @@ const ReportsPage: React.FC = () => {
                                 </select>
                             </div>
 
-                            <div className="text-sm text-gray-600">
+                            <div className="text-sm text-gray-600 font-data">
                                 Showing {filteredReports.length} of {reports.length} reports
                             </div>
                         </div>
 
                         {/* Reports Table */}
                         <div className="overflow-x-auto">
-                            <div className="mb-4 text-sm text-gray-600">
-                                💡 Click on any row to view the detailed user report
-                            </div>
                             <table className="w-full">
                                 <thead>
                                     <tr className="border-b border-gray-200">
@@ -336,8 +351,11 @@ const ReportsPage: React.FC = () => {
                                     {filteredReports.map((report, index) => (
                                         <tr
                                             key={`${report.id}_${index}`}
+                                            // ----------------------------------------------------------------------
+                                            // UPDATED: Row click navigates to report details
+                                            // ----------------------------------------------------------------------
                                             className="border-b border-gray-100 hover:bg-gray-50 cursor-pointer transition-colors duration-200"
-                                            onClick={() => handleUserClick(report)}
+                                            onClick={() => handleViewReport(report)}
                                             title={`Click to view ${report.startupName}'s detailed report`}
                                         >
                                             <td className="py-4 px-2">
@@ -346,35 +364,35 @@ const ReportsPage: React.FC = () => {
                                                         <Building className="h-5 w-5 text-gray-600" />
                                                     </div>
                                                     <div>
-                                                        <div className="font-semibold text-gray-900 hover:text-blue-600 transition-colors">
+                                                        <div className="font-semibold text-gray-900 hover:text-blue-600 transition-colors font-data">
                                                             {report.startupName}
                                                         </div>
-                                                        <div className="text-sm text-gray-600">{report.userEmail}</div>
+                                                        <div className="text-sm text-gray-600 font-data">{report.userEmail}</div>
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td className="py-4 px-2">
+                                            <td className="py-4 px-2 font-data">
                                                 {report.status === 'In Progress' ? (
                                                     <span className="text-gray-500">-</span>
                                                 ) : (
-                                                    <span className={`px-3 py-1 rounded-full text-sm font-medium ${getScoreBadge(report.score)}`}>
+                                                    <span className={`px-3 py-1 rounded-full text-sm font-medium ${getScoreBadge(report.score)} font-numbers`}>
                                                         {report.score}%
                                                     </span>
                                                 )}
                                             </td>
-                                            <td className="py-4 px-2">
+                                            <td className="py-4 px-2 font-data">
                                                 <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusBadge(report.status)}`}>
                                                     {report.status}
                                                 </span>
                                             </td>
-                                            <td className="py-4 px-2">
+                                            <td className="py-4 px-2 font-data">
                                                 {report.criticalIssues > 0 ? (
-                                                    <span className="text-red-600 font-medium">{report.criticalIssues}</span>
+                                                    <span className="text-red-600 font-medium font-numbers">{report.criticalIssues}</span>
                                                 ) : (
                                                     <CheckCircle className="h-5 w-5 text-green-600" />
                                                 )}
                                             </td>
-                                            <td className="py-4 px-2 text-sm text-gray-600">
+                                            <td className="py-4 px-2 text-sm text-gray-600 font-data">
                                                 {new Date(report.completedAt).toLocaleDateString()}
                                             </td>
                                             <td className="py-4 px-2">
@@ -382,7 +400,10 @@ const ReportsPage: React.FC = () => {
                                                     className="text-gray-600 hover:text-gray-900 p-2 rounded-lg hover:bg-gray-100 transition-colors"
                                                     onClick={(e) => {
                                                         e.stopPropagation();
-                                                        handleUserClick(report);
+                                                        // ----------------------------------------------------------------------
+                                                        // UPDATED: Button click also navigates to report details
+                                                        // ----------------------------------------------------------------------
+                                                        handleViewReport(report);
                                                     }}
                                                 >
                                                     <ArrowUpRight className="h-4 w-4" />

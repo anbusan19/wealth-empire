@@ -10,7 +10,6 @@ import {
   Award,
   BarChart3,
   AlertTriangle,
-  Edit,
   Loader2,
   User,
   CreditCard

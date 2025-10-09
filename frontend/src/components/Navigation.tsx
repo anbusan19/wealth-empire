@@ -1,6 +1,6 @@
-import { Menu, X, User, LogOut } from 'lucide-react';
-import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { LogOut, Menu, User, X } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom'; // Import useNavigate and useLocation
 import { useAuth } from '../contexts/AuthContext';
 import ConditionalLink from './ConditionalLink';
 
@@ -10,6 +10,9 @@ export default function Navigation() {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const { currentUser, logout } = useAuth();
 
+  const navigate = useNavigate(); // Initialize useNavigate
+  const location = useLocation(); // Get the current location
+
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
@@ -18,6 +21,25 @@ export default function Navigation() {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Function to handle smooth scrolling, with cross-page navigation
+  const handleScrollToElement = (id, event) => {
+    event.preventDefault();
+    setIsMenuOpen(false);
+    setShowUserMenu(false);
+
+    // If we are already on the home page ('/'), just smooth scroll
+    if (location.pathname === '/') {
+      document.getElementById(id)?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      });
+    } else {
+      // If we are on any other page (like /dashboard), navigate to home and append the hash
+      // The browser will handle the scroll once the home page is loaded with the hash
+      navigate(`/#${id}`);
+    }
+  };
 
   return (
     <nav className={`fixed top-2 sm:top-4 left-1/2 transform -translate-x-1/2 z-50 transition-all duration-500 ${isScrolled ? 'w-[95%] max-w-6xl' : 'w-[96%] sm:w-[98%] max-w-7xl'
@@ -39,66 +61,35 @@ export default function Navigation() {
               </Link>
             </div>
 
+            {/* Desktop Navigation Links: Dashboard, Pricing, Contact */}
             <div className="hidden md:flex items-center space-x-8">
               <ConditionalLink
-                to="/health-check"
-                requireOnboarding={true}
+                to="/dashboard"
                 className="nav-link text-gray-700 hover:text-gray-900 transition-all duration-300 text-sm font-medium relative"
               >
-                Health Check
+                Dashboard
               </ConditionalLink>
-              {currentUser && (
-                <ConditionalLink
-                  to="/dashboard"
-                  requireOnboarding={true}
-                  className="nav-link text-gray-700 hover:text-gray-900 transition-all duration-300 text-sm font-medium relative"
-                >
-                  Dashboard
-                </ConditionalLink>
-              )}
-              {!currentUser && (
-                <a 
-                  href="#pricing" 
-                  className="nav-link text-gray-700 hover:text-gray-900 transition-all duration-300 text-sm font-medium relative"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    document.getElementById('pricing')?.scrollIntoView({ 
-                      behavior: 'smooth',
-                      block: 'start'
-                    });
-                  }}
-                >
-                  Pricing
-                </a>
-              )}
-              <a 
-                href="#resources" 
+
+              {/* Pricing Link - Uses handleScrollToElement */}
+              <a
+                href="#pricing"
                 className="nav-link text-gray-700 hover:text-gray-900 transition-all duration-300 text-sm font-medium relative"
-                onClick={(e) => {
-                  e.preventDefault();
-                  document.getElementById('resources')?.scrollIntoView({ 
-                    behavior: 'smooth',
-                    block: 'start'
-                  });
-                }}
+                onClick={(e) => handleScrollToElement('pricing', e)}
               >
-                Resources
+                Pricing
               </a>
-              <a 
-                href="#contact" 
+
+              {/* Contact Link - Uses handleScrollToElement */}
+              <a
+                href="#contact"
                 className="nav-link text-gray-700 hover:text-gray-900 transition-all duration-300 text-sm font-medium relative"
-                onClick={(e) => {
-                  e.preventDefault();
-                  document.getElementById('contact')?.scrollIntoView({ 
-                    behavior: 'smooth',
-                    block: 'start'
-                  });
-                }}
+                onClick={(e) => handleScrollToElement('services', e)}
               >
                 Contact
               </a>
             </div>
 
+            {/* Right-side elements (User Menu / Login / CTA) - Unchanged */}
             <div className="hidden md:flex items-center space-x-3 lg:space-x-4">
               {currentUser ? (
                 <div className="relative">
@@ -154,71 +145,36 @@ export default function Navigation() {
           </div>
         </div>
 
+        {/* Mobile Menu Content */}
         {isMenuOpen && (
           <div className="md:hidden border-t border-white/20 bg-white/80 backdrop-blur-xl rounded-b-2xl animate-slide-down">
             <div className="px-6 py-4 space-y-3">
               <ConditionalLink
-                to="/health-check"
-                requireOnboarding={true}
+                to="/dashboard"
                 className="block text-gray-700 hover:text-gray-900 py-3 px-3 rounded-lg hover:bg-white/50 transition-all duration-300"
                 onClick={() => setIsMenuOpen(false)}
               >
-                Health Check
+                Dashboard
               </ConditionalLink>
-              {currentUser && (
-                <ConditionalLink
-                  to="/dashboard"
-                  requireOnboarding={true}
-                  className="block text-gray-700 hover:text-gray-900 py-3 px-3 rounded-lg hover:bg-white/50 transition-all duration-300"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Dashboard
-                </ConditionalLink>
-              )}
-              {!currentUser && (
-                <a 
-                  href="#pricing" 
-                  className="block text-gray-700 hover:text-gray-900 py-3 px-3 rounded-lg hover:bg-white/50 transition-all duration-300"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    document.getElementById('pricing')?.scrollIntoView({ 
-                      behavior: 'smooth',
-                      block: 'start'
-                    });
-                    setIsMenuOpen(false);
-                  }}
-                >
-                  Pricing
-                </a>
-              )}
-              <a 
-                href="#resources" 
+
+              {/* Pricing Link (Mobile) - Uses handleScrollToElement */}
+              <a
+                href="#pricing"
                 className="block text-gray-700 hover:text-gray-900 py-3 px-3 rounded-lg hover:bg-white/50 transition-all duration-300"
-                onClick={(e) => {
-                  e.preventDefault();
-                  document.getElementById('resources')?.scrollIntoView({ 
-                    behavior: 'smooth',
-                    block: 'start'
-                  });
-                  setIsMenuOpen(false);
-                }}
+                onClick={(e) => handleScrollToElement('pricing', e)}
               >
-                Resources
+                Pricing
               </a>
-              <a 
-                href="#contact" 
+
+              {/* Contact Link (Mobile) - Uses handleScrollToElement */}
+              <a
+                href="#contact"
                 className="block text-gray-700 hover:text-gray-900 py-3 px-3 rounded-lg hover:bg-white/50 transition-all duration-300"
-                onClick={(e) => {
-                  e.preventDefault();
-                  document.getElementById('contact')?.scrollIntoView({ 
-                    behavior: 'smooth',
-                    block: 'start'
-                  });
-                  setIsMenuOpen(false);
-                }}
+                onClick={(e) => handleScrollToElement('contact', e)}
               >
                 Contact
               </a>
+              
               <div className="pt-3 space-y-3 border-t border-white/20">
                 {currentUser ? (
                   <>

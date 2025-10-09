@@ -3,10 +3,8 @@ import { Link } from 'react-router-dom';
 import {
   Users,
   BarChart3,
-  TrendingUp,
   Award,
   AlertTriangle,
-  FileText,
   Loader2,
   ArrowUpRight,
   Building,

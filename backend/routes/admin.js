@@ -459,5 +459,70 @@ router.get('/reports', requireAdmin, async (req, res) => {
     });
   }
 });
+// GET /api/admin/reports/:userId/:reportDate - Get single report detail
+router.get('/reports/:userId/:reportDate', requireAdmin, async (req, res) => {
+    try {
+        const { userId, reportDate } = req.params;
+        
+        // Convert the URL-encoded date string back to a date object
+        // NOTE: The reportDate includes the user's ID and index, e.g. "68e4bafce2c1897a54e386d1_Tue Oct 07 2025 14:19:33 GMT+0000 (Coordinated Universal Time)"
+        // We only need the date part. Since you constructed the ID in the previous route, 
+        // a simple split works:
+        const dateString = reportDate.split('_')[1]; // Get the date string part
+        const assessmentDate = new Date(decodeURIComponent(dateString));
+
+        const user = await User.findById(userId).lean();
+
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+
+        // Find the specific health check result by date
+        const reportResult = user.healthCheckResults.find(
+            (check) => new Date(check.assessmentDate).getTime() === assessmentDate.getTime()
+        );
+
+        if (!reportResult) {
+            return res.status(404).json({ success: false, message: 'Report not found' });
+        }
+
+        // Format the report data to match the frontend component's expectations
+        const formattedReport = {
+            id: reportDate, // Use the full URL ID for the frontend
+            userId: user._id.toString(),
+            userEmail: user.email,
+            startupName: user.startupName,
+            score: reportResult.score,
+            completedAt: reportResult.assessmentDate,
+            criticalIssues: reportResult.score < 50 ? Math.floor(Math.random() * 5) + 1 : 0, // Keep mock logic
+            status: reportResult.score ? 'Completed' : 'In Progress',
+            recommendations: reportResult.recommendations || [],
+            strengths: reportResult.strengths || [],
+            redFlags: reportResult.redFlags || [],
+            risks: reportResult.risks || [],
+            followUpAnswers: reportResult.followUpAnswers || {},
+            // Mock categories data for detail page visualization
+            categories: {
+                legal: Math.floor(Math.random() * 20) + 70,
+                financial: Math.floor(Math.random() * 20) + 70,
+                operational: Math.floor(Math.random() * 20) + 70,
+                regulatory: Math.floor(Math.random() * 20) + 70
+            }
+        };
+
+        res.status(200).json({
+            success: true,
+            data: formattedReport
+        });
+
+    } catch (error) {
+        console.error('Report detail error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to get report details',
+            error: error.message
+        });
+    }
+});
 
 module.exports = router;
