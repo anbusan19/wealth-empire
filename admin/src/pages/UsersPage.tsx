@@ -113,7 +113,7 @@ const UsersPage: React.FC = () => {
     return (
       <div className="min-h-screen bg-white">
         <AdminNavigation />
-        <div className="flex items-center justify-center py-20">
+        <div className="flex items-center mt-20 justify-center py-20">
           <div className="text-center">
             <Loader2 className="h-8 w-8 animate-spin text-gray-900 mx-auto mb-4" />
             <p className="text-gray-600">Loading users...</p>
