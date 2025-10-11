@@ -1,0 +1,6 @@
+{
+  "scripts": {
+    "migrate:separate-collections": "node scripts/migrate-to-separate-collections.js",
+    "cleanup:old-fields": "node scripts/cleanup-old-user-fields.js"
+  }
+}

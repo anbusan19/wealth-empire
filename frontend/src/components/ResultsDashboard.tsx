@@ -1,9 +1,8 @@
 import React from 'react';
-import { Download, CheckCircle, AlertTriangle, TrendingUp, FileText, Loader2, Share2 } from 'lucide-react';
+import { Download, CheckCircle, AlertTriangle, TrendingUp, Loader2, Share2 } from 'lucide-react';
 import generatePDF from '../utils/pdfGenerator';
 import { calculateScores } from '../utils/scoringSystem';
-import { useAuth } from '../contexts/AuthContext';
-import { useHealthCheck } from '../hooks/useHealthCheck';
+import { useUserProfile } from '../hooks/useUserProfile';
 
 interface ResultsDashboardProps {
   companyData?: {
@@ -19,58 +18,24 @@ interface ResultsDashboardProps {
 }
 
 export default function ResultsDashboard({ companyData, answers, followUpAnswers }: ResultsDashboardProps) {
-  const { saveHealthCheck } = useHealthCheck();
   const [isGeneratingPDF, setIsGeneratingPDF] = React.useState(false);
-  const [isSavingResults, setIsSavingResults] = React.useState(false);
-  const [resultsSaved, setResultsSaved] = React.useState(false);
+  const { profile } = useUserProfile();
 
   // Calculate dynamic scores based on user answers
   const complianceData = React.useMemo(() => {
     return calculateScores(answers, followUpAnswers);
   }, [answers, followUpAnswers]);
 
-  // Save results to database
-  const saveHealthCheckResults = React.useCallback(async () => {
-    if (resultsSaved || isSavingResults) return; // Prevent duplicate saves
-
-    try {
-      setIsSavingResults(true);
-
-      const recommendations = [
-        ...complianceData.strengths.map(s => `Strength: ${s}`),
-        ...complianceData.redFlags.map(r => `Red Flag: ${r}`),
-        ...complianceData.riskForecast.risks.map(risk => `Risk: ${risk.type} - ${risk.penalty}`)
-      ];
-
-      await saveHealthCheck(
-        answers,
-        complianceData.overallScore,
-        recommendations,
-        followUpAnswers
-      );
-
-      setResultsSaved(true);
-      console.log('Health check results saved successfully');
-    } catch (error) {
-      console.error('Error saving health check results:', error);
-    } finally {
-      setIsSavingResults(false);
-    }
-  }, [answers, followUpAnswers, complianceData, saveHealthCheck, resultsSaved, isSavingResults]);
-
-  // Auto-save results when component mounts
-  React.useEffect(() => {
-    saveHealthCheckResults();
-  }, [saveHealthCheckResults]);
-
   const generatePDFReport = async () => {
     try {
       setIsGeneratingPDF(true);
 
-      // Extract company name from company data if available
-      const companyName = companyData?.data?.company_info?.find(
-        info => info.Attribute === 'Company Name'
-      )?.Value || 'Your Company Name';
+      // Use user's startup name from profile, fallback to MCA data, then default
+      const companyName = profile?.startupName || 
+        companyData?.data?.company_info?.find(
+          info => info.Attribute === 'Company Name'
+        )?.Value || 
+        'Your Company Name';
 
       const reportData = {
         companyName,
@@ -140,19 +105,11 @@ export default function ResultsDashboard({ companyData, answers, followUpAnswers
             <p className="text-xs font-medium tracking-widest uppercase text-gray-500 mb-4">
               YOUR RESULTS
             </p>
-            {/* Save Status Indicator */}
-            {isSavingResults && (
-              <div className="flex items-center justify-center gap-2 text-sm text-gray-600 mb-4">
-                <Loader2 size={16} className="animate-spin" />
-                Saving results to your dashboard...
-              </div>
-            )}
-            {resultsSaved && (
-              <div className="flex items-center justify-center gap-2 text-sm text-green-600 mb-4">
-                <CheckCircle size={16} />
-                Results saved to your dashboard
-              </div>
-            )}
+            {/* Results saved indicator */}
+            <div className="flex items-center justify-center gap-2 text-sm text-green-600 mb-4">
+              <CheckCircle size={16} />
+              Results saved to your dashboard
+            </div>
           </div>
 
         </div>

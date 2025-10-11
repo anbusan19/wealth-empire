@@ -1,6 +1,8 @@
 const express = require('express');
 const { body, validationResult } = require('express-validator');
 const User = require('../models/User');
+const HealthCheck = require('../models/HealthCheck');
+const Subscription = require('../models/Subscription');
 const { verifyFirebaseToken, requireOnboarding } = require('../middleware/auth');
 
 const router = express.Router();
@@ -36,33 +38,59 @@ router.post('/save-results', verifyFirebaseToken, requireOnboarding, [
     } = req.body;
     const user = req.user;
 
-    // Create health check result
-    const healthCheckResult = {
-      assessmentDate: new Date(),
+    // Get or create subscription (for tracking purposes, but no limits enforced)
+    let subscription = await Subscription.getActiveForUser(user._id);
+    
+    // If no subscription exists, create a default free subscription
+    if (!subscription) {
+      subscription = new Subscription({
+        userId: user._id,
+        firebaseUid: user.firebaseUid,
+        type: 'free',
+        startDate: new Date(),
+        isActive: true,
+        status: 'active'
+      });
+      await subscription.save();
+    }
+    
+    // Note: Health check limits are disabled - users can perform unlimited health checks
+
+    // Create new health check record
+    const healthCheck = new HealthCheck({
+      userId: user._id,
+      firebaseUid: user.firebaseUid,
       answers: new Map(Object.entries(answers)),
+      followUpAnswers: new Map(Object.entries(followUpAnswers)),
       score: parseFloat(score),
       recommendations,
       strengths,
       redFlags,
-      risks,
-      followUpAnswers: new Map(Object.entries(followUpAnswers))
-    };
+      risks
+    });
 
-    // Add to user's health check results
-    await user.addHealthCheckResult(healthCheckResult);
+    await healthCheck.save();
+
+    // Update subscription usage (for tracking only, no limits enforced)
+    await subscription.incrementUsage('healthCheck');
+
+    // Get total assessments count
+    const totalAssessments = await HealthCheck.countDocuments({ userId: user._id });
 
     res.status(201).json({
       success: true,
       message: 'Health check results saved successfully',
       data: {
         result: {
-          assessmentDate: healthCheckResult.assessmentDate,
-          score: healthCheckResult.score,
-          recommendations: healthCheckResult.recommendations,
-          strengths: healthCheckResult.strengths,
-          redFlags: healthCheckResult.redFlags,
-          risks: healthCheckResult.risks,
-          totalAssessments: user.healthCheckResults.length
+          id: healthCheck._id,
+          assessmentDate: healthCheck.assessmentDate,
+          score: healthCheck.score,
+          recommendations: healthCheck.recommendations,
+          strengths: healthCheck.strengths,
+          redFlags: healthCheck.redFlags,
+          risks: healthCheck.risks,
+          riskLevel: healthCheck.riskLevel,
+          totalAssessments
         }
       }
     });
@@ -83,33 +111,38 @@ router.get('/history', verifyFirebaseToken, requireOnboarding, async (req, res) 
     const user = req.user;
     const { limit = 10, page = 1 } = req.query;
 
-    const startIndex = (page - 1) * limit;
-    const endIndex = startIndex + parseInt(limit);
+    const skip = (page - 1) * limit;
+    const totalResults = await HealthCheck.countDocuments({ userId: user._id });
 
-    const history = user.healthCheckResults
-      .slice()
-      .reverse() // Most recent first
-      .slice(startIndex, endIndex)
-      .map(result => ({
-        assessmentDate: result.assessmentDate,
-        score: result.score,
-        recommendations: result.recommendations,
-        strengths: result.strengths || [],
-        redFlags: result.redFlags || [],
-        risks: result.risks || [],
-        answersCount: result.answers ? result.answers.size : 0,
-        followUpAnswersCount: result.followUpAnswers ? result.followUpAnswers.size : 0
-      }));
+    const history = await HealthCheck.find({ userId: user._id })
+      .sort({ assessmentDate: -1 })
+      .skip(skip)
+      .limit(parseInt(limit))
+      .select('assessmentDate score recommendations strengths redFlags risks answers followUpAnswers riskLevel')
+      .lean();
+
+    const formattedHistory = history.map(result => ({
+      id: result._id,
+      assessmentDate: result.assessmentDate,
+      score: result.score,
+      riskLevel: result.riskLevel,
+      recommendations: result.recommendations || [],
+      strengths: result.strengths || [],
+      redFlags: result.redFlags || [],
+      risks: result.risks || [],
+      answersCount: result.answers ? Object.keys(result.answers).length : 0,
+      followUpAnswersCount: result.followUpAnswers ? Object.keys(result.followUpAnswers).length : 0
+    }));
 
     res.status(200).json({
       success: true,
       data: {
-        history,
+        history: formattedHistory,
         pagination: {
           currentPage: parseInt(page),
-          totalResults: user.healthCheckResults.length,
-          totalPages: Math.ceil(user.healthCheckResults.length / limit),
-          hasNext: endIndex < user.healthCheckResults.length,
+          totalResults,
+          totalPages: Math.ceil(totalResults / limit),
+          hasNext: skip + parseInt(limit) < totalResults,
           hasPrev: page > 1
         }
       }
@@ -129,7 +162,7 @@ router.get('/history', verifyFirebaseToken, requireOnboarding, async (req, res) 
 router.get('/latest', verifyFirebaseToken, requireOnboarding, async (req, res) => {
   try {
     const user = req.user;
-    const latestResult = user.latestHealthCheck;
+    const latestResult = await HealthCheck.getLatestForUser(user._id);
 
     if (!latestResult) {
       return res.status(404).json({
@@ -138,16 +171,22 @@ router.get('/latest', verifyFirebaseToken, requireOnboarding, async (req, res) =
       });
     }
 
+    // Get improvement data
+    const improvement = await latestResult.getImprovement();
+
     // Convert Maps to Objects for JSON response
     const result = {
+      id: latestResult._id,
       assessmentDate: latestResult.assessmentDate,
       answers: Object.fromEntries(latestResult.answers || new Map()),
       score: latestResult.score,
+      riskLevel: latestResult.riskLevel,
       recommendations: latestResult.recommendations,
       strengths: latestResult.strengths || [],
       redFlags: latestResult.redFlags || [],
       risks: latestResult.risks || [],
-      followUpAnswers: Object.fromEntries(latestResult.followUpAnswers || new Map())
+      followUpAnswers: Object.fromEntries(latestResult.followUpAnswers || new Map()),
+      improvement
     };
 
     res.status(200).json({
@@ -171,7 +210,12 @@ router.get('/latest', verifyFirebaseToken, requireOnboarding, async (req, res) =
 router.get('/stats', verifyFirebaseToken, requireOnboarding, async (req, res) => {
   try {
     const user = req.user;
-    const results = user.healthCheckResults;
+    
+    // Get all health checks for the user
+    const results = await HealthCheck.find({ userId: user._id })
+      .sort({ assessmentDate: 1 })
+      .select('score assessmentDate')
+      .lean();
 
     if (results.length === 0) {
       return res.status(200).json({
@@ -182,12 +226,13 @@ router.get('/stats', verifyFirebaseToken, requireOnboarding, async (req, res) =>
           highestScore: 0,
           lowestScore: 0,
           lastAssessment: null,
-          trend: 'no-data'
+          trend: 'no-data',
+          riskDistribution: { low: 0, medium: 0, high: 0, critical: 0 }
         }
       });
     }
 
-    const scores = results.map(r => r.score).filter(s => s !== undefined);
+    const scores = results.map(r => r.score);
     const totalAssessments = results.length;
     const averageScore = scores.reduce((sum, score) => sum + score, 0) / scores.length;
     const highestScore = Math.max(...scores);
@@ -203,6 +248,18 @@ router.get('/stats', verifyFirebaseToken, requireOnboarding, async (req, res) =>
       else if (lastScore < previousScore) trend = 'declining';
     }
 
+    // Calculate risk distribution
+    const riskDistribution = { low: 0, medium: 0, high: 0, critical: 0 };
+    scores.forEach(score => {
+      if (score >= 80) riskDistribution.low++;
+      else if (score >= 60) riskDistribution.medium++;
+      else if (score >= 40) riskDistribution.high++;
+      else riskDistribution.critical++;
+    });
+
+    // Get subscription info
+    const subscription = await Subscription.getActiveForUser(user._id);
+
     res.status(200).json({
       success: true,
       data: {
@@ -211,7 +268,12 @@ router.get('/stats', verifyFirebaseToken, requireOnboarding, async (req, res) =>
         highestScore,
         lowestScore,
         lastAssessment,
-        trend
+        trend,
+        riskDistribution,
+        subscription: {
+          type: subscription?.type || 'free',
+          healthChecksRemaining: 'unlimited' // No limits enforced
+        }
       }
     });
 

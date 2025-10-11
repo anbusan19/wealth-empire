@@ -1,5 +1,5 @@
 // Admin API Configuration
-const API_BASE_URL = 'https://wealth-empire-backend.vercel.app';
+const API_BASE_URL = 'http://localhost:3001';
 
 export const ADMIN_API_ENDPOINTS = {
   // Dashboard

@@ -2,8 +2,10 @@ import { AlertTriangle, Award, Building, Check, ChevronLeft, ChevronRight, FileT
 import { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { calculateScores } from '../utils/scoringSystem';
+import { useHealthCheck } from '../hooks/useHealthCheck';
 import ReportView from './ReportView';
 import ResultsDashboard from './ResultsDashboard';
+import Footer from './Footer';
 
 interface Question {
   id: number;
@@ -193,6 +195,7 @@ export default function QuestionFlow() {
   const [isSavingResults, setIsSavingResults] = useState(false);
 
   const { currentUser } = useAuth();
+  const { saveHealthCheck } = useHealthCheck();
 
   const question = healthCheckupQuestions[currentQuestion];
   const progress = ((currentQuestion + 1) / healthCheckupQuestions.length) * 100;
@@ -269,43 +272,29 @@ export default function QuestionFlow() {
       // Calculate scores using the scoring system
       const results = calculateScores(answers, followUpAnswers);
 
-      // Save results to backend
-      if (currentUser) {
-        const idToken = await currentUser.getIdToken();
+      // Save results using the hook
+      await saveHealthCheck(
+        answers,
+        results.overallScore,
+        results.categoryScores.map(cat => `${cat.category}: ${cat.insights}`),
+        followUpAnswers,
+        results.strengths,
+        results.redFlags,
+        results.riskForecast.risks.map(risk => `${risk.type}: ${risk.penalty}`)
+      );
 
-        const response = await fetch('https://wealth-empire-backend.vercel.app/api/health-check/save-results', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${idToken}`,
-            'x-firebase-uid': currentUser.uid,
-            'x-user-email': currentUser.email || ''
-          },
-          body: JSON.stringify({
-            firebaseUid: currentUser.uid,
-            overallScore: results.overallScore,
-            categoryScores: results.categoryScores,
-            answers,
-            followUpAnswers,
-            strengths: results.strengths,
-            redFlags: results.redFlags,
-            risks: results.riskForecast.risks
-          })
-        });
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.message || 'Failed to save results');
-        }
-
-        console.log('Health check results saved successfully');
-      }
-
+      console.log('Health check results saved successfully');
       setIsCompleted(true);
     } catch (error: any) {
       console.error('Error saving health check results:', error);
-      // Still show results even if saving fails
-      setIsCompleted(true);
+
+      // Check if it's a subscription limit error
+      if (error.message.includes('limit reached')) {
+        alert('Health check limit reached for your subscription plan. Please upgrade to continue.');
+      } else {
+        // Still show results even if saving fails for other reasons
+        setIsCompleted(true);
+      }
     } finally {
       setIsSavingResults(false);
     }
@@ -407,25 +396,7 @@ export default function QuestionFlow() {
         />
 
         {/* Footer */}
-        <footer className="bg-white py-16 px-6">
-          <div className="max-w-7xl mx-auto">
-            <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-              <div className="text-2xl font-bold text-gray-900 lowercase tracking-tight">
-                wealthempire.
-              </div>
-              <div className="flex gap-8 text-sm text-gray-600">
-                <a href="#" className="hover:text-gray-900 transition-colors">Privacy</a>
-                <a href="#" className="hover:text-gray-900 transition-colors">Terms</a>
-                <a href="#" className="hover:text-gray-900 transition-colors">Contact</a>
-              </div>
-            </div>
-            <div className="mt-8 pt-8 border-t border-gray-100 text-center">
-              <p className="text-sm text-gray-500">
-                © 2025 Wealth Empires. All rights reserved.
-              </p>
-            </div>
-          </div>
-        </footer>
+        <Footer/>
       </div>
     );
   }

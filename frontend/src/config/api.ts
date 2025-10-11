@@ -1,5 +1,6 @@
 // API Configuration
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://wealth-empire-backend.vercel.app';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || (import.meta.env.DEV ? '' : 'http://localhost:3001');
+export const FRONTEND_URL = import.meta.env.VITE_FRONTEND_URL || 'http://localhost:5173';
 
 export const API_ENDPOINTS = {
   // Authentication
@@ -20,6 +21,13 @@ export const API_ENDPOINTS = {
   // Users
   USER_DASHBOARD: `${API_BASE_URL}/api/users/dashboard`,
   USER_SUBSCRIPTION: `${API_BASE_URL}/api/users/subscription`,
+  USER_PROFILE: `${API_BASE_URL}/api/users/profile`,
+
+  // Shareable Reports
+  SHAREABLE_REPORTS_CREATE: `${API_BASE_URL}/api/shareable-reports/create`,
+  SHAREABLE_REPORTS_GET: (companySlug: string, hash: string) => `${API_BASE_URL}/api/shareable-reports/${companySlug}/${hash}`,
+  SHAREABLE_REPORTS_LIST: `${API_BASE_URL}/api/shareable-reports/user/list`,
+  SHAREABLE_REPORTS_DELETE: (hash: string) => `${API_BASE_URL}/api/shareable-reports/${hash}`,
 
   // External APIs
   COMPANY_DATA: (cin: string) => `${API_BASE_URL}/api/company/${cin}`,

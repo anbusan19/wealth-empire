@@ -1,4 +1,4 @@
-import { ArrowUpRight, Phone, CheckCircle, Zap } from 'lucide-react';
+import { ArrowUpRight, Phone, CheckCircle } from 'lucide-react';
 import { calculateScores } from '../utils/scoringSystem';
 
 interface WealthEmpireService {
@@ -173,8 +173,12 @@ export default function ReportView({ answers, followUpAnswers }: ReportViewProps
       <div className="max-w-7xl mx-auto">
         {/* Header Section */}
         <div className="text-center mb-16 sm:mb-20">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-slate-900 to-slate-700 rounded-2xl mb-8 shadow-lg">
-            <Zap className="w-8 h-8 text-white" />
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-8 shadow-lg">
+            <img
+              src="/welogo.png"
+              alt="WE"
+              className="w-8 h-8"
+            />
           </div>
           <p className="text-xs font-semibold tracking-[0.2em] uppercase text-slate-500 mb-6 letterspacing-wide">
             SOLUTIONS & PRICING
@@ -196,7 +200,11 @@ export default function ReportView({ answers, followUpAnswers }: ReportViewProps
             <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 rounded-2xl p-8 mb-12 shadow-sm">
               <div className="flex items-center gap-4 mb-6">
                 <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
-                  <Zap className="w-6 h-6 text-white" />
+                  <img
+                    src="/welogo.png"
+                    alt="WE"
+                    className="w-6 h-6"
+                  />
                 </div>
                 <div>
                   <h3 className="text-xl font-bold text-slate-900 mb-1">

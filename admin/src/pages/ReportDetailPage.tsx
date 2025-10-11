@@ -113,7 +113,7 @@ const ReportDetailsPage: React.FC = () => {
                     setError('Report not found for this user.');
                 }
             } else {
-                setError(response.message || 'Failed to fetch user data.');
+                setError(response.message || 'Will be updated soon');
             }
         } catch (error) {
             console.error('Error fetching report details:', error);
@@ -146,7 +146,7 @@ const ReportDetailsPage: React.FC = () => {
                 <div className="flex items-center mt-20 justify-center py-20">
                     <div className="text-center">
                         <AlertTriangle className="h-8 w-8 text-red-500 mx-auto mb-4" />
-                        <p className="text-red-600 mb-4">{error}</p>
+                        <p className="text-black-600 mb-4">{error}</p>
                         <button
                             onClick={fetchReportData}
                             className="px-6 py-3 bg-gray-900 text-white rounded-2xl hover:bg-gray-800 transition-all duration-300"
@@ -275,7 +275,7 @@ const ReportDetailsPage: React.FC = () => {
                             Raw Assessment Data
                         </h2>
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {Object.entries(report.answers).map(([key, value], index) => (
+                            {Object.entries(report.answers).map(([key, value]) => (
                                 <div key={key} className="p-4 bg-gray-50 rounded-xl border border-gray-100">
                                     <div className="text-sm font-medium text-gray-500 mb-1">Question #{key}</div>
                                     <div className="font-semibold text-gray-900">{value}</div>

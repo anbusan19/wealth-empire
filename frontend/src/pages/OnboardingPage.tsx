@@ -92,8 +92,8 @@ const OnboardingPage: React.FC = () => {
         } else if (!/^\+?[\d\s-()]+$/.test(formData.contactNumber)) {
           newErrors.contactNumber = 'Please enter a valid contact number';
         }
-        if (formData.website && !/^https?:\/\/.+/.test(formData.website)) {
-          newErrors.website = 'Please enter a valid website URL (include http:// or https://)';
+        if (formData.website && formData.website !== 'https://' && !/^https:\/\/.+\..+/.test(formData.website)) {
+          newErrors.website = 'Please enter a valid website URL';
         }
         break;
     }
@@ -276,14 +276,23 @@ const OnboardingPage: React.FC = () => {
           <label className="block text-sm font-medium text-gray-900 mb-3">
             Website (Optional)
           </label>
-          <input
-            type="url"
-            value={formData.website}
-            onChange={(e) => handleInputChange('website', e.target.value)}
-            className={`w-full px-6 py-4 border-2 rounded-2xl focus:ring-2 focus:ring-gray-900 focus:border-gray-900 transition-all duration-300 text-lg ${errors.website ? 'border-red-500' : 'border-gray-200 hover:border-gray-300'
-              }`}
-            placeholder="https://yourwebsite.com"
-          />
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-6 flex items-center pointer-events-none">
+              <span className="text-gray-500 text-lg">https://</span>
+            </div>
+            <input
+              type="text"
+              value={formData.website.replace(/^https?:\/\//, '')}
+              onChange={(e) => {
+                const value = e.target.value;
+                // Always prepend https:// when saving to state
+                handleInputChange('website', value ? `https://${value}` : '');
+              }}
+              className={`w-full pl-24 pr-6 py-4 border-2 rounded-2xl focus:ring-2 focus:ring-gray-900 focus:border-gray-900 transition-all duration-300 text-lg ${errors.website ? 'border-red-500' : 'border-gray-200 hover:border-gray-300'
+                }`}
+              placeholder="yourwebsite.com"
+            />
+          </div>
           {errors.website && (
             <p className="mt-2 text-sm text-red-600">{errors.website}</p>
           )}

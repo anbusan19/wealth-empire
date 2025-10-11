@@ -62,6 +62,19 @@ router.post('/firebase-auth', [
 
     await user.save();
 
+    // Create default free subscription for new user
+    const Subscription = require('../models/Subscription');
+    const defaultSubscription = new Subscription({
+      userId: user._id,
+      firebaseUid: user.firebaseUid,
+      type: 'free',
+      startDate: new Date(),
+      isActive: true,
+      status: 'active'
+    });
+
+    await defaultSubscription.save();
+
     res.status(201).json({
       success: true,
       message: 'User registered successfully',
@@ -91,6 +104,10 @@ router.get('/profile', verifyFirebaseToken, async (req, res) => {
   try {
     const user = req.user;
 
+    // Get active subscription from separate collection
+    const Subscription = require('../models/Subscription');
+    const activeSubscription = await Subscription.getActiveForUser(user._id);
+
     res.status(200).json({
       success: true,
       data: {
@@ -105,7 +122,16 @@ router.get('/profile', verifyFirebaseToken, async (req, res) => {
           founderName: user.founderName,
           contactNumber: user.contactNumber,
           isOnboardingComplete: user.isOnboardingComplete,
-          subscription: user.subscription,
+          subscription: activeSubscription ? {
+            type: activeSubscription.type,
+            isActive: activeSubscription.isActive,
+            startDate: activeSubscription.startDate,
+            endDate: activeSubscription.endDate
+          } : {
+            type: 'free',
+            isActive: true,
+            startDate: user.createdAt
+          },
           createdAt: user.createdAt,
           lastLoginAt: user.lastLoginAt
         }

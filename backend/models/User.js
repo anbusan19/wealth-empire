@@ -58,47 +58,6 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
-  subscription: {
-    type: {
-      type: String,
-      enum: ['free', 'premium', 'enterprise'],
-      default: 'free'
-    },
-    startDate: {
-      type: Date,
-      default: Date.now
-    },
-    endDate: Date,
-    isActive: {
-      type: Boolean,
-      default: true
-    }
-  },
-  
-  // Health Check Results
-  healthCheckResults: [{
-    assessmentDate: {
-      type: Date,
-      default: Date.now
-    },
-    answers: {
-      type: Map,
-      of: mongoose.Schema.Types.Mixed
-    },
-    score: {
-      type: Number,
-      min: 0,
-      max: 100
-    },
-    recommendations: [String],
-    strengths: [String],
-    redFlags: [String],
-    risks: [String],
-    followUpAnswers: {
-      type: Map,
-      of: mongoose.Schema.Types.Mixed
-    }
-  }],
   
   // Metadata
   lastLoginAt: {
@@ -119,19 +78,23 @@ userSchema.index({ firebaseUid: 1 });
 userSchema.index({ startupName: 1 });
 userSchema.index({ createdAt: -1 });
 
-// Virtual for latest health check
-userSchema.virtual('latestHealthCheck').get(function() {
-  if (this.healthCheckResults && this.healthCheckResults.length > 0) {
-    return this.healthCheckResults[this.healthCheckResults.length - 1];
-  }
-  return null;
+// Virtual for latest health check (now from separate collection)
+userSchema.virtual('latestHealthCheck', {
+  ref: 'HealthCheck',
+  localField: '_id',
+  foreignField: 'userId',
+  justOne: true,
+  options: { sort: { assessmentDate: -1 } }
 });
 
-// Method to add health check result
-userSchema.methods.addHealthCheckResult = function(resultData) {
-  this.healthCheckResults.push(resultData);
-  return this.save();
-};
+// Virtual for active subscription (now from separate collection)
+userSchema.virtual('activeSubscription', {
+  ref: 'Subscription',
+  localField: '_id',
+  foreignField: 'userId',
+  justOne: true,
+  match: { isActive: true, status: 'active' }
+});
 
 // Method to complete onboarding
 userSchema.methods.completeOnboarding = function() {

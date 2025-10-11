@@ -6,6 +6,8 @@ import HealthCheckPage from './pages/HealthCheckPage';
 import LoginPage from './pages/LoginPage';
 import OnboardingPage from './pages/OnboardingPage';
 import DashboardPage from './pages/DashboardPage';
+import ReportsPage from './pages/ReportsPage';
+import SharedReportPage from './pages/SharedReportPage';
 import NotFoundPage from './pages/NotFoundPage';
 
 function App() {
@@ -38,6 +40,18 @@ function App() {
                 <HealthCheckPage />
               </ProtectedRoute>
             } 
+          />
+          <Route 
+            path="/reports" 
+            element={
+              <ProtectedRoute requireOnboarding={true}>
+                <ReportsPage />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/shared-report/:companySlug/:hash" 
+            element={<SharedReportPage />} 
           />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>

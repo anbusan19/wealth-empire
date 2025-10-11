@@ -3,11 +3,22 @@ import { useAuth } from '../contexts/AuthContext';
 import { API_ENDPOINTS } from '../config/api';
 
 interface HealthCheckResult {
+  id: string;
   assessmentDate: string;
   answers: Record<number, string>;
   score: number;
+  riskLevel: 'low' | 'medium' | 'high' | 'critical';
   recommendations: string[];
+  strengths: string[];
+  redFlags: string[];
+  risks: string[];
   followUpAnswers: Record<number, string>;
+  improvement?: {
+    scoreChange: number;
+    previousScore: number;
+    currentScore: number;
+    daysBetween: number;
+  } | null;
 }
 
 interface HealthCheckStats {
@@ -17,12 +28,27 @@ interface HealthCheckStats {
   lowestScore: number;
   lastAssessment: string | null;
   trend: 'improving' | 'declining' | 'stable' | 'no-data';
+  riskDistribution: {
+    low: number;
+    medium: number;
+    high: number;
+    critical: number;
+  };
+  subscription: {
+    type: 'free' | 'premium' | 'enterprise';
+    healthChecksRemaining: number | 'unlimited';
+  };
 }
 
 interface HealthCheckHistory {
+  id: string;
   assessmentDate: string;
   score: number;
+  riskLevel: 'low' | 'medium' | 'high' | 'critical';
   recommendations: string[];
+  strengths: string[];
+  redFlags: string[];
+  risks: string[];
   answersCount: number;
   followUpAnswersCount: number;
 }
@@ -165,7 +191,10 @@ export const useHealthCheck = () => {
     answers: Record<number, string>,
     score: number,
     recommendations: string[],
-    followUpAnswers: Record<number, string> = {}
+    followUpAnswers: Record<number, string> = {},
+    strengths: string[] = [],
+    redFlags: string[] = [],
+    risks: string[] = []
   ) => {
     if (!currentUser) throw new Error('User not authenticated');
     
@@ -186,11 +215,15 @@ export const useHealthCheck = () => {
           answers,
           score,
           recommendations,
-          followUpAnswers
+          followUpAnswers,
+          strengths,
+          redFlags,
+          risks
         })
       });
 
       if (response.ok) {
+        const data = await response.json();
         // Refresh data after saving
         try {
           await refreshData();
@@ -198,9 +231,13 @@ export const useHealthCheck = () => {
           console.error('Error refreshing data after save:', refreshError);
           // Don't throw here, the save was successful
         }
-        return true;
+        return { success: true, data: data.data };
       } else {
         const errorData = await response.json();
+        if (response.status === 403) {
+          // Subscription limit reached
+          throw new Error(errorData.message || 'Health check limit reached for your subscription plan');
+        }
         throw new Error(errorData.message || 'Failed to save health check');
       }
     } catch (error) {

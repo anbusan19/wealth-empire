@@ -67,6 +67,8 @@ app.use('/api/users', require('./routes/users'));
 app.use('/api/onboarding', require('./routes/onboarding'));
 app.use('/api/health-check', require('./routes/healthCheck'));
 app.use('/api/admin', require('./routes/admin'));
+app.use('/api/debug', require('./routes/debug'));
+app.use('/api/shareable-reports', require('./routes/shareableReports'));
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

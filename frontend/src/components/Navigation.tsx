@@ -23,7 +23,7 @@ export default function Navigation() {
   }, []);
 
   // Function to handle smooth scrolling, with cross-page navigation
-  const handleScrollToElement = (id, event) => {
+  const handleScrollToElement = (id: string, event: React.MouseEvent<HTMLAnchorElement>) => {
     event.preventDefault();
     setIsMenuOpen(false);
     setShowUserMenu(false);
@@ -98,13 +98,15 @@ export default function Navigation() {
                     className="flex items-center gap-2 text-gray-700 hover:text-gray-900 transition-all duration-300 text-sm font-medium px-3 lg:px-4 py-2 rounded-lg hover:bg-white/50"
                   >
                     <User size={16} />
-                    {currentUser.displayName || currentUser.email?.split('@')[0]}
+                    {currentUser.displayName || currentUser.email?.split('@')[0] || 'User'}
                   </button>
 
                   {showUserMenu && (
-                    <div className="absolute right-0 mt-2 w-48 bg-white/90 backdrop-blur-xl rounded-xl shadow-lg border border-white/20 py-2 z-50">
-                      <div className="px-4 py-2 text-sm text-gray-600 border-b border-gray-200">
-                        {currentUser.email}
+                    <div className="absolute right-0 mt-2 w-56 bg-white/90 backdrop-blur-xl rounded-xl shadow-lg border border-white/20 py-2 z-50">
+                      <div className="px-4 py-2 text-sm text-gray-600 border-b border-gray-200 truncate">
+                        <span className="block truncate" title={currentUser.email || undefined}>
+                          {currentUser.email}
+                        </span>
                       </div>
                       <button
                         onClick={() => {
@@ -174,12 +176,14 @@ export default function Navigation() {
               >
                 Contact
               </a>
-              
+
               <div className="pt-3 space-y-3 border-t border-white/20">
                 {currentUser ? (
                   <>
-                    <div className="px-3 py-2 text-sm text-gray-600">
-                      {currentUser.email}
+                    <div className="px-3 py-2 text-sm text-gray-600 truncate">
+                      <span className="block truncate" title={currentUser.email || undefined}>
+                        {currentUser.email}
+                      </span>
                     </div>
                     <button
                       onClick={() => {
