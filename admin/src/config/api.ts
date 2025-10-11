@@ -1,5 +1,5 @@
 // Admin API Configuration
-const API_BASE_URL = 'http://localhost:3001';
+const API_BASE_URL = 'https://api-wealthempires.vercel.app';
 
 export const ADMIN_API_ENDPOINTS = {
   // Dashboard
@@ -13,6 +13,7 @@ export const ADMIN_API_ENDPOINTS = {
 
   // Reports
   REPORTS: `${API_BASE_URL}/api/admin/reports`,
+  REPORT_DETAIL: (userId: string, reportId: string) => `${API_BASE_URL}/api/admin/reports/${userId}/${reportId}`,
 
   // System Health
   HEALTH: `${API_BASE_URL}/api/health`
@@ -21,9 +22,27 @@ export const ADMIN_API_ENDPOINTS = {
 // API Helper functions
 export const apiRequest = async (url: string, options: RequestInit = {}) => {
   try {
+    // Get auth token from localStorage for admin requests
+    const authData = localStorage.getItem('adminAuth');
+    let authHeaders = {};
+    
+    if (authData) {
+      try {
+        const parsed = JSON.parse(authData);
+        if (parsed.expires > Date.now() && parsed.token) {
+          authHeaders = {
+            'Authorization': `Bearer ${parsed.token}`
+          };
+        }
+      } catch (error) {
+        console.warn('Failed to parse admin auth data:', error);
+      }
+    }
+
     const response = await fetch(url, {
       headers: {
         'Content-Type': 'application/json',
+        ...authHeaders,
         ...options.headers,
       },
       ...options,

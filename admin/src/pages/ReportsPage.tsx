@@ -1,6 +1,5 @@
 import {
     AlertTriangle,
-    ArrowUpRight,
     Award,
     Building,
     CheckCircle,
@@ -8,7 +7,11 @@ import {
     FileText,
     Loader2,
     Search,
-    TrendingUp
+    TrendingUp,
+    Calendar,
+    BarChart3,
+    Users,
+    Eye
 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -31,10 +34,15 @@ interface ComplianceReport {
     userId?: string; // This is the user's main _id (68e49f5f4652adc7d3d94beb)
     userEmail: string;
     startupName: string;
+    founderName?: string;
     score: number;
     completedAt: string;
     criticalIssues: number;
     status: 'Completed' | 'In Progress' | 'Failed';
+    riskLevel?: 'low' | 'medium' | 'high' | 'critical';
+    strengths?: string[];
+    redFlags?: string[];
+    recommendations?: string[];
     categories: {
         legal: number;
         financial: number;
@@ -107,10 +115,26 @@ const ReportsPage: React.FC = () => {
         return styles[status as keyof typeof styles] || 'bg-gray-100 text-gray-800';
     };
 
-    const getScoreBadge = (score: number) => {
-        if (score >= 80) return 'bg-green-100 text-green-800';
-        if (score >= 60) return 'bg-yellow-100 text-yellow-800';
-        return 'bg-red-100 text-red-800';
+    const getRiskLevelColor = (riskLevel: string) => {
+        switch (riskLevel) {
+            case 'low':
+                return 'bg-green-100 text-green-800 border-green-200';
+            case 'medium':
+                return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+            case 'high':
+                return 'bg-orange-100 text-orange-800 border-orange-200';
+            case 'critical':
+                return 'bg-red-100 text-red-800 border-red-200';
+            default:
+                return 'bg-gray-100 text-gray-800 border-gray-200';
+        }
+    };
+
+    const getScoreColor = (score: number) => {
+        if (score >= 80) return 'text-green-600';
+        if (score >= 60) return 'text-blue-600';
+        if (score >= 40) return 'text-orange-600';
+        return 'text-red-600';
     };
 
     const filteredReports = reports.filter(report => {
@@ -124,7 +148,7 @@ const ReportsPage: React.FC = () => {
 
         return matchesSearch && matchesStatus;
     });
-    
+
     // ----------------------------------------------------------------------
     // MODIFIED FUNCTION: Navigates to the report detail page
     // ----------------------------------------------------------------------
@@ -139,7 +163,7 @@ const ReportsPage: React.FC = () => {
             console.error('Cannot view report detail: Missing User ID or Report ID.', report);
             // Fallback: Navigate to the general user profile if ID is missing for the report detail page
             const fallbackUserId = report.userId || report.id.split('_')[0];
-            navigate(`/users/${fallbackUserId}`); 
+            navigate(`/users/${fallbackUserId}`);
         }
     };
     // ----------------------------------------------------------------------
@@ -191,14 +215,39 @@ const ReportsPage: React.FC = () => {
                             <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-4">
                                 Compliance Reports
                             </h1>
-                            <p className="text-gray-600 text-lg">
+                            <p className="text-gray-600 text-lg mb-2">
                                 Monitor and analyze startup compliance assessments across the platform.
                             </p>
+                            <div className="flex items-center gap-4 text-sm text-gray-500">
+                                <div className="flex items-center gap-1">
+                                    <Users className="w-4 h-4" />
+                                    <span>{stats?.totalReports || 0} total reports</span>
+                                </div>
+                                <span>•</span>
+                                <div className="flex items-center gap-1">
+                                    <BarChart3 className="w-4 h-4" />
+                                    <span>{stats?.averageScore || 0}% avg score</span>
+                                </div>
+                                <span>•</span>
+                                <div className="flex items-center gap-1">
+                                    <AlertTriangle className="w-4 h-4" />
+                                    <span>{stats?.criticalIssues || 0} critical issues</span>
+                                </div>
+                            </div>
                         </div>
-                        <button className="flex items-center px-6 py-3 bg-gray-900 text-white rounded-2xl hover:bg-gray-800 transition-all duration-300">
-                            <Download className="h-5 w-5 mr-2" />
-                            Export Reports
-                        </button>
+                        <div className="flex items-center gap-3">
+                            <button
+                                onClick={fetchReportsData}
+                                className="flex items-center px-4 py-2 text-gray-700 bg-gray-100 rounded-xl hover:bg-gray-200 transition-all duration-300"
+                            >
+                                <TrendingUp className="h-4 w-4 mr-2" />
+                                Refresh
+                            </button>
+                            <button className="flex items-center px-6 py-3 bg-gray-900 text-white rounded-2xl hover:bg-gray-800 transition-all duration-300">
+                                <Download className="h-5 w-5 mr-2" />
+                                Export Reports
+                            </button>
+                        </div>
                     </div>
 
                     {/* Stats Grid - (Content remains the same) */}
@@ -334,90 +383,113 @@ const ReportsPage: React.FC = () => {
                             </div>
                         </div>
 
-                        {/* Reports Table */}
-                        <div className="overflow-x-auto">
-                            <table className="w-full">
-                                <thead>
-                                    <tr className="border-b border-gray-200">
-                                        <th className="text-left py-4 px-2 font-semibold text-gray-900">Startup</th>
-                                        <th className="text-left py-4 px-2 font-semibold text-gray-900">Score</th>
-                                        <th className="text-left py-4 px-2 font-semibold text-gray-900">Status</th>
-                                        <th className="text-left py-4 px-2 font-semibold text-gray-900">Issues</th>
-                                        <th className="text-left py-4 px-2 font-semibold text-gray-900">Date</th>
-                                        <th className="text-left py-4 px-2 font-semibold text-gray-900">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {filteredReports.map((report, index) => (
-                                        <tr
-                                            key={`${report.id}_${index}`}
-                                            // ----------------------------------------------------------------------
-                                            // UPDATED: Row click navigates to report details
-                                            // ----------------------------------------------------------------------
-                                            className="border-b border-gray-100 hover:bg-gray-50 cursor-pointer transition-colors duration-200"
-                                            onClick={() => handleViewReport(report)}
-                                            title={`Click to view ${report.startupName}'s detailed report`}
-                                        >
-                                            <td className="py-4 px-2">
-                                                <div className="flex items-center">
-                                                    <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center mr-3">
-                                                        <Building className="h-5 w-5 text-gray-600" />
-                                                    </div>
-                                                    <div>
-                                                        <div className="font-semibold text-gray-900 hover:text-blue-600 transition-colors font-data">
-                                                            {report.startupName}
-                                                        </div>
-                                                        <div className="text-sm text-gray-600 font-data">{report.userEmail}</div>
-                                                    </div>
+                        {/* Enhanced Reports Display */}
+                        <div className="space-y-4">
+                            {filteredReports.map((report, index) => (
+                                <div
+                                    key={`${report.id}_${index}`}
+                                    className="bg-white border border-gray-200 rounded-2xl p-6 hover:shadow-lg transition-all duration-300 cursor-pointer"
+                                    onClick={() => handleViewReport(report)}
+                                >
+                                    <div className="flex items-center justify-between mb-4">
+                                        <div className="flex items-center gap-4">
+                                            <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
+                                                <Building className="h-6 w-6 text-white" />
+                                            </div>
+                                            <div>
+                                                <h3 className="text-lg font-semibold text-gray-900 hover:text-blue-600 transition-colors">
+                                                    {report.startupName}
+                                                </h3>
+                                                <div className="flex items-center gap-2 text-sm text-gray-600">
+                                                    <span>{report.userEmail}</span>
+                                                    {report.founderName && (
+                                                        <>
+                                                            <span>•</span>
+                                                            <span>{report.founderName}</span>
+                                                        </>
+                                                    )}
                                                 </div>
-                                            </td>
-                                            <td className="py-4 px-2 font-data">
-                                                {report.status === 'In Progress' ? (
-                                                    <span className="text-gray-500">-</span>
-                                                ) : (
-                                                    <span className={`px-3 py-1 rounded-full text-sm font-medium ${getScoreBadge(report.score)} font-numbers`}>
-                                                        {report.score}%
-                                                    </span>
-                                                )}
-                                            </td>
-                                            <td className="py-4 px-2 font-data">
-                                                <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusBadge(report.status)}`}>
-                                                    {report.status}
+                                            </div>
+                                        </div>
+
+                                        <div className="flex items-center gap-3">
+                                            {report.riskLevel && (
+                                                <span className={`px-3 py-1 rounded-full text-xs font-semibold border ${getRiskLevelColor(report.riskLevel)}`}>
+                                                    {report.riskLevel.toUpperCase()} RISK
                                                 </span>
-                                            </td>
-                                            <td className="py-4 px-2 font-data">
-                                                {report.criticalIssues > 0 ? (
-                                                    <span className="text-red-600 font-medium font-numbers">{report.criticalIssues}</span>
-                                                ) : (
-                                                    <CheckCircle className="h-5 w-5 text-green-600" />
-                                                )}
-                                            </td>
-                                            <td className="py-4 px-2 text-sm text-gray-600 font-data">
-                                                {new Date(report.completedAt).toLocaleDateString()}
-                                            </td>
-                                            <td className="py-4 px-2">
-                                                <button
-                                                    className="text-gray-600 hover:text-gray-900 p-2 rounded-lg hover:bg-gray-100 transition-colors"
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        // ----------------------------------------------------------------------
-                                                        // UPDATED: Button click also navigates to report details
-                                                        // ----------------------------------------------------------------------
-                                                        handleViewReport(report);
-                                                    }}
-                                                >
-                                                    <ArrowUpRight className="h-4 w-4" />
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
+                                            )}
+                                            <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusBadge(report.status)}`}>
+                                                {report.status}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                                        <div className="flex items-center gap-2">
+                                            <BarChart3 className="w-4 h-4 text-gray-500" />
+                                            <span className="text-sm text-gray-500">Score:</span>
+                                            <span className={`text-lg font-bold ${getScoreColor(report.score)}`}>
+                                                {report.score}%
+                                            </span>
+                                        </div>
+
+                                        <div className="flex items-center gap-2">
+                                            <Calendar className="w-4 h-4 text-gray-500" />
+                                            <span className="text-sm text-gray-500">Date:</span>
+                                            <span className="text-sm font-medium text-gray-900">
+                                                {new Date(report.completedAt).toLocaleDateString('en-US', {
+                                                    month: 'short',
+                                                    day: 'numeric',
+                                                    year: 'numeric'
+                                                })}
+                                            </span>
+                                        </div>
+
+                                        <div className="flex items-center gap-2">
+                                            <CheckCircle className="w-4 h-4 text-green-500" />
+                                            <span className="text-sm text-gray-500">Strengths:</span>
+                                            <span className="text-sm font-medium text-green-600">
+                                                {report.strengths?.length || 0}
+                                            </span>
+                                        </div>
+
+                                        <div className="flex items-center gap-2">
+                                            <AlertTriangle className="w-4 h-4 text-red-500" />
+                                            <span className="text-sm text-gray-500">Issues:</span>
+                                            <span className="text-sm font-medium text-red-600">
+                                                {report.redFlags?.length || report.criticalIssues || 0}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+                                        <div className="flex items-center gap-4 text-sm text-gray-600">
+                                            <span>Recommendations: {report.recommendations?.length || 0}</span>
+                                            <span>•</span>
+                                            <span>Report ID: {report.id.slice(-8)}</span>
+                                        </div>
+
+                                        <div className="flex items-center gap-2">
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleViewReport(report);
+                                                }}
+                                                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-300 text-sm font-medium"
+                                            >
+                                                <Eye className="w-4 h-4" />
+                                                View Details
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
 
                             {filteredReports.length === 0 && (
                                 <div className="text-center py-12">
-                                    <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                                    <p className="text-gray-600">No reports found matching your criteria</p>
+                                    <FileText className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+                                    <h3 className="text-xl font-semibold text-gray-900 mb-2">No Reports Found</h3>
+                                    <p className="text-gray-600">No reports match your current search and filter criteria.</p>
                                 </div>
                             )}
                         </div>

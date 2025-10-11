@@ -1,5 +1,5 @@
 // API Configuration
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || (import.meta.env.DEV ? '' : 'http://localhost:3001');
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || (import.meta.env.DEV ? '' : 'https://api-wealthempires.vercel.app');
 export const FRONTEND_URL = import.meta.env.VITE_FRONTEND_URL || 'http://localhost:5173';
 
 export const API_ENDPOINTS = {
@@ -33,7 +33,7 @@ export const API_ENDPOINTS = {
   COMPANY_DATA: (cin: string) => `${API_BASE_URL}/api/company/${cin}`,
 
   // Health Check
-  HEALTH: `${API_BASE_URL}/api/health`
+  HEALTH: `${API_BASE_URL}/api/health`,
 };
 
 export default API_BASE_URL;

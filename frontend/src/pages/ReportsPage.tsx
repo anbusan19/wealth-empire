@@ -21,7 +21,6 @@ import { useUserProfile } from '../hooks/useUserProfile';
 import { useAuth } from '../contexts/AuthContext';
 import { API_ENDPOINTS } from '../config/api';
 import generatePDF from '../utils/pdfGenerator';
-import { calculateScores } from '../utils/scoringSystem';
 
 const ReportsPage: React.FC = () => {
     const { history, stats, loading, error, fetchHistory } = useHealthCheck();
@@ -155,7 +154,7 @@ const ReportsPage: React.FC = () => {
         return (
             <div className="min-h-screen bg-white">
                 <Navigation />
-                <div className="flex items-center justify-center py-20">
+                <div className="flex items-center mt-20 justify-center py-20">
                     <div className="text-center">
                         <Loader2 className="h-8 w-8 animate-spin text-gray-900 mx-auto mb-4" />
                         <p className="text-gray-600">Loading reports...</p>

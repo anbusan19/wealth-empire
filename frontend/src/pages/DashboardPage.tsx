@@ -15,7 +15,6 @@ import {
     CheckCircle,
     BarChart3,
     FileText,
-    Settings,
     Loader2
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
@@ -49,17 +48,12 @@ interface DashboardStats {
     lastScore: number | null;
 }
 
-interface LatestHealthCheck {
-    date: string;
-    score: number;
-    recommendations: string[];
-}
+
 
 const DashboardPage: React.FC = () => {
     const { currentUser, getIdToken } = useAuth();
     const { latestResult: latestHealthCheck, stats: healthStats } = useHealthCheck();
     const [profile, setProfile] = useState<UserProfile | null>(null);
-    const [stats, setStats] = useState<DashboardStats | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -82,7 +76,6 @@ const DashboardPage: React.FC = () => {
             if (response.ok) {
                 const result = await response.json();
                 setProfile(result.data.user);
-                setStats(result.data.stats);
             } else {
                 setError('Failed to load dashboard data');
             }
@@ -98,7 +91,7 @@ const DashboardPage: React.FC = () => {
         return (
             <div className="min-h-screen bg-white">
                 <Navigation />
-                <div className="flex items-center justify-center py-20">
+                <div className="flex items-center mt-20 justify-center py-20">
                     <div className="text-center">
                         <Loader2 className="h-8 w-8 animate-spin text-gray-900 mx-auto mb-4" />
                         <p className="text-gray-600">Loading dashboard...</p>
@@ -320,14 +313,6 @@ const DashboardPage: React.FC = () => {
                                     >
                                         <FileText className="h-5 w-5 mr-3" />
                                         View Reports
-                                    </Link>
-
-                                    <Link
-                                        to="/settings"
-                                        className="w-full flex items-center justify-center px-6 py-4 text-gray-700 bg-gray-100 rounded-2xl hover:bg-gray-200 transition-all duration-300"
-                                    >
-                                        <Settings className="h-5 w-5 mr-3" />
-                                        Settings
                                     </Link>
                                 </div>
                             </div>

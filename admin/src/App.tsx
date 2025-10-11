@@ -51,8 +51,10 @@ function App() {
             />
             <Route
               path="/reports/:userId/:reportId"
-              element={<ReportDetailPage />
-
+              element={
+                <ProtectedRoute>
+                  <ReportDetailPage />
+                </ProtectedRoute>
               }
             />
             {/* Catch-all route for 404 pages */}
