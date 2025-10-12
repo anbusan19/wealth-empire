@@ -189,7 +189,7 @@ const ReportDetailsPage: React.FC = () => {
                         <p className="text-gray-600 text-lg">
                             Assessment completed on{' '}
                             <span className="font-semibold text-gray-800">
-                                {new Date(report.assessmentDate).toLocaleDateString()}
+                                {new Date(report.assessmentDate).toLocaleDateString('en-GB')}
                             </span>
                         </p>
                     </div>

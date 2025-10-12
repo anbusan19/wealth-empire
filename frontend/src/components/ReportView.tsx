@@ -219,21 +219,28 @@ export default function ReportView({ answers, followUpAnswers }: ReportViewProps
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
               {recommendedServices.map((service) => (
-                <div key={service.id} className="group bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 lg:p-8 border border-slate-200 shadow-sm hover:shadow-xl hover:border-slate-300 transition-all duration-300 relative overflow-hidden">
+                <div key={service.id} className="group bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 lg:p-8 border border-slate-200 shadow-sm hover:shadow-xl hover:border-slate-300 transition-all duration-300 relative overflow-hidden min-w-0">
                   {/* Priority Badge */}
                   {service.priority === 'high' && (
-                    <div className="absolute top-3 right-3 sm:top-4 sm:right-4 lg:top-6 lg:right-6">
-                      <span className="bg-gradient-to-r from-red-500 to-red-600 text-white text-xs font-semibold px-2 py-1 sm:px-3 sm:py-1.5 rounded-full shadow-sm">
+                    <div className="absolute top-3 right-3 sm:top-4 sm:right-4 lg:top-6 lg:right-6 z-10">
+                      <span className="bg-gradient-to-r from-red-500 to-red-600 text-white text-xs font-semibold px-2 py-1 sm:px-3 sm:py-1.5 rounded-full shadow-sm whitespace-nowrap">
                         HIGH PRIORITY
                       </span>
                     </div>
                   )}
+                  {service.priority === 'medium' && (
+                    <div className="absolute top-3 right-3 sm:top-4 sm:right-4 lg:top-6 lg:right-6 z-10">
+                      <span className="bg-gradient-to-r from-orange-500 to-orange-600 text-white text-xs font-semibold px-2 py-1 sm:px-3 sm:py-1.5 rounded-full shadow-sm whitespace-nowrap">
+                        MEDIUM PRIORITY
+                      </span>
+                    </div>
+                  )}
 
-                  <div className="mb-4 sm:mb-6 pr-20 sm:pr-24">
-                    <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-slate-900 mb-2 sm:mb-3 group-hover:text-slate-700 transition-colors leading-tight">
+                  <div className="mb-4 sm:mb-6 pr-16 sm:pr-20 lg:pr-24">
+                    <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-slate-900 mb-2 sm:mb-3 group-hover:text-slate-700 transition-colors leading-tight break-words">
                       {service.title}
                     </h3>
-                    <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
+                    <p className="text-sm sm:text-base text-slate-600 leading-relaxed break-words">
                       {service.description}
                     </p>
                   </div>
@@ -253,18 +260,25 @@ export default function ReportView({ answers, followUpAnswers }: ReportViewProps
                   </div>
 
                   {/* Pricing */}
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 sm:mb-8">
-                    <div>
-                      <div className="flex items-baseline gap-2 sm:gap-3 mb-1">
-                        <span className="text-2xl sm:text-3xl font-bold text-slate-900">
-                          ₹{service.discountedPrice.toLocaleString()}
-                        </span>
-                        <span className="text-base sm:text-lg text-slate-400 line-through">
-                          ₹{service.originalPrice.toLocaleString()}
-                        </span>
+                  <div className="mb-6 sm:mb-8">
+                    <div className="flex flex-col xs:flex-row xs:items-end xs:justify-between gap-3 mb-3">
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-baseline gap-2 mb-1 flex-wrap">
+                          <span className="text-xl sm:text-2xl lg:text-3xl font-bold text-slate-900 leading-none">
+                            ₹{service.discountedPrice.toLocaleString()}
+                          </span>
+                          <span className="text-sm sm:text-base lg:text-lg text-slate-400 line-through leading-none">
+                            ₹{service.originalPrice.toLocaleString()}
+                          </span>
+                        </div>
+                        <div className="text-xs sm:text-sm text-green-600 font-medium leading-tight">
+                          {service.discount}
+                        </div>
                       </div>
-                      <div className="text-xs sm:text-sm text-green-600 font-medium">
-                        {service.discount}
+                      <div className="flex-shrink-0">
+                        <div className="inline-flex items-center bg-green-500 text-white px-2 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-semibold shadow-sm">
+                          SAVE ₹{(service.originalPrice - service.discountedPrice).toLocaleString()}
+                        </div>
                       </div>
                     </div>
                   </div>

@@ -347,7 +347,7 @@ const UserDetailPage: React.FC = () => {
                     <p className="text-sm text-gray-600 mb-4">Latest Compliance Score</p>
                     {user.lastHealthCheck && (
                       <p className="text-xs text-gray-500 font-lato">
-                        Last check: {new Date(user.lastHealthCheck).toLocaleDateString()}
+                        Last check: {new Date(user.lastHealthCheck).toLocaleDateString('en-GB')}
                       </p>
                     )}
                   </div>
@@ -364,13 +364,13 @@ const UserDetailPage: React.FC = () => {
                     <div className="flex items-center justify-between">
                       <span className="text-sm text-gray-600">Member Since</span>
                       <span className="font-semibold text-gray-900 font-lato">
-                        {new Date(user.joinDate).toLocaleDateString()}
+                        {new Date(user.joinDate).toLocaleDateString('en-GB')}
                       </span>
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-sm text-gray-600">Last Login</span>
                       <span className="font-semibold text-gray-900 font-lato">
-                        {new Date(user.lastLogin).toLocaleDateString()}
+                        {new Date(user.lastLogin).toLocaleDateString('en-GB')}
                       </span>
                     </div>
                   </div>
@@ -415,7 +415,7 @@ const UserDetailPage: React.FC = () => {
                                 Compliance Assessment
                               </h3>
                               <p className="text-sm text-gray-600 font-lato">
-                                {new Date(check.date).toLocaleDateString()}
+                                {new Date(check.date).toLocaleDateString('en-GB')}
                               </p>
                             </div>
                           </div>
@@ -499,14 +499,14 @@ const UserDetailPage: React.FC = () => {
                           <div className="flex items-center justify-between">
                             <span className="text-sm text-gray-600">Start Date</span>
                             <span className="font-semibold text-gray-900 font-lato">
-                              {new Date(user.subscriptionStartDate).toLocaleDateString()}
+                              {new Date(user.subscriptionStartDate).toLocaleDateString('en-GB')}
                             </span>
                           </div>
                           {user.subscriptionEndDate && (
                             <div className="flex items-center justify-between">
                               <span className="text-sm text-gray-600">End Date</span>
                               <span className="font-semibold text-gray-900 font-lato">
-                                {new Date(user.subscriptionEndDate).toLocaleDateString()}
+                                {new Date(user.subscriptionEndDate).toLocaleDateString('en-GB')}
                               </span>
                             </div>
                           )}

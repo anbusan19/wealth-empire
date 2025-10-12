@@ -113,7 +113,7 @@ const SharedReportPage: React.FC = () => {
 
       const reportPDFData = {
         companyName: reportData.companyName,
-        reportDate: new Date(reportData.healthCheck.assessmentDate).toLocaleDateString('en-US', {
+        reportDate: new Date(reportData.healthCheck.assessmentDate).toLocaleDateString('en-GB', {
           year: 'numeric',
           month: 'long',
           day: 'numeric'
@@ -251,7 +251,7 @@ const SharedReportPage: React.FC = () => {
             <div className="flex flex-wrap justify-center gap-6 text-sm text-gray-600 mb-8">
               <div className="flex items-center gap-2">
                 <Calendar className="w-4 h-4" />
-                Generated: {new Date(reportData.healthCheck.assessmentDate).toLocaleDateString()}
+                Generated: {new Date(reportData.healthCheck.assessmentDate).toLocaleDateString('en-GB')}
               </div>
               <div className="flex items-center gap-2">
                 <Eye className="w-4 h-4" />

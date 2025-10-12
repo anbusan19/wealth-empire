@@ -250,7 +250,7 @@ const DashboardPage: React.FC = () => {
                           )}
                         </div>
                         <p className="text-xs text-gray-500 font-lato">
-                          Joined {new Date(user.joinDate).toLocaleDateString()}
+                          Joined {new Date(user.joinDate).toLocaleDateString('en-GB')}
                         </p>
                       </div>
                     </div>
@@ -303,7 +303,7 @@ const DashboardPage: React.FC = () => {
                       <p className="text-xs text-gray-600 mb-1 font-lato">{check.userEmail}</p>
                       <div className="flex items-center justify-between">
                         <p className="text-xs text-gray-500 font-lato">
-                          {new Date(check.completedAt).toLocaleDateString()}
+                          {new Date(check.completedAt).toLocaleDateString('en-GB')}
                         </p>
                         {check.criticalIssues > 0 && (
                           <span className="text-xs text-red-600 font-medium">

@@ -39,7 +39,7 @@ export default function ResultsDashboard({ companyData, answers, followUpAnswers
 
       const reportData = {
         companyName,
-        reportDate: new Date().toLocaleDateString('en-US', {
+        reportDate: new Date().toLocaleDateString('en-GB', {
           year: 'numeric',
           month: 'long',
           day: 'numeric'

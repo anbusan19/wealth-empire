@@ -76,11 +76,7 @@ const ReportsPage: React.FC = () => {
             // Since we don't have the original answers, we'll create a simplified version
             const reportData = {
                 companyName: profile?.startupName || 'Your Company',
-                reportDate: new Date(report.assessmentDate).toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                }),
+                reportDate: new Date(report.assessmentDate).toLocaleDateString('en-GB'),
                 overallScore: report.score,
                 categoryScores: [
                     { category: 'Overall', score: report.score, insights: `Risk Level: ${report.riskLevel}`, status: report.riskLevel }
@@ -266,7 +262,7 @@ const ReportsPage: React.FC = () => {
                                 </span>
                             </div>
                             <div className="text-xl sm:text-2xl font-bold text-gray-900 mb-1 leading-none">
-                                {stats?.lastAssessment ? new Date(stats.lastAssessment).toLocaleDateString() : 'Never'}
+                                {stats?.lastAssessment ? new Date(stats.lastAssessment).toLocaleDateString('en-GB') : 'Never'}
                             </div>
                             <div className="text-xs sm:text-sm text-gray-600">Last Assessment</div>
                         </div>
@@ -288,7 +284,7 @@ const ReportsPage: React.FC = () => {
                                                     <div className="flex items-center gap-2">
                                                         <Calendar className="w-4 h-4 text-gray-500 flex-shrink-0" />
                                                         <span className="text-xs sm:text-sm font-medium text-gray-900">
-                                                            {new Date(report.assessmentDate).toLocaleDateString('en-US', {
+                                                            {new Date(report.assessmentDate).toLocaleDateString('en-GB', {
                                                                 year: 'numeric',
                                                                 month: 'short',
                                                                 day: 'numeric'

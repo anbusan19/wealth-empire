@@ -437,11 +437,7 @@ const ReportsPage: React.FC = () => {
                                             <Calendar className="w-4 h-4 text-gray-500" />
                                             <span className="text-sm text-gray-500">Date:</span>
                                             <span className="text-sm font-medium text-gray-900">
-                                                {new Date(report.completedAt).toLocaleDateString('en-US', {
-                                                    month: 'short',
-                                                    day: 'numeric',
-                                                    year: 'numeric'
-                                                })}
+                                                {new Date(report.completedAt).toLocaleDateString('en-GB')}
                                             </span>
                                         </div>
 

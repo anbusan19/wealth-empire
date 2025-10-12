@@ -178,8 +178,8 @@ const DashboardPage: React.FC = () => {
                         <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-2xl sm:rounded-3xl p-6 sm:p-8 min-h-[180px] sm:aspect-square flex flex-col justify-between">
                             <div>
                                 <Calendar className="h-6 w-6 sm:h-8 sm:w-8 text-gray-900 mb-3 sm:mb-4" />
-                                <div className="text-base sm:text-lg lg:text-xl font-bold text-gray-900 mb-2 leading-tight break-words">
-                                    {healthStats?.lastAssessment ? new Date(healthStats.lastAssessment).toLocaleDateString() : 'Never'}
+                                <div className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-2 leading-none">
+                                    {healthStats?.lastAssessment ? new Date(healthStats.lastAssessment).toLocaleDateString('en-GB') : 'Never'}
                                 </div>
                                 <div className="text-xs sm:text-sm text-gray-700 leading-relaxed">Last Assessment</div>
                             </div>
@@ -283,7 +283,7 @@ const DashboardPage: React.FC = () => {
                                 {/* Member Since */}
                                 <div className="mt-8 pt-8 border-t border-gray-200">
                                     <p className="text-sm text-gray-500">
-                                        Member since {profile?.memberSince ? new Date(profile.memberSince).toLocaleDateString('en-US', {
+                                        Member since {profile?.memberSince ? new Date(profile.memberSince).toLocaleDateString('en-GB', {
                                             year: 'numeric',
                                             month: 'long',
                                             day: 'numeric'
@@ -328,7 +328,7 @@ const DashboardPage: React.FC = () => {
                                 </div>
                                 {profile?.subscription?.isActive && (
                                     <p className="text-sm text-gray-600 mb-4">
-                                        Active since {new Date(profile.subscription.startDate).toLocaleDateString()}
+                                        Active since {new Date(profile.subscription.startDate).toLocaleDateString('en-GB')}
                                     </p>
                                 )}
                                 <Link
@@ -348,7 +348,7 @@ const DashboardPage: React.FC = () => {
                                             {latestHealthCheck.score}%
                                         </div>
                                         <p className="text-sm text-gray-600">
-                                            {new Date(latestHealthCheck.assessmentDate).toLocaleDateString()}
+                                            {new Date(latestHealthCheck.assessmentDate).toLocaleDateString('en-GB')}
                                         </p>
                                     </div>
                                     {latestHealthCheck.recommendations && latestHealthCheck.recommendations.length > 0 && (

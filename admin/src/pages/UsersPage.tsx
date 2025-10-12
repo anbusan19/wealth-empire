@@ -266,7 +266,7 @@ const UsersPage: React.FC = () => {
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-lato">
-                        {new Date(user.lastLogin).toLocaleDateString()}
+                        {new Date(user.lastLogin).toLocaleDateString('en-GB')}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <div className="flex items-center justify-end space-x-2">
