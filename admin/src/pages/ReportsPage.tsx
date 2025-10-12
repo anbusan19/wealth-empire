@@ -156,17 +156,30 @@ const ReportsPage: React.FC = () => {
     // MODIFIED FUNCTION: Navigates to the report detail page
     // ----------------------------------------------------------------------
     const handleViewReport = (report: ComplianceReport) => {
+        console.log('Navigating to report detail with data:', report);
+
         const userId = report.userId;
         const reportId = report.id;
 
+        console.log('Extracted IDs:', { userId, reportId });
+
         if (userId && reportId) {
+            const navigationPath = `/reports/${userId}/${reportId}`;
+            console.log('Navigating to:', navigationPath);
             // Navigate to the detail page: /admin/reports/:userId/:reportId
-            navigate(`/reports/${userId}/${reportId}`);
+            navigate(navigationPath);
         } else {
             console.error('Cannot view report detail: Missing User ID or Report ID.', report);
             // Fallback: Navigate to the general user profile if ID is missing for the report detail page
             const fallbackUserId = report.userId || report.id.split('_')[0];
-            navigate(`/users/${fallbackUserId}`);
+            if (fallbackUserId) {
+                console.log('Using fallback navigation to user profile:', fallbackUserId);
+                navigate(`/users/${fallbackUserId}`);
+            } else {
+                console.error('No valid user ID found for fallback navigation');
+                // Show an error message to the user
+                alert('Unable to view report details. Missing required information.');
+            }
         }
     };
     // ----------------------------------------------------------------------
@@ -392,43 +405,27 @@ const ReportsPage: React.FC = () => {
             <section className="relative pt-20 sm:pt-32 pb-16 sm:pb-24 px-4 sm:px-6 lg:px-8">
                 <div className="max-w-7xl mx-auto">
                     {/* Header */}
-                    <div className="flex items-center justify-between mb-12">
+                    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-8 lg:mb-12 gap-6 lg:gap-0">
                         <div>
-                            <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-4">
+                            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-3 lg:mb-4">
                                 Compliance Reports
                             </h1>
-                            <p className="text-gray-600 text-lg mb-2">
+                            <p className="text-gray-600 text-base lg:text-lg mb-3 lg:mb-2">
                                 Monitor and analyze startup compliance assessments across the platform.
                             </p>
-                            <div className="flex items-center gap-4 text-sm text-gray-500">
-                                <div className="flex items-center gap-1">
-                                    <Users className="w-4 h-4" />
-                                    <span>{stats?.totalReports || 0} total reports</span>
-                                </div>
-                                <span>•</span>
-                                <div className="flex items-center gap-1">
-                                    <BarChart3 className="w-4 h-4" />
-                                    <span>{stats?.averageScore || 0}% avg score</span>
-                                </div>
-                                <span>•</span>
-                                <div className="flex items-center gap-1">
-                                    <AlertTriangle className="w-4 h-4" />
-                                    <span>{stats?.criticalIssues || 0} critical issues</span>
-                                </div>
-                            </div>
                         </div>
-                        <div className="flex items-center gap-3">
+                        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
                             <button
                                 onClick={fetchReportsData}
-                                className="flex items-center px-4 py-2 text-gray-700 bg-gray-100 rounded-xl hover:bg-gray-200 transition-all duration-300"
+                                className="flex items-center justify-center px-4 py-2 text-gray-700 bg-gray-100 rounded-xl hover:bg-gray-200 transition-all duration-300"
                             >
                                 <TrendingUp className="h-4 w-4 mr-2" />
-                                Refresh
+                                <span className="sm:inline">Refresh</span>
                             </button>
                             <button
                                 onClick={handleExportReports}
                                 disabled={exportLoading || loading}
-                                className="flex items-center px-6 py-3 bg-gray-900 text-white rounded-2xl hover:bg-gray-800 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="flex items-center justify-center px-6 py-3 bg-gray-900 text-white rounded-2xl hover:bg-gray-800 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 {exportLoading ? (
                                     <Loader2 className="h-5 w-5 mr-2 animate-spin" />
@@ -440,31 +437,31 @@ const ReportsPage: React.FC = () => {
                         </div>
                     </div>
 
-                    {/* Stats Grid - (Content remains the same) */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8 sm:mb-12 px-2 sm:px-0">
+                    {/* Stats Grid */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8 sm:mb-12">
                         {/* Total Reports */}
-                        <div className="bg-gray-900 rounded-3xl p-8 text-white">
+                        <div className="bg-gray-900 rounded-2xl sm:rounded-3xl p-6 sm:p-8 text-white">
                             <div className="flex items-center justify-between mb-4">
-                                <FileText className="h-8 w-8" />
-                                <span className="text-xs font-medium tracking-widest uppercase text-gray-400">
-                                    TOTAL REPORTS
+                                <FileText className="h-6 w-6 sm:h-8 sm:w-8" />
+                                <span className="text-xs font-medium tracking-widest uppercase text-gray-400 text-right leading-tight">
+                                    TOTAL<br className="sm:hidden" /><span className="hidden sm:inline"> </span>REPORTS
                                 </span>
                             </div>
-                            <div className="text-4xl font-bold mb-2 font-numbers">{stats?.totalReports.toLocaleString()}</div>
+                            <div className="text-3xl sm:text-4xl font-bold mb-2 font-numbers">{stats?.totalReports.toLocaleString()}</div>
                             <div className="text-sm text-gray-300">
                                 +<span className="font-numbers">{stats?.completedThisMonth}</span> this month
                             </div>
                         </div>
 
                         {/* Average Score */}
-                        <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-3xl p-8">
+                        <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl sm:rounded-3xl p-6 sm:p-8">
                             <div className="flex items-center justify-between mb-4">
-                                <Award className="h-8 w-8 text-gray-900" />
-                                <span className="text-xs font-medium tracking-widest uppercase text-gray-600">
-                                    AVG SCORE
+                                <Award className="h-6 w-6 sm:h-8 sm:w-8 text-gray-900" />
+                                <span className="text-xs font-medium tracking-widest uppercase text-gray-600 text-right leading-tight">
+                                    AVG<br className="sm:hidden" /><span className="hidden sm:inline"> </span>SCORE
                                 </span>
                             </div>
-                            <div className="text-4xl font-bold text-gray-900 mb-2 font-numbers">
+                            <div className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2 font-numbers">
                                 {stats?.averageScore}%
                             </div>
                             <div className="text-sm text-gray-700">
@@ -473,14 +470,14 @@ const ReportsPage: React.FC = () => {
                         </div>
 
                         {/* Critical Issues */}
-                        <div className="bg-gradient-to-br from-red-50 to-red-100 rounded-3xl p-8">
+                        <div className="bg-gradient-to-br from-red-50 to-red-100 rounded-2xl sm:rounded-3xl p-6 sm:p-8">
                             <div className="flex items-center justify-between mb-4">
-                                <AlertTriangle className="h-8 w-8 text-gray-900" />
-                                <span className="text-xs font-medium tracking-widest uppercase text-gray-600">
-                                    CRITICAL ISSUES
+                                <AlertTriangle className="h-6 w-6 sm:h-8 sm:w-8 text-gray-900" />
+                                <span className="text-xs font-medium tracking-widest uppercase text-gray-600 text-right leading-tight">
+                                    CRITICAL<br className="sm:hidden" /><span className="hidden sm:inline"> </span>ISSUES
                                 </span>
                             </div>
-                            <div className="text-4xl font-bold text-gray-900 mb-2 font-numbers">
+                            <div className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2 font-numbers">
                                 {stats?.criticalIssues}
                             </div>
                             <div className="text-sm text-gray-700">
@@ -489,14 +486,14 @@ const ReportsPage: React.FC = () => {
                         </div>
 
                         {/* Improvement Rate */}
-                        <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-3xl p-8">
+                        <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-2xl sm:rounded-3xl p-6 sm:p-8">
                             <div className="flex items-center justify-between mb-4">
-                                <TrendingUp className="h-8 w-8 text-gray-900" />
-                                <span className="text-xs font-medium tracking-widest uppercase text-gray-600">
+                                <TrendingUp className="h-6 w-6 sm:h-8 sm:w-8 text-gray-900" />
+                                <span className="text-xs font-medium tracking-widest uppercase text-gray-600 text-right leading-tight">
                                     IMPROVEMENT
                                 </span>
                             </div>
-                            <div className="text-4xl font-bold text-gray-900 mb-2 font-numbers">
+                            <div className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2 font-numbers">
                                 +{stats?.improvementRate}%
                             </div>
                             <div className="text-sm text-gray-700">
@@ -505,179 +502,194 @@ const ReportsPage: React.FC = () => {
                         </div>
                     </div>
 
-                    {/* Category Performance - (Content remains the same) */}
-                    <div className="mb-12">
-                        <div className="bg-white rounded-3xl shadow-2xl border border-gray-100 p-8">
-                            <h2 className="text-2xl font-bold text-gray-900 mb-6">Category Performance</h2>
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    {/* Category Performance */}
+                    <div className="mb-8 sm:mb-12">
+                        <div className="bg-white rounded-3xl shadow-2xl border border-gray-100 p-4 sm:p-6 lg:p-8">
+                            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">Category Performance</h2>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
                                 {categoryStats.map((category, index) => (
-                                    <div key={`${category.category}_${index}`} className="p-6 bg-gray-50 rounded-2xl">
-                                        <h3 className="font-semibold text-gray-900 mb-2">{category.category}</h3>
-                                        <div className="text-3xl font-bold text-gray-900 mb-2 font-numbers">
+                                    <div key={`${category.category}_${index}`} className="p-4 sm:p-6 bg-gray-50 rounded-2xl">
+                                        <h3 className="font-semibold text-gray-900 mb-2 text-sm sm:text-base">{category.category}</h3>
+                                        <div className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2 font-numbers">
                                             {category.averageScore}%
                                         </div>
-                                        <div className="flex items-center text-sm">
-                                            <TrendingUp className="h-4 w-4 text-green-600 mr-1" />
+                                        <div className="flex items-center text-xs sm:text-sm">
+                                            <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4 text-green-600 mr-1" />
                                             <span className="text-green-600 font-medium font-numbers">+{category.improvement}%</span>
-                                            <span className="text-gray-500 ml-1">vs last month</span>
+                                            <span className="text-gray-500 ml-1 hidden sm:inline">vs last month</span>
+                                            <span className="text-gray-500 ml-1 sm:hidden">vs last</span>
                                         </div>
                                     </div>
                                 ))}
                             </div>
                         </div>
-                    </div>
 
-                    {/* Filters and Search - (Content remains the same) */}
-                    <div className="bg-white rounded-3xl shadow-2xl border border-gray-100 p-8 mb-8">
-                        <div className="flex flex-col sm:flex-row gap-4 items-center justify-between mb-6">
-                            <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-                                {/* Search */}
-                                <div className="relative">
-                                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                                    <input
-                                        type="text"
-                                        placeholder="Search reports..."
-                                        value={searchTerm}
-                                        onChange={(e) => setSearchTerm(e.target.value)}
-                                        className="pl-10 pr-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-gray-900 focus:border-transparent"
-                                    />
+                        {/* Filters and Search */}
+                        <div className="bg-white mt-8 sm:mt-12 rounded-3xl shadow-xl border border-gray-100 p-6 sm:p-8 lg:p-10 mb-8 sm:mb-12">
+                            <div className="flex flex-col gap-6 mb-8">
+                                <div className="flex flex-col sm:flex-row gap-4 w-full">
+                                    {/* Search */}
+                                    <div className="relative flex-1 sm:flex-none sm:w-80">
+                                        <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                                        <input
+                                            type="text"
+                                            placeholder="Search reports..."
+                                            value={searchTerm}
+                                            onChange={(e) => setSearchTerm(e.target.value)}
+                                            className="w-full pl-12 pr-4 py-3.5 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-gray-900 focus:border-transparent text-sm font-lato shadow-sm"
+                                        />
+                                    </div>
+
+                                    <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+                                        {/* Status Filter */}
+                                        <select
+                                            value={filterStatus}
+                                            onChange={(e) => setFilterStatus(e.target.value as any)}
+                                            className="px-4 py-3.5 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-gray-900 focus:border-transparent text-sm min-w-0 sm:min-w-[140px] font-lato shadow-sm"
+                                        >
+                                            <option value="all">All Status</option>
+                                            <option value="completed">Completed</option>
+                                            <option value="in-progress">In Progress</option>
+                                            <option value="failed">Failed</option>
+                                        </select>
+
+                                        {/* Date Range */}
+                                        <select
+                                            value={dateRange}
+                                            onChange={(e) => setDateRange(e.target.value as any)}
+                                            className="px-4 py-3.5 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-gray-900 focus:border-transparent text-sm min-w-0 sm:min-w-[140px] font-lato shadow-sm"
+                                        >
+                                            <option value="7d">Last 7 days</option>
+                                            <option value="30d">Last 30 days</option>
+                                            <option value="90d">Last 90 days</option>
+                                            <option value="all">All time</option>
+                                        </select>
+                                    </div>
                                 </div>
 
-                                {/* Status Filter */}
-                                <select
-                                    value={filterStatus}
-                                    onChange={(e) => setFilterStatus(e.target.value as any)}
-                                    className="px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-gray-900 focus:border-transparent"
-                                >
-                                    <option value="all">All Status</option>
-                                    <option value="completed">Completed</option>
-                                    <option value="in-progress">In Progress</option>
-                                    <option value="failed">Failed</option>
-                                </select>
-
-                                {/* Date Range */}
-                                <select
-                                    value={dateRange}
-                                    onChange={(e) => setDateRange(e.target.value as any)}
-                                    className="px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-gray-900 focus:border-transparent"
-                                >
-                                    <option value="7d">Last 7 days</option>
-                                    <option value="30d">Last 30 days</option>
-                                    <option value="90d">Last 90 days</option>
-                                    <option value="all">All time</option>
-                                </select>
+                                <div className="flex justify-between items-center pt-4 border-t border-gray-100">
+                                    <div className="text-sm text-gray-600 font-lato">
+                                        Showing <span className="font-semibold text-gray-900">{filteredReports.length}</span> of <span className="font-semibold text-gray-900">{reports.length}</span> reports
+                                    </div>
+                                </div>
                             </div>
 
-                            <div className="text-sm text-gray-600 font-data">
-                                Showing {filteredReports.length} of {reports.length} reports
-                            </div>
-                        </div>
-
-                        {/* Enhanced Reports Display */}
-                        <div className="space-y-4">
-                            {filteredReports.map((report, index) => (
-                                <div
-                                    key={`${report.id}_${index}`}
-                                    className="bg-white border border-gray-200 rounded-2xl p-6 hover:shadow-lg transition-all duration-300 cursor-pointer"
-                                    onClick={() => handleViewReport(report)}
-                                >
-                                    <div className="flex items-center justify-between mb-4">
-                                        <div className="flex items-center gap-4">
-                                            <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
-                                                <Building className="h-6 w-6 text-white" />
+                            {/* Enhanced Reports Display */}
+                            <div className="space-y-6">
+                                {filteredReports.map((report, index) => (
+                                    <div
+                                        key={`${report.id}_${index}`}
+                                        className="bg-gray-50 border border-gray-200 rounded-3xl p-6 sm:p-8 hover:shadow-xl hover:bg-white transition-all duration-300 cursor-pointer group"
+                                        onClick={() => handleViewReport(report)}
+                                    >
+                                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4 sm:gap-0">
+                                            <div className="flex items-center gap-4 sm:gap-5">
+                                                <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gray-900 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg">
+                                                    <Building className="h-6 w-6 sm:h-7 sm:w-7 text-white" />
+                                                </div>
+                                                <div className="min-w-0 flex-1">
+                                                    <h3 className="text-lg sm:text-xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors truncate font-lato">
+                                                        {report.startupName}
+                                                    </h3>
+                                                    <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 text-sm text-gray-600 font-lato">
+                                                        <span className="truncate font-medium">{report.userEmail}</span>
+                                                        {report.founderName && (
+                                                            <>
+                                                                <span className="hidden sm:inline text-gray-400">•</span>
+                                                                <span className="truncate">{report.founderName}</span>
+                                                            </>
+                                                        )}
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <div>
-                                                <h3 className="text-lg font-semibold text-gray-900 hover:text-blue-600 transition-colors">
-                                                    {report.startupName}
-                                                </h3>
-                                                <div className="flex items-center gap-2 text-sm text-gray-600">
-                                                    <span>{report.userEmail}</span>
-                                                    {report.founderName && (
-                                                        <>
-                                                            <span>•</span>
-                                                            <span>{report.founderName}</span>
-                                                        </>
-                                                    )}
+
+                                            <div className="flex flex-wrap items-center gap-3">
+                                                {report.riskLevel && (
+                                                    <span className={`px-3 sm:px-4 py-1.5 rounded-full text-xs font-bold border shadow-sm ${getRiskLevelColor(report.riskLevel)} font-lato`}>
+                                                        <span className="hidden sm:inline">{report.riskLevel.toUpperCase()} RISK</span>
+                                                        <span className="sm:hidden">{report.riskLevel.toUpperCase()}</span>
+                                                    </span>
+                                                )}
+                                                <span className={`px-3 sm:px-4 py-1.5 rounded-full text-xs sm:text-sm font-bold shadow-sm ${getStatusBadge(report.status)} font-lato`}>
+                                                    {report.status}
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6">
+                                            <div className="flex items-center gap-3 p-3 bg-white rounded-2xl border border-gray-100 shadow-sm">
+                                                <BarChart3 className="w-5 h-5 text-gray-500 flex-shrink-0" />
+                                                <div>
+                                                    <span className="text-xs text-gray-500 font-lato block">Score</span>
+                                                    <span className={`text-lg font-bold ${getScoreColor(report.score)} font-lato`}>
+                                                        {report.score}%
+                                                    </span>
+                                                </div>
+                                            </div>
+
+                                            <div className="flex items-center gap-3 p-3 bg-white rounded-2xl border border-gray-100 shadow-sm">
+                                                <Calendar className="w-5 h-5 text-gray-500 flex-shrink-0" />
+                                                <div>
+                                                    <span className="text-xs text-gray-500 font-lato block">Date</span>
+                                                    <span className="text-sm font-bold text-gray-900 font-lato">
+                                                        {new Date(report.completedAt).toLocaleDateString('en-GB')}
+                                                    </span>
+                                                </div>
+                                            </div>
+
+                                            <div className="flex items-center gap-3 p-3 bg-white rounded-2xl border border-gray-100 shadow-sm">
+                                                <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
+                                                <div>
+                                                    <span className="text-xs text-gray-500 font-lato block">Strengths</span>
+                                                    <span className="text-lg font-bold text-green-600 font-lato">
+                                                        {report.strengths?.length || 0}
+                                                    </span>
+                                                </div>
+                                            </div>
+
+                                            <div className="flex items-center gap-3 p-3 bg-white rounded-2xl border border-gray-100 shadow-sm">
+                                                <AlertTriangle className="w-5 h-5 text-red-500 flex-shrink-0" />
+                                                <div>
+                                                    <span className="text-xs text-gray-500 font-lato block">Issues</span>
+                                                    <span className="text-lg font-bold text-red-600 font-lato">
+                                                        {report.redFlags?.length || report.criticalIssues || 0}
+                                                    </span>
                                                 </div>
                                             </div>
                                         </div>
 
-                                        <div className="flex items-center gap-3">
-                                            {report.riskLevel && (
-                                                <span className={`px-3 py-1 rounded-full text-xs font-semibold border ${getRiskLevelColor(report.riskLevel)}`}>
-                                                    {report.riskLevel.toUpperCase()} RISK
-                                                </span>
-                                            )}
-                                            <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusBadge(report.status)}`}>
-                                                {report.status}
-                                            </span>
+                                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pt-6 border-t border-gray-200 gap-4 sm:gap-0">
+                                            <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 font-lato">
+                                                <span className="font-medium">Recommendations: <span className="text-gray-900 font-bold">{report.recommendations?.length || 0}</span></span>
+                                                <span className="hidden sm:inline text-gray-400">•</span>
+                                                <span className="font-medium">ID: <span className="text-gray-900 font-mono">{report.id.slice(-8)}</span></span>
+                                            </div>
+
+                                            <div className="flex items-center gap-3">
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        handleViewReport(report);
+                                                    }}
+                                                    className="flex items-center gap-2 px-6 py-3 bg-gray-900 text-white rounded-2xl hover:bg-gray-800 transition-all duration-300 text-sm font-bold w-full sm:w-auto justify-center shadow-lg font-lato"
+                                                >
+                                                    <Eye className="w-4 h-4" />
+                                                    <span className="hidden sm:inline">View Details</span>
+                                                    <span className="sm:hidden">View</span>
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
+                                ))}
 
-                                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
-                                        <div className="flex items-center gap-2">
-                                            <BarChart3 className="w-4 h-4 text-gray-500" />
-                                            <span className="text-sm text-gray-500">Score:</span>
-                                            <span className={`text-lg font-bold ${getScoreColor(report.score)}`}>
-                                                {report.score}%
-                                            </span>
-                                        </div>
-
-                                        <div className="flex items-center gap-2">
-                                            <Calendar className="w-4 h-4 text-gray-500" />
-                                            <span className="text-sm text-gray-500">Date:</span>
-                                            <span className="text-sm font-medium text-gray-900">
-                                                {new Date(report.completedAt).toLocaleDateString('en-GB')}
-                                            </span>
-                                        </div>
-
-                                        <div className="flex items-center gap-2">
-                                            <CheckCircle className="w-4 h-4 text-green-500" />
-                                            <span className="text-sm text-gray-500">Strengths:</span>
-                                            <span className="text-sm font-medium text-green-600">
-                                                {report.strengths?.length || 0}
-                                            </span>
-                                        </div>
-
-                                        <div className="flex items-center gap-2">
-                                            <AlertTriangle className="w-4 h-4 text-red-500" />
-                                            <span className="text-sm text-gray-500">Issues:</span>
-                                            <span className="text-sm font-medium text-red-600">
-                                                {report.redFlags?.length || report.criticalIssues || 0}
-                                            </span>
-                                        </div>
+                                {filteredReports.length === 0 && (
+                                    <div className="text-center py-16">
+                                        <FileText className="h-20 w-20 text-gray-300 mx-auto mb-6" />
+                                        <h3 className="text-2xl font-bold text-gray-900 mb-3 font-lato">No Reports Found</h3>
+                                        <p className="text-gray-600 font-lato text-lg">No reports match your current search and filter criteria.</p>
                                     </div>
-
-                                    <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-                                        <div className="flex items-center gap-4 text-sm text-gray-600">
-                                            <span>Recommendations: {report.recommendations?.length || 0}</span>
-                                            <span>•</span>
-                                            <span>Report ID: {report.id.slice(-8)}</span>
-                                        </div>
-
-                                        <div className="flex items-center gap-2">
-                                            <button
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    handleViewReport(report);
-                                                }}
-                                                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-300 text-sm font-medium"
-                                            >
-                                                <Eye className="w-4 h-4" />
-                                                View Details
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            ))}
-
-                            {filteredReports.length === 0 && (
-                                <div className="text-center py-12">
-                                    <FileText className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-                                    <h3 className="text-xl font-semibold text-gray-900 mb-2">No Reports Found</h3>
-                                    <p className="text-gray-600">No reports match your current search and filter criteria.</p>
-                                </div>
-                            )}
+                                )}
+                            </div>
                         </div>
                     </div>
                 </div>

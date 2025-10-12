@@ -207,20 +207,24 @@ const UserDetailPage: React.FC = () => {
       <section className="relative pt-20 sm:pt-32 pb-16 sm:pb-24 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           {/* Header */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 sm:mb-8 gap-4 sm:gap-0">
-            <div className="flex items-center">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between mb-6 lg:mb-8 gap-4 lg:gap-0">
+            <div className="flex items-start sm:items-center gap-3 sm:gap-4">
               <Link
                 to="/users"
-                className="mr-4 p-2 text-gray-600 hover:text-gray-900 rounded-lg hover:bg-gray-100"
+                className="p-2 text-gray-600 hover:text-gray-900 rounded-lg hover:bg-gray-100 flex-shrink-0 mt-1 sm:mt-0"
               >
                 <ArrowLeft className="h-5 w-5" />
               </Link>
-              <div>
-                <h1 className="text-4xl font-bold text-gray-900">{user.startupName}</h1>
-                <p className="text-gray-600">{user.founderName} • {user.email}</p>
+              <div className="min-w-0 flex-1">
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 break-words">{user.startupName}</h1>
+                <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 text-gray-600 text-sm sm:text-base">
+                  <span className="break-words">{user.founderName}</span>
+                  <span className="hidden sm:inline">•</span>
+                  <span className="break-all">{user.email}</span>
+                </div>
               </div>
             </div>
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-3 self-start lg:self-center">
               <span className={`px-3 py-1 text-sm font-semibold rounded-full ${getStatusBadge(user.status)}`}>
                 {user.status}
               </span>
@@ -228,11 +232,11 @@ const UserDetailPage: React.FC = () => {
           </div>
 
           {/* Tabs */}
-          <div className="border-b border-gray-200 mb-6 sm:mb-8 overflow-x-auto">
-            <nav className="flex space-x-4 sm:space-x-8 min-w-max px-2 sm:px-0">
+          <div className="border-b border-gray-200 mb-6 lg:mb-8 overflow-x-auto">
+            <nav className="flex space-x-6 lg:space-x-8 min-w-max">
               <button
                 onClick={() => setActiveTab('overview')}
-                className={`py-2 px-1 border-b-2 font-medium text-sm ${activeTab === 'overview'
+                className={`py-3 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${activeTab === 'overview'
                   ? 'border-gray-900 text-gray-900'
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                   }`}
@@ -241,7 +245,7 @@ const UserDetailPage: React.FC = () => {
               </button>
               <button
                 onClick={() => setActiveTab('health-checks')}
-                className={`py-2 px-1 border-b-2 font-medium text-sm ${activeTab === 'health-checks'
+                className={`py-3 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${activeTab === 'health-checks'
                   ? 'border-gray-900 text-gray-900'
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                   }`}
@@ -250,7 +254,7 @@ const UserDetailPage: React.FC = () => {
               </button>
               <button
                 onClick={() => setActiveTab('subscription')}
-                className={`py-2 px-1 border-b-2 font-medium text-sm ${activeTab === 'subscription'
+                className={`py-3 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${activeTab === 'subscription'
                   ? 'border-gray-900 text-gray-900'
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                   }`}
@@ -262,53 +266,53 @@ const UserDetailPage: React.FC = () => {
 
           {/* Tab Content */}
           {activeTab === 'overview' && (
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
               {/* User Info */}
               <div className="lg:col-span-2">
-                <div className="bg-white rounded-3xl shadow-2xl border border-gray-100 p-8">
-                  <h2 className="text-2xl font-bold text-gray-900 mb-6">User Information</h2>
+                <div className="bg-white rounded-3xl shadow-2xl border border-gray-100 p-4 sm:p-6 lg:p-8">
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">User Information</h2>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                     <div className="space-y-4">
                       <div className="flex items-start">
-                        <User className="h-5 w-5 text-gray-400 mt-1 mr-3" />
-                        <div>
+                        <User className="h-5 w-5 text-gray-400 mt-1 mr-3 flex-shrink-0" />
+                        <div className="min-w-0 flex-1">
                           <p className="text-sm font-medium text-gray-500">Founder Name</p>
-                          <p className="text-lg font-semibold text-gray-900 font-lato">{user.founderName}</p>
+                          <p className="text-base sm:text-lg font-semibold text-gray-900 font-lato break-words">{user.founderName}</p>
                         </div>
                       </div>
 
                       <div className="flex items-start">
-                        <Mail className="h-5 w-5 text-gray-400 mt-1 mr-3" />
-                        <div>
+                        <Mail className="h-5 w-5 text-gray-400 mt-1 mr-3 flex-shrink-0" />
+                        <div className="min-w-0 flex-1">
                           <p className="text-sm font-medium text-gray-500">Email</p>
-                          <p className="text-lg font-semibold text-gray-900 font-lato">{user.email}</p>
+                          <p className="text-base sm:text-lg font-semibold text-gray-900 font-lato break-all">{user.email}</p>
                         </div>
                       </div>
 
                       <div className="flex items-start">
-                        <Phone className="h-5 w-5 text-gray-400 mt-1 mr-3" />
-                        <div>
+                        <Phone className="h-5 w-5 text-gray-400 mt-1 mr-3 flex-shrink-0" />
+                        <div className="min-w-0 flex-1">
                           <p className="text-sm font-medium text-gray-500">Contact Number</p>
-                          <p className="text-lg font-semibold text-gray-900 font-lato">{user.contactNumber}</p>
+                          <p className="text-base sm:text-lg font-semibold text-gray-900 font-lato">{user.contactNumber}</p>
                         </div>
                       </div>
                     </div>
 
                     <div className="space-y-4">
                       <div className="flex items-start">
-                        <Building className="h-5 w-5 text-gray-400 mt-1 mr-3" />
-                        <div>
+                        <Building className="h-5 w-5 text-gray-400 mt-1 mr-3 flex-shrink-0" />
+                        <div className="min-w-0 flex-1">
                           <p className="text-sm font-medium text-gray-500">Startup Name</p>
-                          <p className="text-lg font-semibold text-gray-900 font-lato">{user.startupName}</p>
+                          <p className="text-base sm:text-lg font-semibold text-gray-900 font-lato break-words">{user.startupName}</p>
                         </div>
                       </div>
 
                       <div className="flex items-start">
-                        <MapPin className="h-5 w-5 text-gray-400 mt-1 mr-3" />
-                        <div>
+                        <MapPin className="h-5 w-5 text-gray-400 mt-1 mr-3 flex-shrink-0" />
+                        <div className="min-w-0 flex-1">
                           <p className="text-sm font-medium text-gray-500">Location</p>
-                          <p className="text-lg font-semibold text-gray-900 font-lato">
+                          <p className="text-base sm:text-lg font-semibold text-gray-900 font-lato break-words">
                             {user.city}, {user.state}, {user.country}
                           </p>
                         </div>
@@ -316,14 +320,14 @@ const UserDetailPage: React.FC = () => {
 
                       {user.website && (
                         <div className="flex items-start">
-                          <Globe className="h-5 w-5 text-gray-400 mt-1 mr-3" />
-                          <div>
+                          <Globe className="h-5 w-5 text-gray-400 mt-1 mr-3 flex-shrink-0" />
+                          <div className="min-w-0 flex-1">
                             <p className="text-sm font-medium text-gray-500">Website</p>
                             <a
                               href={user.website}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="text-lg font-semibold text-blue-600 hover:text-blue-700 font-lato"
+                              className="text-base sm:text-lg font-semibold text-blue-600 hover:text-blue-700 font-lato break-all"
                             >
                               {user.website}
                             </a>
@@ -336,15 +340,15 @@ const UserDetailPage: React.FC = () => {
               </div>
 
               {/* Stats Sidebar */}
-              <div className="space-y-6">
+              <div className="space-y-4 sm:space-y-6">
                 {/* Compliance Score */}
-                <div className="bg-white rounded-3xl shadow-2xl border border-gray-100 p-6">
+                <div className="bg-white rounded-3xl shadow-2xl border border-gray-100 p-4 sm:p-6">
                   <div className="text-center">
-                    <Award className="h-8 w-8 text-gray-900 mx-auto mb-4" />
-                    <div className="text-4xl font-bold text-gray-900 mb-2 font-numbers">
+                    <Award className="h-6 w-6 sm:h-8 sm:w-8 text-gray-900 mx-auto mb-3 sm:mb-4" />
+                    <div className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2 font-numbers">
                       {user.complianceScore || 0}%
                     </div>
-                    <p className="text-sm text-gray-600 mb-4">Latest Compliance Score</p>
+                    <p className="text-sm text-gray-600 mb-3 sm:mb-4">Latest Compliance Score</p>
                     {user.lastHealthCheck && (
                       <p className="text-xs text-gray-500 font-lato">
                         Last check: {new Date(user.lastHealthCheck).toLocaleDateString('en-GB')}
@@ -354,22 +358,22 @@ const UserDetailPage: React.FC = () => {
                 </div>
 
                 {/* Activity Stats */}
-                <div className="bg-white rounded-3xl shadow-2xl border border-gray-100 p-6">
-                  <h3 className="text-lg font-bold text-gray-900 mb-4">Activity</h3>
-                  <div className="space-y-4">
+                <div className="bg-white rounded-3xl shadow-2xl border border-gray-100 p-4 sm:p-6">
+                  <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-3 sm:mb-4">Activity</h3>
+                  <div className="space-y-3 sm:space-y-4">
                     <div className="flex items-center justify-between">
                       <span className="text-sm text-gray-600">Health Checks</span>
                       <span className="font-semibold text-gray-900 font-lato">{user.totalHealthChecks}</span>
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-sm text-gray-600">Member Since</span>
-                      <span className="font-semibold text-gray-900 font-lato">
+                      <span className="font-semibold text-gray-900 font-lato text-sm">
                         {new Date(user.joinDate).toLocaleDateString('en-GB')}
                       </span>
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-sm text-gray-600">Last Login</span>
-                      <span className="font-semibold text-gray-900 font-lato">
+                      <span className="font-semibold text-gray-900 font-lato text-sm">
                         {new Date(user.lastLogin).toLocaleDateString('en-GB')}
                       </span>
                     </div>
@@ -377,10 +381,10 @@ const UserDetailPage: React.FC = () => {
                 </div>
 
                 {/* Revenue */}
-                <div className="bg-white rounded-3xl shadow-2xl border border-gray-100 p-6">
-                  <h3 className="text-lg font-bold text-gray-900 mb-4">Revenue</h3>
+                <div className="bg-white rounded-3xl shadow-2xl border border-gray-100 p-4 sm:p-6">
+                  <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-3 sm:mb-4">Revenue</h3>
                   <div className="text-center">
-                    <div className="text-3xl font-bold text-gray-900 mb-2 font-numbers">
+                    <div className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2 font-numbers">
                       ₹{user.totalRevenue.toLocaleString()}
                     </div>
                     <p className="text-sm text-gray-600">Total Revenue</p>
