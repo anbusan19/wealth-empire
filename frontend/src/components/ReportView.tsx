@@ -197,80 +197,80 @@ export default function ReportView({ answers, followUpAnswers }: ReportViewProps
         {/* Dynamic Service Recommendations */}
         {recommendedServices.length > 0 && (
           <div className="mb-20">
-            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 rounded-2xl p-8 mb-12 shadow-sm">
-              <div className="flex items-center gap-4 mb-6">
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
+            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 rounded-2xl p-4 sm:p-6 lg:p-8 mb-8 sm:mb-12 shadow-sm">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center shadow-lg flex-shrink-0">
                   <img
                     src="/welogo.png"
                     alt="WE"
-                    className="w-6 h-6"
+                    className="w-5 h-5 sm:w-6 sm:h-6"
                   />
                 </div>
-                <div>
-                  <h3 className="text-xl font-bold text-slate-900 mb-1">
+                <div className="min-w-0 flex-1">
+                  <h3 className="text-lg sm:text-xl font-bold text-slate-900 mb-1 sm:mb-2">
                     Personalized Recommendations
                   </h3>
-                  <p className="text-slate-600">
+                  <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
                     Based on your assessment, we've identified {recommendedServices.length} key service(s) to address your compliance gaps
                   </p>
                 </div>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
               {recommendedServices.map((service) => (
-                <div key={service.id} className="group bg-white rounded-2xl p-8 border border-slate-200 shadow-sm hover:shadow-xl hover:border-slate-300 transition-all duration-300 relative overflow-hidden">
+                <div key={service.id} className="group bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 lg:p-8 border border-slate-200 shadow-sm hover:shadow-xl hover:border-slate-300 transition-all duration-300 relative overflow-hidden">
                   {/* Priority Badge */}
                   {service.priority === 'high' && (
-                    <div className="absolute top-6 right-6">
-                      <span className="bg-gradient-to-r from-red-500 to-red-600 text-white text-xs font-semibold px-3 py-1.5 rounded-full shadow-sm">
+                    <div className="absolute top-3 right-3 sm:top-4 sm:right-4 lg:top-6 lg:right-6">
+                      <span className="bg-gradient-to-r from-red-500 to-red-600 text-white text-xs font-semibold px-2 py-1 sm:px-3 sm:py-1.5 rounded-full shadow-sm">
                         HIGH PRIORITY
                       </span>
                     </div>
                   )}
 
-                  <div className="mb-6">
-                    <h3 className="text-2xl font-bold text-slate-900 mb-3 group-hover:text-slate-700 transition-colors">
+                  <div className="mb-4 sm:mb-6 pr-20 sm:pr-24">
+                    <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-slate-900 mb-2 sm:mb-3 group-hover:text-slate-700 transition-colors leading-tight">
                       {service.title}
                     </h3>
-                    <p className="text-slate-600 leading-relaxed">
+                    <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
                       {service.description}
                     </p>
                   </div>
 
                   {/* Features */}
-                  <div className="mb-8">
-                    <div className="grid grid-cols-1 gap-3">
+                  <div className="mb-6 sm:mb-8">
+                    <div className="grid grid-cols-1 gap-2 sm:gap-3">
                       {service.features.slice(0, 4).map((feature, index) => (
-                        <div key={index} className="flex items-center gap-3">
-                          <div className="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
-                            <CheckCircle className="w-3 h-3 text-green-600" />
+                        <div key={index} className="flex items-start gap-2 sm:gap-3">
+                          <div className="w-4 h-4 sm:w-5 sm:h-5 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <CheckCircle className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-green-600" />
                           </div>
-                          <span className="text-sm text-slate-700">{feature}</span>
+                          <span className="text-xs sm:text-sm text-slate-700 leading-relaxed">{feature}</span>
                         </div>
                       ))}
                     </div>
                   </div>
 
                   {/* Pricing */}
-                  <div className="flex items-center justify-between mb-8">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 sm:mb-8">
                     <div>
-                      <div className="flex items-baseline gap-3">
-                        <span className="text-3xl font-bold text-slate-900">
+                      <div className="flex items-baseline gap-2 sm:gap-3 mb-1">
+                        <span className="text-2xl sm:text-3xl font-bold text-slate-900">
                           ₹{service.discountedPrice.toLocaleString()}
                         </span>
-                        <span className="text-lg text-slate-400 line-through">
+                        <span className="text-base sm:text-lg text-slate-400 line-through">
                           ₹{service.originalPrice.toLocaleString()}
                         </span>
                       </div>
-                      <div className="text-sm text-green-600 font-medium mt-1">
+                      <div className="text-xs sm:text-sm text-green-600 font-medium">
                         {service.discount}
                       </div>
                     </div>
                   </div>
 
                   {/* CTA Button */}
-                  <button className="w-full bg-gradient-to-r from-slate-900 to-slate-800 text-white py-4 px-6 rounded-xl font-semibold hover:from-slate-800 hover:to-slate-700 transition-all duration-300 flex items-center justify-center gap-2 group shadow-lg">
+                  <button className="w-full bg-gradient-to-r from-slate-900 to-slate-800 text-white py-3 sm:py-4 px-4 sm:px-6 rounded-lg sm:rounded-xl font-semibold hover:from-slate-800 hover:to-slate-700 transition-all duration-300 flex items-center justify-center gap-2 group shadow-lg text-sm sm:text-base">
                     Get Started
                     <ArrowUpRight className="w-4 h-4 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
                   </button>
@@ -302,10 +302,10 @@ export default function ReportView({ answers, followUpAnswers }: ReportViewProps
               {/* Recommendation Badge */}
               <div className="flex justify-center mb-8">
                 <span className={`px-4 py-2 rounded-full text-xs font-semibold ${recommendedPlan.urgency === 'high'
-                    ? 'bg-gradient-to-r from-red-500 to-red-600 text-white'
-                    : recommendedPlan.urgency === 'medium'
-                      ? 'bg-gradient-to-r from-blue-500 to-indigo-500 text-white'
-                      : 'bg-gradient-to-r from-green-500 to-green-600 text-white'
+                  ? 'bg-gradient-to-r from-red-500 to-red-600 text-white'
+                  : recommendedPlan.urgency === 'medium'
+                    ? 'bg-gradient-to-r from-blue-500 to-indigo-500 text-white'
+                    : 'bg-gradient-to-r from-green-500 to-green-600 text-white'
                   }`}>
                   {recommendedPlan.subtitle}
                 </span>

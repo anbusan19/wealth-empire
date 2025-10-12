@@ -132,56 +132,56 @@ const DashboardPage: React.FC = () => {
                         <p className="text-xs font-medium tracking-widest uppercase text-gray-500 mb-4 sm:mb-6">
                             DASHBOARD
                         </p>
-                        <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-gray-900 mb-4 sm:mb-6 leading-tight">
+                        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-4 sm:mb-6 leading-tight px-2 sm:px-0">
                             Welcome back,
                             <br />
-                            <span className="text-gray-400">{profile?.founderName || currentUser?.displayName}</span>
+                            <span className="text-gray-400 break-words">{profile?.founderName || currentUser?.displayName}</span>
                         </h1>
-                        <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto mb-8 sm:mb-10">
-                            Here's what's happening with {profile?.startupName || 'your startup'} today.
+                        <p className="text-sm sm:text-base lg:text-lg text-gray-600 max-w-2xl mx-auto mb-6 sm:mb-8 lg:mb-10 px-4 sm:px-0 leading-relaxed">
+                            Here's what's happening with <span className="break-words">{profile?.startupName || 'your startup'}</span> today.
                         </p>
                     </div>
 
                     {/* Stats Cards */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 mb-12">
-                        <div className="bg-gray-900 rounded-2xl sm:rounded-3xl p-6 sm:p-8 text-white aspect-square flex flex-col justify-between">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8 sm:mb-12 px-2 sm:px-0">
+                        <div className="bg-gray-900 rounded-2xl sm:rounded-3xl p-6 sm:p-8 text-white min-h-[180px] sm:aspect-square flex flex-col justify-between">
                             <div>
-                                <BarChart3 className="h-8 w-8 mb-4" />
-                                <div className="text-4xl sm:text-5xl font-bold mb-2">
+                                <BarChart3 className="h-6 w-6 sm:h-8 sm:w-8 mb-3 sm:mb-4" />
+                                <div className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-2 leading-none">
                                     {healthStats?.totalAssessments || 0}
                                 </div>
-                                <div className="text-sm text-gray-300">Health Checks Completed</div>
+                                <div className="text-xs sm:text-sm text-gray-300 leading-relaxed">Health Checks Completed</div>
                             </div>
                         </div>
 
-                        <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl sm:rounded-3xl p-6 sm:p-8 aspect-square flex flex-col justify-between overflow-hidden relative">
+                        <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl sm:rounded-3xl p-6 sm:p-8 min-h-[180px] sm:aspect-square flex flex-col justify-between overflow-hidden relative">
                             <div className="relative z-10">
-                                <TrendingUp className="h-8 w-8 text-gray-900 mb-4" />
-                                <div className="text-4xl sm:text-5xl font-bold text-gray-900 mb-2">
+                                <TrendingUp className="h-6 w-6 sm:h-8 sm:w-8 text-gray-900 mb-3 sm:mb-4" />
+                                <div className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-2 leading-none">
                                     {Math.round(healthStats?.averageScore || 0)}%
                                 </div>
-                                <div className="text-sm text-gray-700">Average Score</div>
+                                <div className="text-xs sm:text-sm text-gray-700 leading-relaxed">Average Score</div>
                             </div>
-                            <div className="absolute bottom-0 right-0 w-24 h-24 sm:w-32 sm:h-32 bg-blue-200/50 rounded-full blur-2xl"></div>
+                            <div className="absolute bottom-0 right-0 w-20 h-20 sm:w-24 sm:h-24 lg:w-32 lg:h-32 bg-blue-200/50 rounded-full blur-2xl"></div>
                         </div>
 
-                        <div className="bg-gradient-to-br from-pink-100 to-pink-200 rounded-2xl sm:rounded-3xl p-6 sm:p-8 aspect-square flex flex-col justify-between">
+                        <div className="bg-gradient-to-br from-pink-100 to-pink-200 rounded-2xl sm:rounded-3xl p-6 sm:p-8 min-h-[180px] sm:aspect-square flex flex-col justify-between">
                             <div>
-                                <Award className="h-8 w-8 text-gray-900 mb-4" />
-                                <div className="text-4xl sm:text-5xl font-bold text-gray-900 mb-2">
+                                <Award className="h-6 w-6 sm:h-8 sm:w-8 text-gray-900 mb-3 sm:mb-4" />
+                                <div className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-2 leading-none">
                                     {latestHealthCheck?.score || 0}%
                                 </div>
-                                <div className="text-sm text-gray-700">Latest Score</div>
+                                <div className="text-xs sm:text-sm text-gray-700 leading-relaxed">Latest Score</div>
                             </div>
                         </div>
 
-                        <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-2xl sm:rounded-3xl p-6 sm:p-8 aspect-square flex flex-col justify-between">
+                        <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-2xl sm:rounded-3xl p-6 sm:p-8 min-h-[180px] sm:aspect-square flex flex-col justify-between">
                             <div>
-                                <Calendar className="h-8 w-8 text-gray-900 mb-4" />
-                                <div className="text-lg sm:text-xl font-bold text-gray-900 mb-2">
+                                <Calendar className="h-6 w-6 sm:h-8 sm:w-8 text-gray-900 mb-3 sm:mb-4" />
+                                <div className="text-base sm:text-lg lg:text-xl font-bold text-gray-900 mb-2 leading-tight break-words">
                                     {healthStats?.lastAssessment ? new Date(healthStats.lastAssessment).toLocaleDateString() : 'Never'}
                                 </div>
-                                <div className="text-sm text-gray-700">Last Assessment</div>
+                                <div className="text-xs sm:text-sm text-gray-700 leading-relaxed">Last Assessment</div>
                             </div>
                         </div>
                     </div>
@@ -201,79 +201,79 @@ const DashboardPage: React.FC = () => {
                                     </Link>
                                 </div>
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                    <div className="space-y-6">
+                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
+                                    <div className="space-y-4 sm:space-y-6">
                                         <div className="flex items-start">
-                                            <div className="bg-gray-100 rounded-2xl p-3 mr-4">
-                                                <Building className="h-6 w-6 text-gray-700" />
+                                            <div className="bg-gray-100 rounded-2xl p-2 sm:p-3 mr-3 sm:mr-4 flex-shrink-0">
+                                                <Building className="h-5 w-5 sm:h-6 sm:w-6 text-gray-700" />
                                             </div>
-                                            <div>
-                                                <p className="text-sm font-medium text-gray-500 mb-1">Startup Name</p>
-                                                <p className="text-lg font-semibold text-gray-900">{profile?.startupName || 'Not provided'}</p>
+                                            <div className="min-w-0 flex-1">
+                                                <p className="text-xs sm:text-sm font-medium text-gray-500 mb-1">Startup Name</p>
+                                                <p className="text-sm sm:text-base lg:text-lg font-semibold text-gray-900 break-words">{profile?.startupName || 'Not provided'}</p>
                                             </div>
                                         </div>
 
                                         <div className="flex items-start">
-                                            <div className="bg-gray-100 rounded-2xl p-3 mr-4">
-                                                <User className="h-6 w-6 text-gray-700" />
+                                            <div className="bg-gray-100 rounded-2xl p-2 sm:p-3 mr-3 sm:mr-4 flex-shrink-0">
+                                                <User className="h-5 w-5 sm:h-6 sm:w-6 text-gray-700" />
                                             </div>
-                                            <div>
-                                                <p className="text-sm font-medium text-gray-500 mb-1">Founder Name</p>
-                                                <p className="text-lg font-semibold text-gray-900">{profile?.founderName || 'Not provided'}</p>
+                                            <div className="min-w-0 flex-1">
+                                                <p className="text-xs sm:text-sm font-medium text-gray-500 mb-1">Founder Name</p>
+                                                <p className="text-sm sm:text-base lg:text-lg font-semibold text-gray-900 break-words">{profile?.founderName || 'Not provided'}</p>
                                             </div>
                                         </div>
 
                                         <div className="flex items-start">
-                                            <div className="bg-gray-100 rounded-2xl p-3 mr-4">
-                                                <Mail className="h-6 w-6 text-gray-700" />
+                                            <div className="bg-gray-100 rounded-2xl p-2 sm:p-3 mr-3 sm:mr-4 flex-shrink-0">
+                                                <Mail className="h-5 w-5 sm:h-6 sm:w-6 text-gray-700" />
                                             </div>
-                                            <div>
-                                                <p className="text-sm font-medium text-gray-500 mb-1">Email</p>
-                                                <p className="text-lg font-semibold text-gray-900">{profile?.email || currentUser?.email}</p>
+                                            <div className="min-w-0 flex-1">
+                                                <p className="text-xs sm:text-sm font-medium text-gray-500 mb-1">Email</p>
+                                                <p className="text-sm sm:text-base lg:text-lg font-semibold text-gray-900 break-all">{profile?.email || currentUser?.email}</p>
                                             </div>
                                         </div>
                                     </div>
 
-                                    <div className="space-y-6">
+                                    <div className="space-y-4 sm:space-y-6">
                                         <div className="flex items-start">
-                                            <div className="bg-gray-100 rounded-2xl p-3 mr-4">
-                                                <MapPin className="h-6 w-6 text-gray-700" />
+                                            <div className="bg-gray-100 rounded-2xl p-2 sm:p-3 mr-3 sm:mr-4 flex-shrink-0">
+                                                <MapPin className="h-5 w-5 sm:h-6 sm:w-6 text-gray-700" />
                                             </div>
-                                            <div>
-                                                <p className="text-sm font-medium text-gray-500 mb-1">Location</p>
-                                                <p className="text-lg font-semibold text-gray-900">
+                                            <div className="min-w-0 flex-1">
+                                                <p className="text-xs sm:text-sm font-medium text-gray-500 mb-1">Location</p>
+                                                <p className="text-sm sm:text-base lg:text-lg font-semibold text-gray-900 break-words">
                                                     {profile ? `${profile.city}, ${profile.state}, ${profile.country}` : 'Not provided'}
                                                 </p>
                                             </div>
                                         </div>
 
                                         <div className="flex items-start">
-                                            <div className="bg-gray-100 rounded-2xl p-3 mr-4">
-                                                <Phone className="h-6 w-6 text-gray-700" />
+                                            <div className="bg-gray-100 rounded-2xl p-2 sm:p-3 mr-3 sm:mr-4 flex-shrink-0">
+                                                <Phone className="h-5 w-5 sm:h-6 sm:w-6 text-gray-700" />
                                             </div>
-                                            <div>
-                                                <p className="text-sm font-medium text-gray-500 mb-1">Contact Number</p>
-                                                <p className="text-lg font-semibold text-gray-900">{profile?.contactNumber || 'Not provided'}</p>
+                                            <div className="min-w-0 flex-1">
+                                                <p className="text-xs sm:text-sm font-medium text-gray-500 mb-1">Contact Number</p>
+                                                <p className="text-sm sm:text-base lg:text-lg font-semibold text-gray-900 break-words">{profile?.contactNumber || 'Not provided'}</p>
                                             </div>
                                         </div>
 
                                         <div className="flex items-start">
-                                            <div className="bg-gray-100 rounded-2xl p-3 mr-4">
-                                                <Globe className="h-6 w-6 text-gray-700" />
+                                            <div className="bg-gray-100 rounded-2xl p-2 sm:p-3 mr-3 sm:mr-4 flex-shrink-0">
+                                                <Globe className="h-5 w-5 sm:h-6 sm:w-6 text-gray-700" />
                                             </div>
-                                            <div>
-                                                <p className="text-sm font-medium text-gray-500 mb-1">Website</p>
+                                            <div className="min-w-0 flex-1">
+                                                <p className="text-xs sm:text-sm font-medium text-gray-500 mb-1">Website</p>
                                                 {profile?.website ? (
                                                     <a
                                                         href={profile.website}
                                                         target="_blank"
                                                         rel="noopener noreferrer"
-                                                        className="text-lg font-semibold text-gray-900 hover:text-gray-700 transition-colors"
+                                                        className="text-sm sm:text-base lg:text-lg font-semibold text-gray-900 hover:text-gray-700 transition-colors break-all"
                                                     >
                                                         {profile.website}
                                                     </a>
                                                 ) : (
-                                                    <p className="text-lg font-semibold text-gray-900">Not provided</p>
+                                                    <p className="text-sm sm:text-base lg:text-lg font-semibold text-gray-900">Not provided</p>
                                                 )}
                                             </div>
                                         </div>

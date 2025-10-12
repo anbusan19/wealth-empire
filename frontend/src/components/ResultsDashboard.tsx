@@ -174,15 +174,15 @@ export default function ResultsDashboard({ companyData, answers, followUpAnswers
             {complianceData.categoryScores.map((category) => (
               <div
                 key={category.category}
-                className={`${category.bgColor} rounded-xl p-4 sm:p-6 text-center`}
+                className={`${category.bgColor} rounded-xl p-4 sm:p-6 text-center flex flex-col justify-center items-center min-h-[120px] sm:min-h-[140px]`}
               >
-                <div className="text-xs font-medium tracking-widest uppercase text-gray-600 mb-2">
+                <div className="text-xs font-medium tracking-widest uppercase text-gray-600 mb-3 leading-tight">
                   {category.category}
                 </div>
-                <div className={`text-3xl sm:text-4xl font-bold ${category.color} mb-2`}>
+                <div className={`text-3xl sm:text-4xl font-bold ${category.color} mb-3 leading-none`}>
                   {category.score}
                 </div>
-                <div className="text-xs text-gray-700">
+                <div className="text-xs text-gray-700 leading-tight text-center">
                   {category.insights}
                 </div>
               </div>

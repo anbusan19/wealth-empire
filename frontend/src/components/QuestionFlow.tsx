@@ -331,11 +331,11 @@ export default function QuestionFlow() {
               <Shield className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
             </div>
 
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-4 sm:mb-6 leading-tight px-4 sm:px-0">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold text-gray-900 mb-4 sm:mb-6 leading-tight px-4 sm:px-0">
               Business Health Checkup
             </h1>
 
-            <p className="text-lg sm:text-xl text-gray-600 mb-6 sm:mb-8 max-w-2xl mx-auto leading-relaxed px-4 sm:px-0">
+            <p className="text-sm sm:text-base lg:text-lg xl:text-xl text-gray-600 mb-6 sm:mb-8 max-w-2xl mx-auto leading-relaxed px-4 sm:px-0">
               Get a comprehensive compliance assessment for your business. Identify risks,
               calculate penalties, and get actionable solutions in minutes.
             </p>
@@ -362,10 +362,10 @@ export default function QuestionFlow() {
 
             <button
               onClick={startHealthCheckup}
-              className="group inline-flex items-center gap-2 sm:gap-3 bg-gray-900 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-semibold text-base sm:text-lg hover:bg-gray-800 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 w-full sm:w-auto max-w-xs sm:max-w-none mx-auto"
+              className="group inline-flex items-center justify-center gap-2 sm:gap-3 bg-gray-900 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-semibold text-sm sm:text-base lg:text-lg hover:bg-gray-800 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 w-full sm:w-auto max-w-xs sm:max-w-none mx-auto"
             >
-              <Play className="w-4 h-4 sm:w-5 sm:h-5 group-hover:scale-110 transition-transform" />
-              Start Health Checkup
+              <Play className="w-4 h-4 sm:w-5 sm:h-5 group-hover:scale-110 transition-transform flex-shrink-0" />
+              <span>Start Health Checkup</span>
             </button>
 
             <p className="text-xs sm:text-sm text-gray-500 mt-3 sm:mt-4">
@@ -429,7 +429,7 @@ export default function QuestionFlow() {
                 {question.category}
               </span>
             </div>
-            <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 leading-tight mb-4">
+            <h2 className="text-lg sm:text-xl lg:text-2xl xl:text-3xl font-bold text-gray-900 leading-tight mb-4 break-words">
               {question.question}
             </h2>
           </div>
@@ -568,11 +568,11 @@ export default function QuestionFlow() {
             {/* Warning Message */}
             {answers[question.id] === 'No' && question.warning && (
               <div className="mt-4 sm:mt-6 p-4 sm:p-6 bg-red-50 border border-red-200 rounded-lg sm:rounded-xl animate-slide-down">
-                <div className="flex items-start gap-3">
-                  <AlertTriangle className="w-5 h-5 sm:w-6 sm:h-6 text-red-600 flex-shrink-0 mt-1" />
+                <div className="flex items-start gap-1">
+    
                   <div>
                     <h4 className="font-semibold text-red-900 mb-2 text-sm sm:text-base">Important Warning</h4>
-                    <p className="text-xs sm:text-sm text-red-800 leading-relaxed">{question.warning}</p>
+                    <p className="text-xs sm:text-sm text-red-800">{question.warning}</p>
                   </div>
                 </div>
               </div>

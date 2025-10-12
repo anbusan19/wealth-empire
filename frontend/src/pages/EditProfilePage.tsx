@@ -179,10 +179,10 @@ const EditProfilePage: React.FC = () => {
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Dashboard
             </Link>
-            <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-4">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-4 leading-tight">
               Edit Profile
             </h1>
-            <p className="text-lg text-gray-600">
+            <p className="text-sm sm:text-base lg:text-lg text-gray-600 leading-relaxed">
               Update your company and personal information
             </p>
           </div>
@@ -198,8 +198,8 @@ const EditProfilePage: React.FC = () => {
           )}
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="bg-white rounded-3xl shadow-2xl border border-gray-100 p-8 sm:p-12">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <form onSubmit={handleSubmit} className="bg-white rounded-2xl sm:rounded-3xl shadow-2xl border border-gray-100 p-6 sm:p-8 lg:p-12">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
               {/* Company Information */}
               <div className="space-y-6">
                 <div>
@@ -310,13 +310,13 @@ const EditProfilePage: React.FC = () => {
             </div>
 
             {/* Location Information */}
-            <div className="mt-8 pt-8 border-t border-gray-200">
-              <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-3">
-                <MapPin className="w-6 h-6 text-gray-700" />
+            <div className="mt-6 sm:mt-8 pt-6 sm:pt-8 border-t border-gray-200">
+              <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-4 sm:mb-6 flex items-center gap-3">
+                <MapPin className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700" />
                 Location Information
               </h3>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-900 mb-3">
                     City *

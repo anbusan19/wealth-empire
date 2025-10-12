@@ -191,84 +191,84 @@ const ReportsPage: React.FC = () => {
             <section className="relative pt-20 sm:pt-32 pb-16 sm:pb-24 px-4 sm:px-6 lg:px-8">
                 <div className="max-w-7xl mx-auto">
                     {/* Header */}
-                    <div className="flex items-center justify-between mb-8">
-                        <div>
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 sm:mb-8 gap-4">
+                        <div className="min-w-0 flex-1">
                             <Link
                                 to="/dashboard"
-                                className="inline-flex items-center text-gray-600 hover:text-gray-900 mb-4 transition-colors"
+                                className="inline-flex items-center text-gray-600 hover:text-gray-900 mb-3 sm:mb-4 transition-colors text-sm sm:text-base"
                             >
-                                <ArrowLeft className="w-4 h-4 mr-2" />
+                                <ArrowLeft className="w-4 h-4 mr-2 flex-shrink-0" />
                                 Back to Dashboard
                             </Link>
-                            <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-4">
+                            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-2 sm:mb-4 leading-tight">
                                 Health Check Reports
                             </h1>
-                            <p className="text-lg text-gray-600">
+                            <p className="text-sm sm:text-base lg:text-lg text-gray-600 leading-relaxed">
                                 View and download your compliance assessment history
                             </p>
                         </div>
                         <button
                             onClick={() => fetchHistory(reportsPerPage, currentPage)}
-                            className="flex items-center gap-2 px-4 py-2 text-gray-700 bg-gray-100 rounded-xl hover:bg-gray-200 transition-all duration-300"
+                            className="flex items-center gap-2 px-4 py-2 text-gray-700 bg-gray-100 rounded-xl hover:bg-gray-200 transition-all duration-300 text-sm font-medium whitespace-nowrap self-start sm:self-auto"
                         >
-                            <RefreshCw className="w-4 h-4" />
+                            <RefreshCw className="w-4 h-4 flex-shrink-0" />
                             Refresh
                         </button>
                     </div>
 
                     {/* Stats Overview */}
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-                        <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-6">
-                            <div className="flex items-center justify-between mb-4">
-                                <BarChart3 className="w-8 h-8 text-blue-600" />
-                                {getTrendIcon(stats?.trend || 'stable')}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8 px-2 sm:px-0">
+                        <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-4 sm:p-6">
+                            <div className="flex items-center justify-between mb-3 sm:mb-4">
+                                <BarChart3 className="w-6 h-6 sm:w-8 sm:h-8 text-blue-600 flex-shrink-0" />
+                                
                             </div>
-                            <div className="text-2xl font-bold text-gray-900 mb-1">
+                            <div className="text-xl sm:text-2xl font-bold text-gray-900 mb-1 leading-none">
                                 {stats?.totalAssessments || 0}
                             </div>
-                            <div className="text-sm text-gray-600">Total Assessments</div>
+                            <div className="text-xs sm:text-sm text-gray-600">Total Assessments</div>
                         </div>
 
-                        <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-2xl p-6">
-                            <div className="flex items-center justify-between mb-4">
-                                <TrendingUp className="w-8 h-8 text-green-600" />
-                                <span className="text-xs font-semibold text-green-600 bg-green-100 px-2 py-1 rounded-full">
+                        <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-2xl p-4 sm:p-6">
+                            <div className="flex items-center justify-between mb-3 sm:mb-4">
+                                <TrendingUp className="w-6 h-6 sm:w-8 sm:h-8 text-green-600 flex-shrink-0" />
+                                <span className="text-xs font-semibold text-green-600 bg-green-100 px-2 py-1 rounded-full whitespace-nowrap">
                                     AVG
                                 </span>
                             </div>
-                            <div className="text-2xl font-bold text-gray-900 mb-1">
+                            <div className="text-xl sm:text-2xl font-bold text-gray-900 mb-1 leading-none">
                                 {Math.round(stats?.averageScore || 0)}%
                             </div>
-                            <div className="text-sm text-gray-600">Average Score</div>
+                            <div className="text-xs sm:text-sm text-gray-600">Average Score</div>
                         </div>
 
-                        <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl p-6">
-                            <div className="flex items-center justify-between mb-4">
-                                <CheckCircle className="w-8 h-8 text-purple-600" />
-                                <span className="text-xs font-semibold text-purple-600 bg-purple-100 px-2 py-1 rounded-full">
+                        <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl p-4 sm:p-6">
+                            <div className="flex items-center justify-between mb-3 sm:mb-4">
+                                <CheckCircle className="w-6 h-6 sm:w-8 sm:h-8 text-purple-600 flex-shrink-0" />
+                                <span className="text-xs font-semibold text-purple-600 bg-purple-100 px-2 py-1 rounded-full whitespace-nowrap">
                                     BEST
                                 </span>
                             </div>
-                            <div className="text-2xl font-bold text-gray-900 mb-1">
+                            <div className="text-xl sm:text-2xl font-bold text-gray-900 mb-1 leading-none">
                                 {stats?.highestScore || 0}%
                             </div>
-                            <div className="text-sm text-gray-600">Highest Score</div>
+                            <div className="text-xs sm:text-sm text-gray-600">Highest Score</div>
                         </div>
 
-                        <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-2xl p-6">
-                            <div className="flex items-center justify-between mb-4">
-                                <Calendar className="w-8 h-8 text-orange-600" />
-                                <span className={`text-xs font-semibold px-2 py-1 rounded-full ${stats?.trend === 'improving' ? 'text-green-600 bg-green-100' :
+                        <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-2xl p-4 sm:p-6">
+                            <div className="flex items-center justify-between mb-3 sm:mb-4">
+                                <Calendar className="w-6 h-6 sm:w-8 sm:h-8 text-orange-600 flex-shrink-0" />
+                                <span className={`text-xs font-semibold px-2 py-1 rounded-full whitespace-nowrap ${stats?.trend === 'improving' ? 'text-green-600 bg-green-100' :
                                     stats?.trend === 'declining' ? 'text-red-600 bg-red-100' :
                                         'text-gray-600 bg-gray-100'
                                     }`}>
                                     {stats?.trend?.toUpperCase() || 'STABLE'}
                                 </span>
                             </div>
-                            <div className="text-sm font-bold text-gray-900 mb-1">
+                            <div className="text-xl sm:text-2xl font-bold text-gray-900 mb-1 leading-none">
                                 {stats?.lastAssessment ? new Date(stats.lastAssessment).toLocaleDateString() : 'Never'}
                             </div>
-                            <div className="text-sm text-gray-600">Last Assessment</div>
+                            <div className="text-xs sm:text-sm text-gray-600">Last Assessment</div>
                         </div>
                     </div>
 
@@ -282,50 +282,50 @@ const ReportsPage: React.FC = () => {
                             <div className="divide-y divide-gray-200">
                                 {history.map((report, index) => (
                                     <div key={report.id || index} className="p-6 hover:bg-gray-50 transition-colors">
-                                        <div className="flex items-center justify-between">
-                                            <div className="flex-1">
-                                                <div className="flex items-center gap-4 mb-3">
+                                        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+                                            <div className="flex-1 min-w-0">
+                                                <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mb-3">
                                                     <div className="flex items-center gap-2">
-                                                        <Calendar className="w-4 h-4 text-gray-500" />
-                                                        <span className="text-sm font-medium text-gray-900">
+                                                        <Calendar className="w-4 h-4 text-gray-500 flex-shrink-0" />
+                                                        <span className="text-xs sm:text-sm font-medium text-gray-900">
                                                             {new Date(report.assessmentDate).toLocaleDateString('en-US', {
                                                                 year: 'numeric',
-                                                                month: 'long',
+                                                                month: 'short',
                                                                 day: 'numeric'
                                                             })}
                                                         </span>
                                                     </div>
 
-                                                    <span className={`px-3 py-1 rounded-full text-xs font-semibold border ${getRiskLevelColor(report.riskLevel || 'medium')}`}>
+                                                    <span className={`px-2 sm:px-3 py-1 rounded-full text-xs font-semibold border ${getRiskLevelColor(report.riskLevel || 'medium')} whitespace-nowrap`}>
                                                         {(report.riskLevel || 'medium').toUpperCase()} RISK
                                                     </span>
                                                 </div>
 
-                                                <div className="flex items-center gap-6 mb-3">
+                                                <div className="flex items-center gap-2 sm:gap-6 mb-3">
                                                     <div className="flex items-center gap-2">
-                                                        <BarChart3 className="w-4 h-4 text-gray-500" />
-                                                        <span className={`text-2xl font-bold ${getScoreColor(report.score)}`}>
+                                                        <BarChart3 className="w-4 h-4 text-gray-500 flex-shrink-0" />
+                                                        <span className={`text-xl sm:text-2xl font-bold ${getScoreColor(report.score)} leading-none`}>
                                                             {report.score}%
                                                         </span>
-                                                        <span className="text-sm text-gray-500">Overall Score</span>
+                                                        <span className="text-xs sm:text-sm text-gray-500">Overall Score</span>
                                                     </div>
                                                 </div>
 
-                                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                                                    <div>
-                                                        <span className="text-gray-500">Strengths: </span>
+                                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-4 text-xs sm:text-sm">
+                                                    <div className="flex items-center gap-1">
+                                                        <span className="text-gray-500">Strengths:</span>
                                                         <span className="font-medium text-green-600">
                                                             {report.strengths?.length || 0}
                                                         </span>
                                                     </div>
-                                                    <div>
-                                                        <span className="text-gray-500">Red Flags: </span>
+                                                    <div className="flex items-center gap-1">
+                                                        <span className="text-gray-500">Red Flags:</span>
                                                         <span className="font-medium text-red-600">
                                                             {report.redFlags?.length || 0}
                                                         </span>
                                                     </div>
-                                                    <div>
-                                                        <span className="text-gray-500">Recommendations: </span>
+                                                    <div className="flex items-center gap-1">
+                                                        <span className="text-gray-500">Recommendations:</span>
                                                         <span className="font-medium text-blue-600">
                                                             {report.recommendations?.length || 0}
                                                         </span>
@@ -333,33 +333,33 @@ const ReportsPage: React.FC = () => {
                                                 </div>
                                             </div>
 
-                                            <div className="flex items-center gap-3 ml-6">
+                                            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 mt-4 sm:mt-0 sm:ml-6">
                                                 <button
                                                     onClick={() => setSelectedReport(selectedReport?.id === report.id ? null : report)}
-                                                    className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-all duration-300 text-sm font-medium"
+                                                    className="px-3 sm:px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-all duration-300 text-xs sm:text-sm font-medium whitespace-nowrap"
                                                 >
                                                     {selectedReport?.id === report.id ? 'Hide Details' : 'View Details'}
                                                 </button>
 
                                                 <button
                                                     onClick={() => createShareableReport(report)}
-                                                    className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-300 text-sm font-medium"
+                                                    className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-300 text-xs sm:text-sm font-medium"
                                                 >
-                                                    <Share2 className="w-4 h-4" />
-                                                    Share
+                                                    <Share2 className="w-4 h-4 flex-shrink-0" />
+                                                    <span>Share</span>
                                                 </button>
 
                                                 <button
                                                     onClick={() => generateReportPDF(report)}
                                                     disabled={isGeneratingPDF}
-                                                    className="flex items-center gap-2 px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-all duration-300 text-sm font-medium disabled:opacity-50"
+                                                    className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-all duration-300 text-xs sm:text-sm font-medium disabled:opacity-50"
                                                 >
                                                     {isGeneratingPDF ? (
-                                                        <Loader2 className="w-4 h-4 animate-spin" />
+                                                        <Loader2 className="w-4 h-4 animate-spin flex-shrink-0" />
                                                     ) : (
-                                                        <Download className="w-4 h-4" />
+                                                        <Download className="w-4 h-4 flex-shrink-0" />
                                                     )}
-                                                    PDF
+                                                    <span>PDF</span>
                                                 </button>
                                             </div>
                                         </div>
