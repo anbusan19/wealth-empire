@@ -15,6 +15,8 @@ import {
 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2';
+import * as XLSX from 'xlsx';
 import AdminNavigation from '../components/AdminNavigation';
 import { ADMIN_API_ENDPOINTS, apiRequest } from '../config/api';
 
@@ -65,6 +67,7 @@ const ReportsPage: React.FC = () => {
     const [stats, setStats] = useState<ReportStats | null>(null);
     const [categoryStats, setCategoryStats] = useState<CategoryStats[]>([]);
     const [loading, setLoading] = useState(true);
+    const [exportLoading, setExportLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [filterStatus, setFilterStatus] = useState<'all' | 'completed' | 'in-progress' | 'failed'>('all');
@@ -168,6 +171,185 @@ const ReportsPage: React.FC = () => {
     };
     // ----------------------------------------------------------------------
 
+    // ----------------------------------------------------------------------
+    // EXPORT FUNCTION: Generates and downloads Excel file with all report data
+    // ----------------------------------------------------------------------
+    const handleExportReports = async () => {
+        // Show confirmation dialog before starting export
+        const confirmResult = await Swal.fire({
+            icon: 'question',
+            title: 'Export Reports',
+            showCancelButton: true,
+            confirmButtonText: 'Export',
+            cancelButtonText: 'Cancel',
+            confirmButtonColor: '#1f2937',
+            cancelButtonColor: '#6b7280',
+            customClass: {
+                popup: 'rounded-2xl',
+                title: 'text-gray-900 font-bold',
+                confirmButton: 'rounded-xl px-6 py-3 font-medium mr-2',
+                cancelButton: 'rounded-xl px-6 py-3 font-medium'
+            },
+            buttonsStyling: false
+        });
+
+        if (!confirmResult.isConfirmed) {
+            return; // User cancelled
+        }
+
+        try {
+            console.log('Export button clicked - starting export process');
+            setExportLoading(true);
+            setError(null);
+
+            // First, let's test with current reports data if API fails
+            let allReports = reports;
+
+            // Try to fetch all reports without filters for complete export
+            try {
+                console.log('Fetching reports from API...');
+                const response = await apiRequest(ADMIN_API_ENDPOINTS.REPORTS);
+
+                if (response.success && response.data.reports) {
+                    allReports = response.data.reports;
+                    console.log(`Fetched ${allReports.length} reports from API`);
+                } else {
+                    console.log('API response not successful, using current reports data');
+                }
+            } catch (apiError) {
+                console.log('API fetch failed, using current reports data:', apiError);
+            }
+
+            if (!allReports || allReports.length === 0) {
+                throw new Error('No reports data available for export');
+            }
+
+            console.log(`Preparing ${allReports.length} reports for export`);
+
+            // Prepare data for Excel export
+            const exportData = allReports.map((report: ComplianceReport) => ({
+                'Report ID': report.id,
+                'User ID': report.userId || 'N/A',
+                'User Email': report.userEmail,
+                'Startup Name': report.startupName,
+                'Founder Name': report.founderName || 'N/A',
+                'Overall Score': report.score,
+                'Status': report.status,
+                'Risk Level': report.riskLevel || 'N/A',
+                'Completed Date': new Date(report.completedAt).toLocaleDateString('en-GB'),
+                'Critical Issues': report.criticalIssues || 0,
+                'Legal Score': report.categories?.legal || 0,
+                'Financial Score': report.categories?.financial || 0,
+                'Operational Score': report.categories?.operational || 0,
+                'Regulatory Score': report.categories?.regulatory || 0,
+                'Strengths Count': report.strengths?.length || 0,
+                'Red Flags Count': report.redFlags?.length || 0,
+                'Recommendations Count': report.recommendations?.length || 0,
+                'Strengths': report.strengths?.join('; ') || 'None',
+                'Red Flags': report.redFlags?.join('; ') || 'None',
+                'Recommendations': report.recommendations?.join('; ') || 'None'
+            }));
+
+            console.log('Export data prepared, creating Excel file...');
+
+            // Create workbook and worksheet
+            const workbook = XLSX.utils.book_new();
+            const worksheet = XLSX.utils.json_to_sheet(exportData);
+
+            // Set column widths for better readability
+            const columnWidths = [
+                { wch: 25 }, // Report ID
+                { wch: 25 }, // User ID
+                { wch: 30 }, // User Email
+                { wch: 25 }, // Startup Name
+                { wch: 20 }, // Founder Name
+                { wch: 12 }, // Overall Score
+                { wch: 12 }, // Status
+                { wch: 12 }, // Risk Level
+                { wch: 15 }, // Completed Date
+                { wch: 15 }, // Critical Issues
+                { wch: 12 }, // Legal Score
+                { wch: 15 }, // Financial Score
+                { wch: 15 }, // Operational Score
+                { wch: 15 }, // Regulatory Score
+                { wch: 15 }, // Strengths Count
+                { wch: 15 }, // Red Flags Count
+                { wch: 20 }, // Recommendations Count
+                { wch: 50 }, // Strengths
+                { wch: 50 }, // Red Flags
+                { wch: 50 }  // Recommendations
+            ];
+            worksheet['!cols'] = columnWidths;
+
+            // Add worksheet to workbook
+            XLSX.utils.book_append_sheet(workbook, worksheet, 'Compliance Reports');
+
+            // Generate filename with current date
+            const currentDate = new Date().toISOString().split('T')[0];
+            const filename = `compliance-reports-${currentDate}.xlsx`;
+
+            console.log(`Writing Excel file: ${filename}`);
+
+            // Write and download the file
+            XLSX.writeFile(workbook, filename);
+
+            console.log(`Successfully exported ${allReports.length} reports to ${filename}`);
+
+            // Show success notification with SweetAlert2
+            await Swal.fire({
+                icon: 'success',
+                title: 'Export Successful!',
+                confirmButtonColor: '#1f2937',
+                timer: 5000,
+                timerProgressBar: true,
+                customClass: {
+                    popup: 'rounded-2xl',
+                    title: 'text-gray-900 font-bold',
+                    confirmButton: 'rounded-xl px-6 py-3 font-medium'
+                },
+                buttonsStyling: false
+            });
+
+        } catch (error) {
+            console.error('Error exporting reports:', error);
+            const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+            setError(`Failed to export reports: ${errorMessage}`);
+
+            // Show error notification with SweetAlert2
+            await Swal.fire({
+                icon: 'error',
+                title: 'Export Failed',
+                html: `
+                    <div class="text-center">
+                        <p class="text-lg mb-2">Failed to export reports</p>
+                        <p class="text-sm text-red-600 bg-red-50 px-3 py-2 rounded-lg">${errorMessage}</p>
+                        <p class="text-sm text-gray-500 mt-2">Please try again or contact support if the issue persists.</p>
+                    </div>
+                `,
+                confirmButtonText: 'Try Again',
+                confirmButtonColor: '#1f2937',
+                showCancelButton: true,
+                cancelButtonText: 'Cancel',
+                cancelButtonColor: '#6b7280',
+                customClass: {
+                    popup: 'rounded-2xl',
+                    title: 'text-gray-900 font-bold',
+                    confirmButton: 'rounded-xl px-6 py-3 font-medium mr-2',
+                    cancelButton: 'rounded-xl px-6 py-3 font-medium'
+                },
+                buttonsStyling: false
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Retry the export
+                    handleExportReports();
+                }
+            });
+        } finally {
+            setExportLoading(false);
+        }
+    };
+    // ----------------------------------------------------------------------
+
 
     if (loading) {
         return (
@@ -243,9 +425,17 @@ const ReportsPage: React.FC = () => {
                                 <TrendingUp className="h-4 w-4 mr-2" />
                                 Refresh
                             </button>
-                            <button className="flex items-center px-6 py-3 bg-gray-900 text-white rounded-2xl hover:bg-gray-800 transition-all duration-300">
-                                <Download className="h-5 w-5 mr-2" />
-                                Export Reports
+                            <button
+                                onClick={handleExportReports}
+                                disabled={exportLoading || loading}
+                                className="flex items-center px-6 py-3 bg-gray-900 text-white rounded-2xl hover:bg-gray-800 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                {exportLoading ? (
+                                    <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                                ) : (
+                                    <Download className="h-5 w-5 mr-2" />
+                                )}
+                                {exportLoading ? 'Exporting...' : 'Export Reports'}
                             </button>
                         </div>
                     </div>

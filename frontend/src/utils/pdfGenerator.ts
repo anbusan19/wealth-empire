@@ -248,7 +248,7 @@ export const generatePDF = async (data: ComplianceData): Promise<void> => {
     }
 
     // Download the PDF
-    const fileName = `compliance-health-report-${data.companyName.replace(/\s+/g, '-').toLowerCase()}-${new Date().toISOString().split('T')[0]}.pdf`;
+    const fileName = `${data.companyName.replace(/\s+/g, '-').toLowerCase()}-Compliance-Health-Report-${new Date().toISOString().split('T')[0]}.pdf`;
     pdf.save(fileName);
 
   } catch (error) {

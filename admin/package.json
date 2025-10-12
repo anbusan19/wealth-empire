@@ -14,12 +14,15 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.8.1",
-    "recharts": "^2.8.0"
+    "recharts": "^2.8.0",
+    "sweetalert2": "^11.26.1",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@types/node": "^24.7.0",
     "@types/react": "^18.2.15",
     "@types/react-dom": "^18.2.7",
+    "@types/xlsx": "^0.0.35",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",
     "@vitejs/plugin-react": "^4.0.3",
