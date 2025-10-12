@@ -10,7 +10,6 @@ import {
     TrendingUp,
     Calendar,
     BarChart3,
-    Users,
     Eye
 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
