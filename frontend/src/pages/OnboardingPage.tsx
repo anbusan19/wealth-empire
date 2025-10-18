@@ -6,8 +6,6 @@ import Navigation from '../components/Navigation';
 import {
   Building,
   MapPin,
-  Globe,
-  User,
   Phone,
   Mail,
   ArrowRight,
@@ -117,7 +115,13 @@ const OnboardingPage: React.FC = () => {
 
     setLoading(true);
     try {
-      const success = await completeOnboarding(formData);
+      // Prepare form data with website as '-' if empty
+      const submitData = {
+        ...formData,
+        website: formData.website.trim() === '' || formData.website === 'https://' ? '-' : formData.website
+      };
+      
+      const success = await completeOnboarding(submitData);
       if (success) {
         // Add a small delay to ensure backend processing is complete
         setTimeout(() => {

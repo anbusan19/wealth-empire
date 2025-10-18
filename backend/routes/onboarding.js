@@ -13,7 +13,15 @@ router.post('/complete', verifyFirebaseToken, [
   body('country').notEmpty().trim().withMessage('Country is required'),
   body('founderName').notEmpty().trim().withMessage('Founder name is required'),
   body('contactNumber').notEmpty().trim().withMessage('Contact number is required'),
-  body('website').optional().trim().isURL().withMessage('Website must be a valid URL')
+  body('website').optional().trim().custom((value) => {
+    if (!value || value === '-' || value === '') return true;
+    // Check if it's a valid URL only if it's not empty and not '-'
+    const urlPattern = /^https?:\/\/.+\..+/;
+    if (!urlPattern.test(value)) {
+      throw new Error('Website must be a valid URL');
+    }
+    return true;
+  })
 ], async (req, res) => {
   try {
     const errors = validationResult(req);
@@ -120,7 +128,15 @@ router.patch('/update', verifyFirebaseToken, [
   body('country').optional().trim(),
   body('founderName').optional().trim(),
   body('contactNumber').optional().trim(),
-  body('website').optional().trim().isURL().withMessage('Website must be a valid URL')
+  body('website').optional().trim().custom((value) => {
+    if (!value || value === '-' || value === '') return true;
+    // Check if it's a valid URL only if it's not empty and not '-'
+    const urlPattern = /^https?:\/\/.+\..+/;
+    if (!urlPattern.test(value)) {
+      throw new Error('Website must be a valid URL');
+    }
+    return true;
+  })
 ], async (req, res) => {
   try {
     const errors = validationResult(req);
